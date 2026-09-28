@@ -1,0 +1,940 @@
+<title>AI Learning Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-950:#0b1730;
+    --navy-900:#0f1e3d;
+    --navy-800:#152a52;
+    --navy-700:#1d3a6e;
+    --gold-500:#f2c94c;
+    --gold-600:#e0b32e;
+    --cream-100:#f7f4ec;
+    --cream-200:#ece6d6;
+    --slate-400:#93a1c4;
+    --slate-500:#7684a8;
+    --ink-900:#12182b;
+    --surface-0:#fffdf8;
+    --surface-1:#ffffff;
+    --line:#25366090;
+    --shadow: 0 20px 50px -20px rgba(11,23,48,0.45);
+    color-scheme: light;
+  }
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --surface-0:#0b1122;
+      --surface-1:#111a33;
+      --ink-900:#f2efe6;
+      --line:#3a4d7d80;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --surface-0:#0b1122;
+    --surface-1:#111a33;
+    --ink-900:#f2efe6;
+    --line:#3a4d7d80;
+    color-scheme: dark;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--surface-0);
+    color:var(--ink-900);
+    font-family:'Inter',system-ui,sans-serif;
+    padding-inline:20px;
+  }
+  .wrap{max-width:640px;margin:0 auto;}
+  h1,h2,h3{font-family:'Fraunces',Georgia,serif;}
+
+  a{color:inherit;}
+
+  /* ---------- eyebrow ---------- */
+  .eyebrow{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold-600);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .eyebrow{color:var(--gold-500);}
+  }
+  :root[data-theme="dark"] .eyebrow{color:var(--gold-500);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    background:linear-gradient(165deg,var(--navy-900),var(--navy-950) 70%);
+    color:var(--cream-100);
+    border-radius:22px;
+    padding:36px 28px 32px;
+    margin-block-start:24px;
+    box-shadow:var(--shadow);
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    inset:auto -40% -60% auto;
+    width:320px;height:320px;
+    background:radial-gradient(circle, rgba(242,201,76,.18), transparent 70%);
+    pointer-events:none;
+  }
+  .hero .eyebrow{margin-block-end:14px;}
+  .hero h1{
+    font-size:clamp(28px,7vw,38px);
+    line-height:1.08;
+    margin:0 0 10px;
+    font-weight:600;
+    text-wrap:balance;
+  }
+  .hero h1 em{
+    font-style:normal;
+    color:var(--gold-500);
+  }
+  .hero p{
+    margin:0;
+    font-size:15.5px;
+    line-height:1.55;
+    color:var(--slate-400);
+    max-width:46ch;
+  }
+  .free-banner{
+    margin-top:22px;
+    border:1px solid #f2c94c40;
+    background:#f2c94c14;
+    border-radius:12px;
+    padding:13px 16px;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+  }
+  .free-banner .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:var(--gold-500);
+    margin-top:6px;flex:none;
+  }
+  .free-banner strong{display:block;font-size:14.5px;color:var(--cream-100);}
+  .free-banner span{font-size:13.5px;color:var(--slate-400);}
+  .host-line{
+    margin-top:22px;
+    font-size:12.5px;
+    color:var(--slate-500);
+    letter-spacing:.02em;
+  }
+
+  /* ---------- section headers ---------- */
+  section{margin-block-start:44px;}
+  .section-head{margin-block-end:16px;}
+  .section-head h2{
+    font-size:22px;
+    font-weight:600;
+    margin:6px 0 0;
+    color:var(--ink-900);
+  }
+  .section-head p{
+    margin:6px 0 0;
+    font-size:14.5px;
+    color:var(--slate-500);
+    line-height:1.5;
+  }
+
+  /* ---------- includes grid ---------- */
+  .includes{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  @media (max-width:420px){ .includes{grid-template-columns:1fr;} }
+  .inc-card{
+    background:var(--surface-1);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:14px 15px;
+    display:flex;
+    gap:11px;
+    align-items:flex-start;
+  }
+  .inc-card .mark{
+    width:9px;height:9px;
+    border-radius:3px;
+    background:var(--gold-500);
+    margin-top:5px;
+    flex:none;
+  }
+  .inc-card strong{display:block;font-size:14.5px;}
+  .inc-card span{display:block;font-size:12.5px;color:var(--slate-500);margin-top:2px;}
+
+  .oneone{
+    margin-top:14px;
+    border-radius:14px;
+    border:1px dashed var(--line);
+    padding:14px 15px;
+    font-size:13.5px;
+    color:var(--slate-500);
+  }
+  .oneone strong{color:var(--ink-900);font-size:14.5px;display:block;margin-bottom:2px;}
+
+  /* ---------- link cards ---------- */
+  .links{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .linkcard{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    background:var(--surface-1);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:16px 17px;
+    text-decoration:none;
+    color:var(--ink-900);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .linkcard:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+  .linkcard .icon{
+    width:46px;height:46px;
+    border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;
+    flex:none;
+  }
+  .linkcard .body{flex:1;min-width:0;}
+  .linkcard .body strong{display:block;font-size:15.5px;}
+  .linkcard .body span{display:block;font-size:12.5px;color:var(--slate-500);margin-top:2px;}
+  .linkcard .go{
+    font-size:13px;
+    font-weight:600;
+    color:var(--slate-500);
+    flex:none;
+  }
+  .linkcard.whatsapp .icon{background:#e8faf0;color:#1fa855;}
+  .linkcard.survey .icon{background:#eef2ff;color:#5566d6;}
+  .linkcard.email .icon{background:#fff3da;color:#c98a12;}
+
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .linkcard.whatsapp .icon{background:#0f3320;color:#4ade80;}
+    :root:not([data-theme="light"]) .linkcard.survey .icon{background:#1c2350;color:#a5b4fc;}
+    :root:not([data-theme="light"]) .linkcard.email .icon{background:#3a2a0d;color:#f2c94c;}
+  }
+  :root[data-theme="dark"] .linkcard.whatsapp .icon{background:#0f3320;color:#4ade80;}
+  :root[data-theme="dark"] .linkcard.survey .icon{background:#1c2350;color:#a5b4fc;}
+  :root[data-theme="dark"] .linkcard.email .icon{background:#3a2a0d;color:#f2c94c;}
+
+  /* locked card */
+  .linkcard.locked{
+    cursor:default;
+    opacity:.92;
+    background:repeating-linear-gradient(135deg, var(--surface-1), var(--surface-1) 10px, color-mix(in srgb, var(--surface-1) 92%, var(--slate-500)) 10px, color-mix(in srgb, var(--surface-1) 92%, var(--slate-500)) 20px);
+  }
+  .linkcard.locked .icon{background:#eceef4;color:#6b7595;}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .linkcard.locked .icon{background:#232c47;color:#8b97c4;}
+  }
+  :root[data-theme="dark"] .linkcard.locked .icon{background:#232c47;color:#8b97c4;}
+  .badge{
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:3px 8px;
+    border-radius:999px;
+    background:var(--navy-900);
+    color:var(--gold-500);
+    flex:none;
+  }
+
+  /* email copy row */
+  .copy-row{
+    margin-top:8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .copy-row code{
+    font-size:12.5px;
+    background:color-mix(in srgb, var(--ink-900) 6%, transparent);
+    padding:3px 8px;
+    border-radius:6px;
+  }
+  .copy-btn{
+    font-size:12px;
+    font-weight:600;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--ink-900);
+    padding:4px 10px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .copy-btn:active{transform:scale(.97);}
+
+  /* ---------- pricing ---------- */
+  .pricing{
+    background:linear-gradient(165deg,var(--navy-900),var(--navy-950) 75%);
+    border-radius:20px;
+    padding:26px 24px 28px;
+    color:var(--cream-100);
+    box-shadow:var(--shadow);
+  }
+  .pricing .eyebrow{color:var(--gold-500);}
+  .price-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:16px;
+  }
+  .price-tile{
+    background:#ffffff0d;
+    border:1px solid #ffffff1f;
+    border-radius:14px;
+    padding:16px 14px;
+    text-align:center;
+  }
+  .price-tile .len{font-size:13px;color:var(--slate-400);}
+  .price-tile .amt{
+    font-family:'Fraunces',serif;
+    font-size:26px;
+    color:var(--gold-500);
+    margin-top:4px;
+    font-variant-numeric:tabular-nums;
+  }
+  .pricing .note{
+    margin-top:14px;
+    font-size:12.5px;
+    color:var(--slate-400);
+    text-align:center;
+  }
+
+  /* what's next */
+  .next-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .next-item{
+    display:flex;
+    gap:12px;
+    align-items:baseline;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:12px 14px;
+    background:var(--surface-1);
+  }
+  .next-item .n{
+    font-family:'Fraunces',serif;
+    font-size:13px;
+    color:var(--gold-600);
+    font-weight:600;
+    flex:none;
+  }
+  .next-item strong{font-size:14px;font-weight:600;}
+  .next-item span{display:block;font-size:12.5px;color:var(--slate-500);margin-top:1px;}
+
+  /* ---------- host card ---------- */
+  .host-card{
+    background:linear-gradient(165deg,var(--navy-900),var(--navy-950) 75%);
+    border-radius:20px;
+    padding:24px 22px;
+    color:var(--cream-100);
+    box-shadow:var(--shadow);
+  }
+  .host-bio{
+    margin:12px 0 0;
+    font-size:14px;
+    line-height:1.6;
+    color:var(--slate-400);
+  }
+  .host-sign{
+    margin-top:18px;
+    padding-top:16px;
+    border-top:1px solid #ffffff1f;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .host-name{font-size:13px;line-height:1.5;color:var(--slate-400);}
+  .host-name strong{color:var(--cream-100);font-size:14.5px;}
+  .host-linkedin{
+    font-size:13px;
+    font-weight:600;
+    color:var(--gold-500);
+    text-decoration:none;
+    white-space:nowrap;
+  }
+
+  footer{
+    margin:52px 0 30px;
+    text-align:center;
+    font-size:12.5px;
+    color:var(--slate-500);
+    line-height:1.7;
+  }
+  footer strong{color:var(--ink-900);}
+
+  /* ---------- nav ---------- */
+  .topnav{
+    position:sticky;
+    top:env(safe-area-inset-top, 0px);
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding-block:14px;
+    background:var(--surface-0);
+    border-bottom:1px solid var(--line);
+  }
+  .topnav .brand{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:15px;
+  }
+  .tabs{display:flex;gap:6px;background:var(--surface-1);border:1px solid var(--line);border-radius:999px;padding:3px;}
+  .tab-btn{
+    appearance:none;border:none;background:transparent;color:var(--slate-500);
+    font-family:inherit;font-size:12.5px;font-weight:600;
+    padding:7px 13px;border-radius:999px;cursor:pointer;
+  }
+  .tab-btn.active{background:var(--navy-900);color:var(--gold-500);}
+
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ---------- session calendar ---------- */
+  .cal-intro{margin-block-start:24px;}
+  .cal-intro h1{font-size:clamp(24px,6vw,30px);margin:6px 0 8px;font-weight:600;text-wrap:balance;}
+  .cal-intro p{margin:0;font-size:14.5px;color:var(--slate-500);line-height:1.55;max-width:52ch;}
+
+  .sess-list{display:flex;flex-direction:column;gap:14px;margin-block-start:24px;}
+  .sess-card{
+    background:var(--surface-1);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px 18px 16px;
+  }
+  .sess-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+  .sess-tag{
+    font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--gold-600);
+  }
+  .sess-status{
+    font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+    padding:3px 9px;border-radius:999px;flex:none;
+  }
+  .sess-status.open{background:#e6f7ec;color:#1c8a4d;}
+  .sess-status.soon{background:#fff3da;color:#c98a12;}
+  .sess-status.closed{background:#f1f1f4;color:#8a8f9e;}
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]) .sess-status.open{background:#0f3320;color:#4ade80;}
+    :root:not([data-theme="light"]) .sess-status.soon{background:#3a2a0d;color:#f2c94c;}
+    :root:not([data-theme="light"]) .sess-status.closed{background:#20263f;color:#8b97c4;}
+  }
+  :root[data-theme="dark"] .sess-status.open{background:#0f3320;color:#4ade80;}
+  :root[data-theme="dark"] .sess-status.soon{background:#3a2a0d;color:#f2c94c;}
+  :root[data-theme="dark"] .sess-status.closed{background:#20263f;color:#8b97c4;}
+
+  .sess-card h3{font-size:17px;margin:8px 0 4px;font-weight:600;}
+  .sess-meta{font-size:12.5px;color:var(--slate-500);font-variant-numeric:tabular-nums;}
+  .sess-times{font-size:11.5px;color:var(--slate-500);opacity:.85;margin-top:3px;font-variant-numeric:tabular-nums;}
+  .sess-desc{font-size:13.5px;color:var(--slate-500);line-height:1.5;margin-top:8px;}
+  .sess-btn{
+    margin-top:14px;
+    width:100%;
+    border:none;
+    border-radius:11px;
+    padding:12px;
+    font-family:inherit;
+    font-size:13.5px;
+    font-weight:700;
+    cursor:pointer;
+    background:var(--navy-900);
+    color:var(--gold-500);
+  }
+  .sess-btn:disabled{background:var(--surface-0);color:var(--slate-500);border:1px solid var(--line);cursor:not-allowed;}
+  .sess-note{font-size:11.5px;color:var(--slate-500);text-align:center;margin-top:8px;}
+
+  .cal-footer{
+    margin:30px 0 40px;
+    text-align:center;
+    font-size:13px;
+    color:var(--slate-500);
+    line-height:1.6;
+  }
+  .cal-footer a{color:var(--gold-600);font-weight:600;text-decoration:none;}
+
+  /* ---------- modal ---------- */
+  .modal-veil{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(11,17,34,.55);
+    align-items:center;justify-content:center;
+    padding:20px;
+    z-index:50;
+  }
+  .modal-veil.open{display:flex;}
+  .modal{
+    background:var(--surface-1);
+    border-radius:18px;
+    padding:22px;
+    width:100%;
+    max-width:380px;
+    box-shadow:var(--shadow);
+  }
+  .modal h3{margin:0 0 4px;font-size:18px;}
+  .modal .sub{font-size:13px;color:var(--slate-500);margin-bottom:16px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block;font-size:12px;font-weight:600;margin-bottom:5px;}
+  .field input{
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    background:var(--surface-0);
+    color:var(--ink-900);
+    font-family:inherit;
+    font-size:14px;
+  }
+  .field input:focus{outline:2px solid var(--gold-500);outline-offset:1px;}
+  .modal-actions{display:flex;gap:10px;margin-top:16px;}
+  .modal-actions button{
+    flex:1;border-radius:10px;padding:11px;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;border:none;
+  }
+  .btn-cancel{background:transparent;border:1px solid var(--line) !important;color:var(--ink-900);}
+  .btn-confirm{background:var(--navy-900);color:var(--gold-500);}
+  .btn-confirm:disabled{opacity:.6;cursor:wait;}
+  .form-error{font-size:12.5px;color:#c0392b;margin-top:6px;min-height:16px;}
+  .modal-result{text-align:center;}
+  .modal-result .big{font-size:32px;margin-bottom:8px;}
+  .modal-result p{font-size:14px;color:var(--slate-500);line-height:1.5;}
+  .modal-result .actions{display:flex;flex-direction:column;gap:8px;margin-top:16px;}
+  .modal-result .actions button{
+    border-radius:10px;padding:11px;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;
+    background:transparent;border:1px solid var(--line);color:var(--ink-900);
+  }
+</style>
+
+<nav class="topnav">
+  <div class="brand">AI Learning Circle</div>
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-home" onclick="showView('home')">Home</button>
+    <button class="tab-btn" id="tab-calendar" onclick="showView('calendar')">Session Calendar</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<div id="view-home" class="view active">
+
+  <div class="hero">
+    <div class="eyebrow">AI Learning Circle</div>
+    <h1>Build practical AI skills <em>for finance</em></h1>
+    <p>A live, practical learning space to explore, try, and apply AI to everyday finance work — one use case at a time.</p>
+    <div class="free-banner">
+      <div class="dot"></div>
+      <div>
+        <strong>Live sessions are free</strong>
+        <span>Every alternate Saturday · 45 minutes · one topic, deep dive. No membership needed to attend.</span>
+      </div>
+    </div>
+    <div class="host-line">Session 1, wrapped: <strong style="color:var(--cream-100)">From Data to Management Reporting</strong></div>
+  </div>
+
+  <section>
+    <div class="section-head">
+      <div class="eyebrow">Membership includes</div>
+      <h2>Beyond the live session</h2>
+    </div>
+    <div class="includes">
+      <div class="inc-card"><div class="mark"></div><div><strong>Session recordings</strong><span>Catch up anytime</span></div></div>
+      <div class="inc-card"><div class="mark"></div><div><strong>Use case starter kits</strong><span>Templates to get going fast</span></div></div>
+      <div class="inc-card"><div class="mark"></div><div><strong>Cheat sheets</strong><span>Quick reference, no fluff</span></div></div>
+      <div class="inc-card"><div class="mark"></div><div><strong>Try this week</strong><span>One simple AI task to try at work</span></div></div>
+      <div class="inc-card"><div class="mark"></div><div><strong>Curated resources</strong><span>Hand-picked, finance-relevant</span></div></div>
+      <div class="inc-card"><div class="mark"></div><div><strong>Knowledge library</strong><span>Members-only, growing archive</span></div></div>
+    </div>
+    <div class="oneone">
+      <strong>1:1 sessions, tailored to your finance use cases</strong>
+      Available on request — not included in membership.
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <div class="eyebrow">Get involved</div>
+      <h2>Three ways in</h2>
+    </div>
+    <div class="links">
+
+      <a class="linkcard whatsapp" href="https://wa.me/491743215456" target="_blank" rel="noopener">
+        <div class="icon">💬</div>
+        <div class="body">
+          <strong>Join on WhatsApp</strong>
+          <span>Chat with the circle · +49 174 3215456</span>
+        </div>
+        <div class="go">Open →</div>
+      </a>
+
+      <a class="linkcard survey" href="https://docs.google.com/forms/d/e/1FAIpQLScehQKlY-b5gAFt98ep4FeJ-jywcjLtImcIGGkeVLXI5iNROA/viewform" target="_blank" rel="noopener">
+        <div class="icon">📊</div>
+        <div class="body">
+          <strong>Take the AI Pulse survey</strong>
+          <span>1 minute · helps shape upcoming sessions</span>
+        </div>
+        <div class="go">Open →</div>
+      </a>
+
+      <a class="linkcard email" href="mailto:ailearningcirclevp@gmail.com?subject=Membership%20interest%20%E2%80%94%20AI%20Learning%20Circle&body=Hi%20Vishnupriya%2C%0A%0AI%27d%20like%20to%20express%20interest%20in%20AI%20Learning%20Circle%20membership.%0A%0APreferred%20plan%3A%20%5B3%20months%20/%206%20months%5D%0AName%3A%0ARole%2FCompany%3A%0A%0AThanks%21">
+        <div class="icon">✉️</div>
+        <div class="body">
+          <strong>Express membership interest</strong>
+          <span>Opens a pre-filled email draft to ailearningcirclevp@gmail.com</span>
+        </div>
+        <div class="go">Draft →</div>
+      </a>
+      <div class="copy-row" style="margin-left:60px;margin-top:-4px;">
+        <code>ailearningcirclevp@gmail.com</code>
+        <button class="copy-btn" onclick="copyEmail(this)">Copy</button>
+      </div>
+
+      <div class="linkcard locked" aria-disabled="true">
+        <div class="icon">🔒</div>
+        <div class="body">
+          <strong>Knowledge library</strong>
+          <span>Unlocks with paid membership — link shared to members directly</span>
+        </div>
+        <div class="badge">Members only</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <div class="eyebrow">Introductory membership</div>
+      <h2>Two ways to join</h2>
+    </div>
+    <div class="pricing">
+      <div class="eyebrow" style="color:var(--gold-500)">Pricing</div>
+      <div class="price-grid">
+        <div class="price-tile">
+          <div class="len">3 Months</div>
+          <div class="amt">₹2,500</div>
+        </div>
+        <div class="price-tile">
+          <div class="len">6 Months</div>
+          <div class="amt">₹3,600</div>
+        </div>
+      </div>
+      <div class="note">Express your interest by email above — a spot is confirmed once payment details are shared back.</div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <div class="eyebrow">What's coming next</div>
+      <h2>Upcoming topics</h2>
+    </div>
+    <div class="next-list">
+      <div class="next-item"><span class="n">01</span><div><strong>Build financial modelling using unstructured, messy data</strong></div></div>
+      <div class="next-item"><span class="n">02</span><div><strong>Finance reporting intelligence</strong><span>From MIS to scenario modelling</span></div></div>
+      <div class="next-item"><span class="n">03</span><div><strong>Build interactive dashboards</strong></div></div>
+      <div class="next-item"><span class="n">04</span><div><strong>Three-way collaboration in one shared Excel</strong><span>2 AIs. 1 human.</span></div></div>
+      <div class="next-item"><span class="n">05</span><div><strong>Use Excel add-ins within Excel</strong></div></div>
+      <div class="next-item"><span class="n">06</span><div><strong>Build your personal AI agent</strong><span>For your everyday tasks</span></div></div>
+      <div class="next-item"><span class="n">07</span><div><strong>Financial commentary aggregation</strong></div></div>
+      <div class="next-item"><span class="n">08</span><div><strong>Learn your AI, get your prompt right</strong></div></div>
+      <div class="next-item"><span class="n">09</span><div><strong>Build a sustainable website using AI</strong></div></div>
+      <div class="next-item"><span class="n">10</span><div><strong>Budgeting &amp; forecasting with AI</strong></div></div>
+      <div class="next-item"><span class="n">11</span><div><strong>Build your own agent</strong></div></div>
+      <div class="next-item"><span class="n">12</span><div><strong>Work with multiple agents</strong></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="host-card">
+      <div class="eyebrow" style="color:var(--gold-500)">Finance · Transformation · AI</div>
+      <p class="host-bio">A Digital Finance and Finance Transformation professional with 14+ years of experience, combining financial expertise, process improvement and practical AI to turn complex data and workflows into clear, decision-ready outcomes.</p>
+      <div class="host-sign">
+        <div class="host-name">Warm regards,<br><strong>Vishnupriya Viswanathan</strong></div>
+        <a class="host-linkedin" href="https://www.linkedin.com/in/vishnupriya-viswanathan-77b4b1169/" target="_blank" rel="noopener">Connect on LinkedIn →</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Learn together. Try it at work. Share what happens.<br>
+    <strong>AI Learning Circle</strong>
+  </footer>
+
+</div><!-- /view-home -->
+
+<div id="view-calendar" class="view">
+
+  <div class="cal-intro">
+    <div class="eyebrow">Session Calendar</div>
+    <h1>Upcoming AI Learning Circle Sessions</h1>
+    <p>Choose the sessions you're interested in. Once you register, the session is added to your calendar and you'll receive the Google Calendar invitation.</p>
+  </div>
+
+  <div class="sess-list" id="sess-list"><!-- rendered by script --></div>
+
+  <div class="cal-footer">
+    New sessions are added regularly.<br>
+    Join the <a href="https://wa.me/491743215456" target="_blank" rel="noopener">AI Learning Circle WhatsApp group</a> for reminders and updates.
+  </div>
+
+</div><!-- /view-calendar -->
+
+</div><!-- /wrap -->
+
+<div class="modal-veil" id="modal-veil">
+  <div class="modal" id="modal-box">
+    <!-- content injected by script -->
+  </div>
+</div>
+
+<script>
+function copyEmail(btn){
+  var text = "ailearningcirclevp@gmail.com";
+  var done = function(){ var old = btn.textContent; btn.textContent = "Copied"; setTimeout(function(){ btn.textContent = old; }, 1400); };
+  try{
+    navigator.clipboard.writeText(text).then(done).catch(function(){ fallbackCopy(text, done); });
+  }catch(e){ fallbackCopy(text, done); }
+}
+function fallbackCopy(text, done){
+  try{
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    done();
+  }catch(e){}
+}
+
+/* =====================================================================
+   SESSION CALENDAR
+   Edit ONLY the `sessions` array below to add, remove, or change sessions.
+   status: "open" | "soon" | "closed"
+   ===================================================================== */
+const sessions = [
+  {
+    id: "presentation-ai-01",
+    title: "Outsource Your Presentation Tasks to AI",
+    tag: "Productivity",
+    date: "Sat, 10 Oct 2026",
+    duration: "4:30 – 5:15 PM · Germany time",
+    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 6:30 PM · India 8:00 PM",
+    description: "Hand off deck-building, formatting and speaker notes to AI — while you keep the story and the judgment calls.",
+    status: "open"
+  },
+  {
+    id: "financial-modelling-01",
+    title: "Build Financial Modelling Using Unstructured, Messy Data",
+    tag: "Finance",
+    date: "Sat, 24 Oct 2026",
+    duration: "4:30 – 5:15 PM · Germany time",
+    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 6:30 PM · India 8:00 PM",
+    description: "Turn scattered, inconsistent finance inputs into a working model AI can help you build and stress-test.",
+    status: "open"
+  },
+  {
+    id: "prompt-context-01",
+    title: "Learn How to Give Context to AI — Get Your Prompt Right",
+    tag: "AI Skills",
+    date: "Sat, 14 Nov 2026",
+    duration: "4:30 – 5:15 PM · Germany time",
+    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 7:30 PM · India 9:00 PM",
+    description: "The difference between a vague answer and a useful one is almost always the prompt. Learn the structure that works.",
+    status: "open"
+  },
+  {
+    id: "budgeting-forecasting-01",
+    title: "Budgeting & Forecasting with AI",
+    tag: "Finance",
+    date: "Sat, 28 Nov 2026",
+    duration: "4:30 – 5:15 PM · Germany time",
+    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 7:30 PM · India 9:00 PM",
+    description: "Build a rolling budget and forecast workflow with AI doing the heavy lifting on scenarios and variance.",
+    status: "open"
+  },
+  {
+    id: "website-ai-01",
+    title: "Build a Sustainable Website Using AI",
+    tag: "Productivity",
+    date: "Sat, 5 Dec 2026",
+    duration: "4:30 – 5:15 PM · Germany time",
+    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 7:30 PM · India 9:00 PM",
+    description: "A practical look at building and maintaining a simple website with AI — no dev team required.",
+    status: "open"
+  }
+];
+
+/* Paste your deployed Google Apps Script Web App URL here.
+   See the deployment guide for how to get this. Until it's set,
+   registration will show a friendly "not connected yet" message
+   instead of failing silently. */
+const REGISTRATION_ENDPOINT = "PASTE_APPS_SCRIPT_URL_HERE";
+
+function showView(name){
+  document.getElementById('view-home').classList.toggle('active', name === 'home');
+  document.getElementById('view-calendar').classList.toggle('active', name === 'calendar');
+  document.getElementById('tab-home').classList.toggle('active', name === 'home');
+  document.getElementById('tab-calendar').classList.toggle('active', name === 'calendar');
+  try{ history.replaceState(null, '', name === 'calendar' ? '#calendar' : '#home'); }catch(e){}
+}
+
+function statusLabel(s){
+  return s === 'open' ? 'Open' : (s === 'soon' ? 'Coming Soon' : 'Closed');
+}
+
+function renderSessions(){
+  var list = document.getElementById('sess-list');
+  list.innerHTML = sessions.map(function(s){
+    var disabled = s.status !== 'open';
+    var btnLabel = s.status === 'open' ? "I’m interested – Add me to session"
+                 : s.status === 'soon' ? 'Coming soon'
+                 : 'Registration closed';
+    return (
+      '<div class="sess-card">' +
+        '<div class="sess-top">' +
+          '<div class="sess-tag">' + s.tag + '</div>' +
+          '<div class="sess-status ' + s.status + '">' + statusLabel(s.status) + '</div>' +
+        '</div>' +
+        '<h3>' + s.title + '</h3>' +
+        '<div class="sess-meta">' + s.date + ' · ' + s.duration + '</div>' +
+        '<div class="sess-times">' + s.times + '</div>' +
+        '<div class="sess-desc">' + s.description + '</div>' +
+        '<button class="sess-btn" ' + (disabled ? 'disabled' : '') + ' onclick="openModal(\'' + s.id + '\')">' + btnLabel + '</button>' +
+      '</div>'
+    );
+  }).join('');
+}
+
+var registered = {};
+try{
+  registered = JSON.parse(localStorage.getItem('alc_registered') || '{}');
+}catch(e){ registered = {}; }
+
+function openModal(sessionId){
+  var session = sessions.find(function(s){ return s.id === sessionId; });
+  if(!session) return;
+
+  if(registered[sessionId]){
+    renderResultModal({
+      icon: '✓',
+      title: 'Already registered',
+      message: 'You’re already registered for ' + session.title + '. Please check your calendar.',
+      showAddAnother: true
+    });
+    document.getElementById('modal-veil').classList.add('open');
+    return;
+  }
+
+  var box = document.getElementById('modal-box');
+  box.innerHTML =
+    '<h3>' + session.title + '</h3>' +
+    '<div class="sub">' + session.date + ' · ' + session.duration + '</div>' +
+    '<div class="sub" style="margin-top:-10px;">' + session.times + '</div>' +
+    '<div class="field"><label for="f-name">Name</label><input id="f-name" type="text" autocomplete="name"></div>' +
+    '<div class="field"><label for="f-email">Email address</label><input id="f-email" type="email" autocomplete="email"></div>' +
+    '<div class="form-error" id="f-error"></div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn-cancel" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn-confirm" id="f-confirm" onclick="submitRegistration(\'' + sessionId + '\')">Confirm &amp; Add to Calendar</button>' +
+    '</div>' +
+    '<div class="sess-note" style="margin-top:12px;">Calendar invitations are sent to the email address you provide.</div>';
+
+  document.getElementById('modal-veil').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modal-veil').classList.remove('open');
+}
+
+function renderResultModal(opts){
+  var box = document.getElementById('modal-box');
+  var addAnotherBtn = opts.showAddAnother ? '<button onclick="closeModal()">Add another session</button>' : '';
+  box.innerHTML =
+    '<div class="modal-result">' +
+      '<div class="big">' + opts.icon + '</div>' +
+      '<h3>' + opts.title + '</h3>' +
+      '<p>' + opts.message + '</p>' +
+      '<div class="actions">' +
+        addAnotherBtn +
+        '<button onclick="closeModal()">Back to Session Calendar</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function submitRegistration(sessionId){
+  var nameEl = document.getElementById('f-name');
+  var emailEl = document.getElementById('f-email');
+  var errEl = document.getElementById('f-error');
+  var btn = document.getElementById('f-confirm');
+  var name = nameEl.value.trim();
+  var email = emailEl.value.trim();
+  var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  if(!name){ errEl.textContent = 'Please enter your name.'; return; }
+  if(!emailOk){ errEl.textContent = 'Please enter a valid email address.'; return; }
+  errEl.textContent = '';
+
+  if(REGISTRATION_ENDPOINT.indexOf('PASTE_') === 0){
+    renderResultModal({
+      icon: '⚙️',
+      title: 'Not connected yet',
+      message: 'The calendar backend hasn’t been deployed yet, so this session can’t be booked from here. See the setup guide to connect a Google Apps Script endpoint.',
+      showAddAnother: false
+    });
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  fetch(REGISTRATION_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight against Apps Script
+    body: JSON.stringify({ sessionId: sessionId, name: name, email: email })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data && data.success){
+      registered[sessionId] = true;
+      try{ localStorage.setItem('alc_registered', JSON.stringify(registered)); }catch(e){}
+      renderResultModal({
+        icon: '🎉',
+        title: 'You’re in!',
+        message: 'A Google Calendar invitation has been sent to ' + email + '. Please check your inbox and accept the invite.',
+        showAddAnother: true
+      });
+    } else {
+      renderResultModal({
+        icon: '⚠️',
+        title: 'Unable to register',
+        message: (data && data.message) || 'Unable to register. Please try again.',
+        showAddAnother: false
+      });
+    }
+  })
+  .catch(function(){
+    renderResultModal({
+      icon: '⚠️',
+      title: 'Unable to reach the calendar backend',
+      message: 'This can happen when the page is viewed inside a sandboxed preview. Try opening the standalone HTML file in a browser, or hosting it on your own site.',
+      showAddAnother: false
+    });
+  });
+}
+
+renderSessions();
+if(location.hash === '#calendar'){ showView('calendar'); }
+</script>
