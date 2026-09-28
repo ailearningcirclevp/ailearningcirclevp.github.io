@@ -15,23 +15,23 @@
 const SESSION_MAP = {
   "presentation-ai-01": {
     calendarId: "primary",
-    eventId: "PUT_GOOGLE_EVENT_ID_HERE"
+    eventId: "43n53eaa3gdhrqbl5ebei0qsv4"
   },
   "financial-modelling-01": {
     calendarId: "primary",
-    eventId: "PUT_GOOGLE_EVENT_ID_HERE"
+    eventId: "b1l1hbf8rl83d9vf1jepvud3m4"
   },
   "prompt-context-01": {
     calendarId: "primary",
-    eventId: "PUT_GOOGLE_EVENT_ID_HERE"
+    eventId: "88l7ui3ft020dlcutkkdm9p9lk"
   },
   "budgeting-forecasting-01": {
     calendarId: "primary",
-    eventId: "PUT_GOOGLE_EVENT_ID_HERE"
+    eventId: "0h5tj75fcq4k535pce8r4jomok"
   },
   "website-ai-01": {
     calendarId: "primary",
-    eventId: "PUT_GOOGLE_EVENT_ID_HERE"
+    eventId: "ugamngqq21u29de9qffog8lus0"
   }
 };
 
