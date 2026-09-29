@@ -371,6 +371,104 @@
     white-space:nowrap;
   }
 
+  /* ---------- CTA buttons ---------- */
+  .cta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;
+    font-family:inherit;font-size:14px;font-weight:700;
+    padding:13px 20px;border-radius:12px;text-decoration:none;
+    cursor:pointer;border:none;
+  }
+  .btn-primary{background:var(--gold-500);color:var(--navy-950);}
+  .btn-secondary{background:transparent;color:var(--cream-100);border:1px solid #ffffff33 !important;}
+  .btn-dark{background:var(--navy-900);color:var(--gold-500);}
+  .btn-outline{background:transparent;color:var(--ink-900);border:1px solid var(--line);}
+
+  /* ---------- questions list ---------- */
+  .q-list{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;}
+  .q-list li{font-size:14px;color:var(--slate-400);padding-left:16px;position:relative;}
+  .q-list li::before{content:"?";position:absolute;left:0;color:var(--gold-500);font-weight:700;font-size:12px;}
+  .hero-lead{margin-top:18px;font-size:15px;line-height:1.6;color:var(--cream-100);}
+  .hero-diff{
+    margin-top:14px;font-size:13px;font-weight:600;color:var(--gold-500);
+    letter-spacing:.01em;
+  }
+
+  /* ---------- pain points ---------- */
+  .pain-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (max-width:420px){ .pain-grid{grid-template-columns:1fr;} }
+  .pain-card{
+    background:var(--surface-1);border:1px solid var(--line);border-radius:14px;
+    padding:16px;font-size:13.5px;line-height:1.5;color:var(--ink-900);
+  }
+  .pain-close{
+    margin-top:16px;text-align:center;font-size:14.5px;font-weight:600;
+    color:var(--ink-900);
+  }
+
+  /* ---------- how it works ---------- */
+  .flow{display:flex;flex-direction:column;gap:10px;}
+  .flow-step{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--surface-1);border:1px solid var(--line);border-radius:14px;
+    padding:14px 16px;
+  }
+  .flow-num{
+    flex:none;width:32px;height:32px;border-radius:50%;
+    background:var(--navy-900);color:var(--gold-500);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:600;font-size:14px;
+  }
+  .flow-step strong{display:block;font-size:14.5px;letter-spacing:.02em;}
+  .flow-step span{display:block;font-size:13px;color:var(--slate-500);margin-top:2px;line-height:1.45;}
+
+  /* ---------- free session card ---------- */
+  .free-card{
+    background:linear-gradient(165deg,var(--navy-900),var(--navy-950) 75%);
+    border-radius:20px;padding:26px 24px;color:var(--cream-100);box-shadow:var(--shadow);
+  }
+  .free-card h2{margin:8px 0 10px;font-size:22px;font-weight:600;color:var(--cream-100);}
+  .free-card p{margin:0 0 6px;font-size:14.5px;line-height:1.55;color:var(--slate-400);}
+
+  /* ---------- membership problem list ---------- */
+  .solve-list{display:flex;flex-direction:column;gap:8px;margin-bottom:18px;}
+  .solve-item{
+    display:flex;gap:10px;font-size:13.5px;line-height:1.5;color:var(--ink-900);
+    border-left:2px solid var(--gold-500);padding-left:12px;
+  }
+  .solve-item b{font-weight:600;}
+
+  .lock-tag{
+    font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--gold-600);margin-left:6px;
+  }
+
+  /* ---------- community ---------- */
+  .community-card{
+    background:var(--surface-1);border:1px solid var(--line);border-radius:18px;
+    padding:22px;
+  }
+  .community-card p{margin:8px 0 0;font-size:14.5px;line-height:1.6;color:var(--slate-500);}
+  .community-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+  .community-tags span{
+    font-size:11.5px;font-weight:600;color:var(--ink-900);
+    background:color-mix(in srgb, var(--ink-900) 6%, transparent);
+    padding:4px 10px;border-radius:999px;
+  }
+  .community-links{margin-top:16px;font-size:13px;}
+  .community-links a{color:var(--gold-600);font-weight:600;text-decoration:none;}
+
+  /* ---------- final CTA ---------- */
+  .final-card{
+    text-align:center;
+    background:linear-gradient(165deg,var(--navy-900),var(--navy-950) 75%);
+    border-radius:20px;padding:32px 24px;color:var(--cream-100);box-shadow:var(--shadow);
+  }
+  .final-card h2{margin:8px 0 20px;font-size:24px;font-weight:600;color:var(--cream-100);}
+  .final-card .cta-row{justify-content:center;}
+  .final-contact{margin-top:18px;font-size:12.5px;color:var(--slate-400);}
+  .final-contact a{color:var(--gold-500);font-weight:600;text-decoration:none;}
+
   footer{
     margin:52px 0 30px;
     text-align:center;
@@ -534,96 +632,110 @@
 
 <div id="view-home" class="view active">
 
+  <!-- SECTION 1 — HERO -->
   <div class="hero">
     <div class="eyebrow">AI Learning Circle</div>
-    <h1>Build practical AI skills <em>for finance</em></h1>
-    <p>A live, practical learning space to explore, try, and apply AI to everyday finance work — one use case at a time.</p>
-    <div class="free-banner">
-      <div class="dot"></div>
-      <div>
-        <strong>Live sessions are free</strong>
-        <span>Every alternate Saturday · 45 minutes · one topic, deep dive. No membership needed to attend.</span>
-      </div>
+    <h1>AI is everywhere. <em>Knowing how to use it at work</em> is the harder part.</h1>
+    <p>You may have watched courses, tried ChatGPT, Copilot or Claude, and saved dozens of AI posts — but applying AI confidently to your day-to-day work is a different challenge.</p>
+    <ul class="q-list">
+      <li>Where do I start?</li>
+      <li>Which tool should I use?</li>
+      <li>Am I doing this correctly?</li>
+      <li>Can I trust the output?</li>
+      <li>What are others actually using at work?</li>
+    </ul>
+    <p class="hero-lead">AI Learning Circle is a practical peer-learning community where we explore one real use case at a time, try it ourselves, ask questions, and learn from what worked — and what didn't.</p>
+    <div class="hero-diff">Not another AI course. Learn it. Try it. Discuss it. Improve it.</div>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#calendar" onclick="showView('calendar')">View Upcoming Free Sessions</a>
+      <a class="btn btn-secondary" href="https://wa.me/491743215456" target="_blank" rel="noopener">Join WhatsApp for Updates</a>
     </div>
-    <div class="host-line">Session 1, wrapped: <strong style="color:var(--cream-100)">From Data to Management Reporting</strong></div>
   </div>
 
+  <!-- SECTION 2 — DOES THIS SOUND FAMILIAR? -->
   <section>
     <div class="section-head">
-      <div class="eyebrow">Membership includes</div>
-      <h2>Beyond the live session</h2>
+      <div class="eyebrow">Sound familiar?</div>
+      <h2>Does this sound familiar?</h2>
+    </div>
+    <div class="pain-grid">
+      <div class="pain-card">You want to learn AI — but don't know where to start.</div>
+      <div class="pain-card">You've watched tutorials — but still struggle to apply them to your own work.</div>
+      <div class="pain-card">When something doesn't work, you don't have someone to ask.</div>
+      <div class="pain-card">You want to learn how other professionals are actually experimenting with AI.</div>
+    </div>
+    <div class="pain-close">That's what the Learning Circle is designed to solve.</div>
+  </section>
+
+  <!-- SECTION 3 — HOW IT WORKS -->
+  <section>
+    <div class="section-head">
+      <div class="eyebrow">The approach</div>
+      <h2>How the Learning Circle works</h2>
+    </div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div><strong>Learn</strong><span>Join a practical live session and see a real use case demonstrated.</span></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div><strong>Try</strong><span>Take the workflow back and experiment with it yourself.</span></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div><strong>Discuss</strong><span>Share questions, difficulties, successes and lessons with the Circle.</span></div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div><strong>Improve</strong><span>Build your practical AI capability one workflow at a time.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 — FREE LIVE SESSIONS -->
+  <section>
+    <div class="free-card">
+      <div class="eyebrow" style="color:var(--gold-500)">Always free</div>
+      <h2>Start with a live session</h2>
+      <p>Alternate Saturday live sessions are free to attend.</p>
+      <p>Each session focuses on a practical AI use case that can be applied to real work.</p>
+      <p>No membership needed to attend.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#calendar" onclick="showView('calendar')">View Session Calendar</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5 — MEMBERSHIP -->
+  <section>
+    <div class="section-head">
+      <div class="eyebrow">Membership</div>
+      <h2>Want continuity beyond the live session?</h2>
+    </div>
+    <div class="solve-list">
+      <div class="solve-item"><span><b>Miss a Saturday?</b> Watch the recording.</span></div>
+      <div class="solve-item"><span><b>Want to recreate the demo?</b> Use the detailed Use Case Starter Kit.</span></div>
+      <div class="solve-item"><span><b>Need a quick refresher?</b> Open the Cheat Sheet.</span></div>
+      <div class="solve-item"><span><b>Want something to try between sessions?</b> Use Try This Week.</span></div>
+      <div class="solve-item"><span><b>Joining midway?</b> Access previous sessions through the Knowledge Library.</span></div>
     </div>
     <div class="includes">
       <div class="inc-card"><div class="mark"></div><div><strong>Session recordings</strong><span>Catch up anytime</span></div></div>
-      <div class="inc-card"><div class="mark"></div><div><strong>Use case starter kits</strong><span>Templates to get going fast</span></div></div>
+      <div class="inc-card"><div class="mark"></div><div><strong>Use case starter kits</strong><span>Prompts &amp; screenshots included</span></div></div>
       <div class="inc-card"><div class="mark"></div><div><strong>Cheat sheets</strong><span>Quick reference, no fluff</span></div></div>
       <div class="inc-card"><div class="mark"></div><div><strong>Try this week</strong><span>One simple AI task to try at work</span></div></div>
-      <div class="inc-card"><div class="mark"></div><div><strong>Curated resources</strong><span>Hand-picked, finance-relevant</span></div></div>
-      <div class="inc-card"><div class="mark"></div><div><strong>Knowledge library</strong><span>Members-only, growing archive</span></div></div>
-    </div>
-    <div class="oneone">
-      <strong>1:1 sessions, tailored to your finance use cases</strong>
-      Available on request — not included in membership.
+      <div class="inc-card"><div class="mark"></div><div><strong>Knowledge library<span class="lock-tag">Members</span></strong><span>Previous sessions &amp; materials</span></div></div>
     </div>
   </section>
 
-  <section>
-    <div class="section-head">
-      <div class="eyebrow">Get involved</div>
-      <h2>Three ways in</h2>
-    </div>
-    <div class="links">
-
-      <a class="linkcard whatsapp" href="https://wa.me/491743215456" target="_blank" rel="noopener">
-        <div class="icon">💬</div>
-        <div class="body">
-          <strong>Join on WhatsApp</strong>
-          <span>Chat with the circle · +49 174 3215456</span>
-        </div>
-        <div class="go">Open →</div>
-      </a>
-
-      <a class="linkcard survey" href="https://docs.google.com/forms/d/e/1FAIpQLScehQKlY-b5gAFt98ep4FeJ-jywcjLtImcIGGkeVLXI5iNROA/viewform" target="_blank" rel="noopener">
-        <div class="icon">📊</div>
-        <div class="body">
-          <strong>Take the AI Pulse survey</strong>
-          <span>1 minute · helps shape upcoming sessions</span>
-        </div>
-        <div class="go">Open →</div>
-      </a>
-
-      <a class="linkcard email" href="mailto:ailearningcirclevp@gmail.com?subject=Membership%20interest%20%E2%80%94%20AI%20Learning%20Circle&body=Hi%20Vishnupriya%2C%0A%0AI%27d%20like%20to%20express%20interest%20in%20AI%20Learning%20Circle%20membership.%0A%0APreferred%20plan%3A%20%5B3%20months%20/%206%20months%5D%0AName%3A%0ARole%2FCompany%3A%0A%0AThanks%21">
-        <div class="icon">✉️</div>
-        <div class="body">
-          <strong>Express membership interest</strong>
-          <span>Opens a pre-filled email draft to ailearningcirclevp@gmail.com</span>
-        </div>
-        <div class="go">Draft →</div>
-      </a>
-      <div class="copy-row" style="margin-left:60px;margin-top:-4px;">
-        <code>ailearningcirclevp@gmail.com</code>
-        <button class="copy-btn" onclick="copyEmail(this)">Copy</button>
-      </div>
-
-      <div class="linkcard locked" aria-disabled="true">
-        <div class="icon">🔒</div>
-        <div class="body">
-          <strong>Knowledge library</strong>
-          <span>Unlocks with paid membership — link shared to members directly</span>
-        </div>
-        <div class="badge">Members only</div>
-      </div>
-
-    </div>
-  </section>
-
+  <!-- SECTION 6 — PRICING -->
   <section>
     <div class="section-head">
       <div class="eyebrow">Introductory membership</div>
-      <h2>Two ways to join</h2>
+      <h2>Pricing</h2>
     </div>
     <div class="pricing">
-      <div class="eyebrow" style="color:var(--gold-500)">Pricing</div>
       <div class="price-grid">
         <div class="price-tile">
           <div class="len">3 Months</div>
@@ -634,39 +746,80 @@
           <div class="amt">₹3,600</div>
         </div>
       </div>
-      <div class="note">Express your interest by email above — a spot is confirmed once payment details are shared back.</div>
+      <div class="note">Introductory pricing for the first Learning Circle cycle.</div>
+    </div>
+    <div class="oneone">
+      <strong>1:1 coaching on specific topics</strong>
+      Available separately on request — not included in membership.
     </div>
   </section>
 
+  <!-- SECTION 7 — UPCOMING TOPICS -->
   <section>
     <div class="section-head">
       <div class="eyebrow">What's coming next</div>
       <h2>Upcoming topics</h2>
     </div>
     <div class="next-list">
-      <div class="next-item"><span class="n">01</span><div><strong>Build financial modelling using unstructured, messy data</strong></div></div>
-      <div class="next-item"><span class="n">02</span><div><strong>Finance reporting intelligence</strong><span>From MIS to scenario modelling</span></div></div>
-      <div class="next-item"><span class="n">03</span><div><strong>Build interactive dashboards</strong></div></div>
-      <div class="next-item"><span class="n">04</span><div><strong>Three-way collaboration in one shared Excel</strong><span>2 AIs. 1 human.</span></div></div>
-      <div class="next-item"><span class="n">05</span><div><strong>Use Excel add-ins within Excel</strong></div></div>
-      <div class="next-item"><span class="n">06</span><div><strong>Build your personal AI agent</strong><span>For your everyday tasks</span></div></div>
-      <div class="next-item"><span class="n">07</span><div><strong>Financial commentary aggregation</strong></div></div>
-      <div class="next-item"><span class="n">08</span><div><strong>Learn your AI, get your prompt right</strong></div></div>
-      <div class="next-item"><span class="n">09</span><div><strong>Build a sustainable website using AI</strong></div></div>
-      <div class="next-item"><span class="n">10</span><div><strong>Budgeting &amp; forecasting with AI</strong></div></div>
-      <div class="next-item"><span class="n">11</span><div><strong>Build your own agent</strong></div></div>
-      <div class="next-item"><span class="n">12</span><div><strong>Work with multiple agents</strong></div></div>
+      <div class="next-item"><span class="n">10 Oct</span><div><strong>Outsource Your Presentation Tasks to AI</strong><span>Next confirmed session</span></div></div>
+      <div class="next-item"><span class="n">24 Oct</span><div><strong>Build Financial Modelling Using Unstructured, Messy Data</strong><span>Following confirmed session</span></div></div>
+      <div class="next-item"><span class="n">Later</span><div><strong>Finance reporting intelligence</strong><span>From MIS to scenario modelling</span></div></div>
+      <div class="next-item"><span class="n">Later</span><div><strong>Build interactive dashboards with AI</strong></div></div>
+      <div class="next-item"><span class="n">Later</span><div><strong>Build your personal AI agent</strong><span>For everyday tasks</span></div></div>
+    </div>
+    <div class="oneone" style="margin-top:14px;">The roadmap is intentionally flexible. Topics may evolve based on member interest, emerging AI developments and guest-speaker availability.</div>
+    <div class="cta-row">
+      <a class="btn btn-outline" href="#calendar" onclick="showView('calendar')">Explore Full Session Calendar</a>
     </div>
   </section>
 
+  <!-- SECTION 8 — COMMUNITY -->
+  <section>
+    <div class="section-head">
+      <div class="eyebrow">Community</div>
+      <h2>Stay in the loop on WhatsApp</h2>
+    </div>
+    <div class="community-card">
+      <p>The WhatsApp group is where the Circle actually lives day to day.</p>
+      <div class="community-tags">
+        <span>Session updates</span>
+        <span>Reminders</span>
+        <span>Practical discussions</span>
+        <span>Questions</span>
+        <span>Community interaction</span>
+      </div>
+      <div class="cta-row">
+        <a class="btn btn-dark" href="https://wa.me/491743215456" target="_blank" rel="noopener">Join the WhatsApp Community</a>
+      </div>
+      <div class="community-links">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScehQKlY-b5gAFt98ep4FeJ-jywcjLtImcIGGkeVLXI5iNROA/viewform" target="_blank" rel="noopener">Take the 1-min AI Pulse survey →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 9 — WHY I STARTED THIS -->
   <section>
     <div class="host-card">
-      <div class="eyebrow" style="color:var(--gold-500)">Finance · Transformation · AI</div>
-      <p class="host-bio">A Digital Finance and Finance Transformation professional with 14+ years of experience, combining financial expertise, process improvement and practical AI to turn complex data and workflows into clear, decision-ready outcomes.</p>
+      <div class="eyebrow" style="color:var(--gold-500)">Why I started AI Learning Circle</div>
+      <p class="host-bio">I work at the intersection of Finance, Transformation and AI. Like many professionals, I realised that knowing AI exists is very different from knowing how to use it effectively in everyday work. I created AI Learning Circle as a space to experiment together — one practical workflow at a time.</p>
+      <p class="host-bio" style="margin-top:12px;">A Digital Finance and Finance Transformation professional with 14+ years of experience, combining financial expertise, process improvement and practical AI to turn complex data and workflows into clear, decision-ready outcomes.</p>
       <div class="host-sign">
         <div class="host-name">Warm regards,<br><strong>Vishnupriya Viswanathan</strong></div>
         <a class="host-linkedin" href="https://www.linkedin.com/in/vishnupriya-viswanathan-77b4b1169/" target="_blank" rel="noopener">Connect on LinkedIn →</a>
       </div>
+    </div>
+  </section>
+
+  <!-- SECTION 10 — FINAL CTA -->
+  <section>
+    <div class="final-card">
+      <div class="eyebrow" style="color:var(--gold-500)">Ready when you are</div>
+      <h2>Curious? Start with one session.</h2>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#calendar" onclick="showView('calendar')">View Upcoming Sessions</a>
+        <a class="btn btn-secondary" href="mailto:ailearningcirclevp@gmail.com?subject=Membership%20interest%20%E2%80%94%20AI%20Learning%20Circle&body=Hi%20Vishnupriya%2C%0A%0AI%27d%20like%20to%20express%20interest%20in%20AI%20Learning%20Circle%20membership.%0A%0APreferred%20plan%3A%20%5B3%20months%20/%206%20months%5D%0AName%3A%0ARole%2FCompany%3A%0A%0AThanks%21">Express Interest in Membership</a>
+      </div>
+      <div class="final-contact">Or write directly to <a href="mailto:ailearningcirclevp@gmail.com">ailearningcirclevp@gmail.com</a></div>
     </div>
   </section>
 
