@@ -688,31 +688,31 @@ const sessions = [
     id: "prompt-context-01",
     title: "Learn How to Give Context to AI — Get Your Prompt Right",
     tag: "AI Skills",
-    date: "Sat, 14 Nov 2026",
-    duration: "4:30 – 5:15 PM · Germany time",
-    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 7:30 PM · India 9:00 PM",
+    date: "Date to be announced",
+    duration: "",
+    times: "",
     description: "The difference between a vague answer and a useful one is almost always the prompt. Learn the structure that works.",
-    status: "open"
+    status: "soon"
   },
   {
     id: "budgeting-forecasting-01",
     title: "Budgeting & Forecasting with AI",
     tag: "Finance",
-    date: "Sat, 28 Nov 2026",
-    duration: "4:30 – 5:15 PM · Germany time",
-    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 7:30 PM · India 9:00 PM",
+    date: "Date to be announced",
+    duration: "",
+    times: "",
     description: "Build a rolling budget and forecast workflow with AI doing the heavy lifting on scenarios and variance.",
-    status: "open"
+    status: "soon"
   },
   {
     id: "website-ai-01",
     title: "Build a Sustainable Website Using AI",
     tag: "Productivity",
-    date: "Sat, 5 Dec 2026",
-    duration: "4:30 – 5:15 PM · Germany time",
-    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 7:30 PM · India 9:00 PM",
+    date: "Date to be announced",
+    duration: "",
+    times: "",
     description: "A practical look at building and maintaining a simple website with AI — no dev team required.",
-    status: "open"
+    status: "soon"
   }
 ];
 
@@ -773,8 +773,9 @@ function renderSessions(){
     }
     var disabled = s.status !== 'open';
     var btnLabel = s.status === 'open' ? "I’m interested – Add me to session"
-                 : s.status === 'soon' ? 'Coming soon'
+                 : s.status === 'soon' ? 'Link to be updated soon'
                  : 'Registration closed';
+    var metaLine = s.date + (s.duration ? ' · ' + s.duration : '');
     return (
       '<div class="sess-card">' +
         '<div class="sess-top">' +
@@ -782,8 +783,8 @@ function renderSessions(){
           '<div class="sess-status ' + s.status + '">' + statusLabel(s.status) + '</div>' +
         '</div>' +
         '<h3>' + s.title + '</h3>' +
-        '<div class="sess-meta">' + s.date + ' · ' + s.duration + '</div>' +
-        '<div class="sess-times">' + s.times + '</div>' +
+        '<div class="sess-meta">' + metaLine + '</div>' +
+        (s.times ? '<div class="sess-times">' + s.times + '</div>' : '') +
         '<div class="sess-desc">' + s.description + '</div>' +
         '<button class="sess-btn" ' + (disabled ? 'disabled' : '') + ' onclick="openModal(\'' + s.id + '\')">' + btnLabel + '</button>' +
       '</div>'
