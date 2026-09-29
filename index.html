@@ -412,6 +412,7 @@
   .sess-status.open{background:#e6f7ec;color:#1c8a4d;}
   .sess-status.soon{background:#fff3da;color:#c98a12;}
   .sess-status.closed{background:#f1f1f4;color:#8a8f9e;}
+  .sess-status.completed{background:var(--navy-900);color:var(--gold-500);}
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]) .sess-status.open{background:#0f3320;color:#4ade80;}
     :root:not([data-theme="light"]) .sess-status.soon{background:#3a2a0d;color:#f2c94c;}
@@ -439,6 +440,7 @@
     color:var(--gold-500);
   }
   .sess-btn:disabled{background:var(--surface-0);color:var(--slate-500);border:1px solid var(--line);cursor:not-allowed;}
+  .sess-btn.link{background:var(--gold-500);color:var(--navy-950);text-decoration:none;display:flex;align-items:center;justify-content:center;box-sizing:border-box;}
   .sess-note{font-size:11.5px;color:var(--slate-500);text-align:center;margin-top:8px;}
 
   .cal-footer{
@@ -653,6 +655,16 @@ function fallbackCopy(text, done){
    ===================================================================== */
 const sessions = [
   {
+    id: "messy-inputs-mgmt-report-01",
+    title: "Turn Messy Inputs into a Management Report",
+    tag: "Finance",
+    date: "Sat, 12 Sep 2026",
+    duration: "4:30 – 5:15 PM · Germany time",
+    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 6:30 PM · India 8:00 PM",
+    description: "Turn scattered, messy data inputs into a clean, decision-ready management report with AI doing the heavy lifting.",
+    status: "completed"
+  },
+  {
     id: "presentation-ai-01",
     title: "Outsource Your Presentation Tasks to AI",
     tag: "Productivity",
@@ -719,12 +731,39 @@ function showView(name){
 }
 
 function statusLabel(s){
-  return s === 'open' ? 'Open' : (s === 'soon' ? 'Coming Soon' : 'Closed');
+  if(s === 'open') return 'Open';
+  if(s === 'soon') return 'Coming Soon';
+  if(s === 'completed') return 'Completed';
+  return 'Closed';
+}
+
+function goToMembership(e){
+  if(e) e.preventDefault();
+  showView('home');
+  setTimeout(function(){
+    var el = document.getElementById('membership');
+    if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 50);
 }
 
 function renderSessions(){
   var list = document.getElementById('sess-list');
   list.innerHTML = sessions.map(function(s){
+    if(s.status === 'completed'){
+      return (
+        '<div class="sess-card">' +
+          '<div class="sess-top">' +
+            '<div class="sess-tag">' + s.tag + '</div>' +
+            '<div class="sess-status ' + s.status + '">' + statusLabel(s.status) + '</div>' +
+          '</div>' +
+          '<h3>' + s.title + '</h3>' +
+          '<div class="sess-meta">' + s.date + ' · ' + s.duration + '</div>' +
+          '<div class="sess-times">' + s.times + '</div>' +
+          '<div class="sess-desc">' + s.description + '</div>' +
+          '<a class="sess-btn link" href="#membership" onclick="goToMembership(event)">Watch in Knowledge Library — Members Only</a>' +
+        '</div>'
+      );
+    }
     var disabled = s.status !== 'open';
     var btnLabel = s.status === 'open' ? "I’m interested – Add me to session"
                  : s.status === 'soon' ? 'Coming soon'
