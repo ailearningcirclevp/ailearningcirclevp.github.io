@@ -722,6 +722,13 @@ const sessions = [
    instead of failing silently. */
 const REGISTRATION_ENDPOINT = "https://script.google.com/macros/s/AKfycbwlvWZHzkBzxouaoWTJizY__Gh6P5_JOAV-CXuxDPpBQrVyQ0wtF7gLrqh-sLvShvtF0Q/exec";
 
+/* Must match SHARED_KEY in Code.gs. This only filters out bots that
+   never load the page — anyone viewing source can still read it —
+   but paired with the honeypot field and the backend's rate limit,
+   it stops the realistic spam scenario (a script hammering the URL
+   directly). Change both sides together if you ever rotate it. */
+const REGISTRATION_KEY = "m70wf5pfK60pOce1S_JKpgze";
+
 function showView(name){
   document.getElementById('view-home').classList.toggle('active', name === 'home');
   document.getElementById('view-calendar').classList.toggle('active', name === 'calendar');
@@ -811,6 +818,7 @@ function openModal(sessionId){
     '<div class="sub" style="margin-top:-10px;">' + session.times + '</div>' +
     '<div class="field"><label for="f-name">Name</label><input id="f-name" type="text" autocomplete="name"></div>' +
     '<div class="field"><label for="f-email">Email address</label><input id="f-email" type="email" autocomplete="email"></div>' +
+    '<input type="text" id="f-hp" name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">' +
     '<div class="form-error" id="f-error"></div>' +
     '<div class="modal-actions">' +
       '<button class="btn-cancel" onclick="closeModal()">Cancel</button>' +
@@ -843,10 +851,12 @@ function renderResultModal(opts){
 function submitRegistration(sessionId){
   var nameEl = document.getElementById('f-name');
   var emailEl = document.getElementById('f-email');
+  var hpEl = document.getElementById('f-hp');
   var errEl = document.getElementById('f-error');
   var btn = document.getElementById('f-confirm');
   var name = nameEl.value.trim();
   var email = emailEl.value.trim();
+  var hp = hpEl ? hpEl.value : '';
   var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   if(!name){ errEl.textContent = 'Please enter your name.'; return; }
@@ -869,7 +879,7 @@ function submitRegistration(sessionId){
   fetch(REGISTRATION_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids CORS preflight against Apps Script
-    body: JSON.stringify({ sessionId: sessionId, name: name, email: email })
+    body: JSON.stringify({ sessionId: sessionId, name: name, email: email, key: REGISTRATION_KEY, hp: hp })
   })
   .then(function(r){ return r.json(); })
   .then(function(data){

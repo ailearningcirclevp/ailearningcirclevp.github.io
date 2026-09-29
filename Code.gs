@@ -12,6 +12,18 @@
  * the website's REGISTRATION_ENDPOINT constant.
  */
 
+// Shared client key — must match REGISTRATION_KEY in index.html.
+// This is a soft filter, not real security (anyone can view page
+// source and read it), but it blocks generic bots/scanners that hit
+// this URL without ever loading the site.
+const SHARED_KEY = "m70wf5pfK60pOce1S_JKpgze";
+
+// Simple abuse throttle: at most MAX_PER_WINDOW submissions per
+// WINDOW_SECONDS, across all visitors combined. Keeps a scripted
+// flood from spamming calendar invites onto your events.
+const WINDOW_SECONDS = 300;   // 5 minutes
+const MAX_PER_WINDOW = 25;
+
 const SESSION_MAP = {
   "presentation-ai-01": {
     calendarId: "primary",
@@ -38,6 +50,18 @@ const SESSION_MAP = {
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
+
+    // Reject anything without the shared key (blocks bots that never
+    // loaded the actual page) and anything that filled in the hidden
+    // honeypot field (blocks bots that fill in every field they see).
+    if (String(data.key || "") !== SHARED_KEY || String(data.hp || "").length > 0) {
+      return jsonOut({ success: false, message: "Unable to register. Please try again." });
+    }
+
+    if (isRateLimited()) {
+      return jsonOut({ success: false, message: "Too many requests right now. Please try again in a few minutes." });
+    }
+
     var sessionId = String(data.sessionId || "").trim();
     var name = String(data.name || "").trim();
     var email = String(data.email || "").trim();
@@ -90,6 +114,14 @@ function doPost(e) {
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isRateLimited() {
+  var cache = CacheService.getScriptCache();
+  var bucket = "alc_rl_" + Math.floor(Date.now() / (WINDOW_SECONDS * 1000));
+  var current = Number(cache.get(bucket) || "0") + 1;
+  cache.put(bucket, String(current), WINDOW_SECONDS);
+  return current > MAX_PER_WINDOW;
 }
 
 function jsonOut(obj) {
