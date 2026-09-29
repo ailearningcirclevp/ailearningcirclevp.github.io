@@ -385,25 +385,26 @@
   .btn-outline{background:transparent;color:var(--ink-900);border:1px solid var(--line);}
 
   /* ---------- questions list ---------- */
-  .q-list{margin:16px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;}
-  .q-list li{font-size:14px;color:var(--slate-400);padding-left:16px;position:relative;}
-  .q-list li::before{content:"?";position:absolute;left:0;color:var(--gold-500);font-weight:700;font-size:12px;}
   .hero .hero-lead{margin-top:24px;font-size:15.5px;line-height:1.55;color:var(--slate-400);max-width:46ch;}
+  .hero-familiar-head{
+    margin:26px 0 12px;font-family:'Fraunces',serif;font-weight:600;
+    font-size:18px;color:var(--cream-100);
+  }
   .hero-diff{
     margin-top:14px;font-size:13px;font-weight:600;color:var(--gold-500);
     letter-spacing:.01em;
   }
 
-  /* ---------- pain points ---------- */
+  /* ---------- pain points (sit on the dark hero card) ---------- */
   .pain-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   @media (max-width:420px){ .pain-grid{grid-template-columns:1fr;} }
   .pain-card{
-    background:var(--surface-1);border:1px solid var(--line);border-radius:14px;
-    padding:16px;font-size:13.5px;line-height:1.5;color:var(--ink-900);
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:14px;
+    padding:16px;font-size:13.5px;line-height:1.5;color:var(--cream-100);
   }
   .pain-close{
     margin-top:16px;text-align:center;font-size:14.5px;font-weight:600;
-    color:var(--ink-900);
+    color:var(--cream-100);
   }
 
   /* ---------- how it works ---------- */
@@ -632,32 +633,13 @@
 
 <div id="view-home" class="view active">
 
-  <!-- SECTION 1 — HERO -->
+  <!-- SECTION 1 — HERO (merged with "Does this sound familiar?") -->
   <div class="hero">
     <div class="eyebrow">AI Learning Circle</div>
     <h1>AI is everywhere. <em>Knowing how to use it at work</em> is the harder part.</h1>
     <p>You may have watched courses, tried ChatGPT, Copilot or Claude, and saved dozens of AI posts — but applying AI confidently to your day-to-day work is a different challenge.</p>
-    <ul class="q-list">
-      <li>Where do I start?</li>
-      <li>Which tool should I use?</li>
-      <li>Am I doing this correctly?</li>
-      <li>Can I trust the output?</li>
-      <li>What are others actually using at work?</li>
-    </ul>
-    <p class="hero-lead">AI Learning Circle is a practical community where we explore one real use case at a time, try it ourselves, ask questions, and learn from what worked — and what didn't.</p>
-    <div class="hero-diff">Not another AI course. Learn it. Try it. Discuss it. Improve it.</div>
-    <div class="cta-row">
-      <a class="btn btn-primary" href="#calendar" onclick="showView('calendar')">View Upcoming Free Sessions</a>
-      <a class="btn btn-secondary" href="https://wa.me/491743215456?text=Hi%21%20I%20am%20interested%20in%20the%20community%20and%20would%20like%20to%20join%20the%20sessions.%20Could%20you%20share%20me%20details%20of%20it.%20I%20am%20%28name%29%2C%20working%20as%20%28....%29." target="_blank" rel="noopener">Join WhatsApp for Updates</a>
-    </div>
-  </div>
 
-  <!-- SECTION 2 — DOES THIS SOUND FAMILIAR? -->
-  <section>
-    <div class="section-head">
-      <div class="eyebrow">Sound familiar?</div>
-      <h2>Does this sound familiar?</h2>
-    </div>
+    <div class="hero-familiar-head">Does this sound familiar?</div>
     <div class="pain-grid">
       <div class="pain-card">You want to learn AI — but don't know where to start.</div>
       <div class="pain-card">You've watched tutorials — but still struggle to apply them to your own work.</div>
@@ -665,7 +647,14 @@
       <div class="pain-card">You want to learn how other professionals are actually experimenting with AI.</div>
     </div>
     <div class="pain-close">That's what the Learning Circle is designed to solve.</div>
-  </section>
+
+    <p class="hero-lead">AI Learning Circle is a practical community where we explore one real use case at a time, try it ourselves, ask questions, and learn from what worked — and what didn't.</p>
+    <div class="hero-diff">Not another AI course. Learn it. Try it. Discuss it. Improve it.</div>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#calendar" onclick="showView('calendar')">View Upcoming Free Sessions</a>
+      <a class="btn btn-secondary" href="https://wa.me/491743215456?text=Hi%21%20I%20am%20interested%20in%20the%20community%20and%20would%20like%20to%20join%20the%20sessions.%20Could%20you%20share%20me%20details%20of%20it.%20I%20am%20%28name%29%2C%20working%20as%20%28....%29." target="_blank" rel="noopener">Join WhatsApp for Updates</a>
+    </div>
+  </div>
 
   <!-- SECTION 3 — HOW IT WORKS -->
   <section>
