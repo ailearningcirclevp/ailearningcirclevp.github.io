@@ -24,6 +24,12 @@ const SHARED_KEY = "m70wf5pfK60pOce1S_JKpgze";
 const WINDOW_SECONDS = 300;   // 5 minutes
 const MAX_PER_WINDOW = 25;
 
+// Google Calendar emails the REGISTRANT automatically (sendUpdates:
+// "all" below), but it does NOT email you, the organizer, just
+// because a guest was added to your own event. This address gets a
+// short notification email on every successful registration instead.
+const ORGANIZER_EMAIL = "ailearningcirclevp@gmail.com";
+
 const SESSION_MAP = {
   "presentation-ai-01": {
     calendarId: "primary",
@@ -105,6 +111,8 @@ function doPost(e) {
       { sendUpdates: "all" }
     );
 
+    notifyOrganizer(event, name, email);
+
     return jsonOut({ success: true, message: "Calendar invitation sent" });
 
   } catch (err) {
@@ -114,6 +122,30 @@ function doPost(e) {
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Emails you (the organizer) whenever someone successfully registers,
+// since Google Calendar's own notification only goes to the guest.
+// Wrapped in try/catch so a Gmail hiccup never breaks the registration
+// itself -- the guest is already added to the calendar by this point.
+function notifyOrganizer(event, name, email) {
+  try {
+    var title = event.summary || "AI Learning Circle session";
+    var when = "";
+    if (event.start) {
+      var startVal = event.start.dateTime || event.start.date;
+      if (startVal) when = new Date(startVal).toString();
+    }
+    var subject = "New registration: " + title;
+    var body =
+      "New sign-up for \"" + title + "\"" + (when ? " (" + when + ")" : "") + ".\n\n" +
+      "Name: " + name + "\n" +
+      "Email: " + email + "\n\n" +
+      "They've been added as a guest and Google has emailed them the calendar invite automatically.";
+    MailApp.sendEmail(ORGANIZER_EMAIL, subject, body);
+  } catch (e) {
+    // Notification failing should never block the registration.
+  }
 }
 
 function isRateLimited() {
