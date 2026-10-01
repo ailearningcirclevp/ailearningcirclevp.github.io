@@ -114,7 +114,21 @@
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
 
-    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+    const profile = {
+      full_name: document.getElementById('full_name').value.trim(),
+      headline: document.getElementById('headline').value.trim(),
+      location: document.getElementById('location').value.trim(),
+      company: document.getElementById('company').value.trim(),
+      linkedin_url: document.getElementById('linkedin_url').value.trim(),
+      area_of_interest: document.getElementById('area_of_interest').value.trim(),
+      website_url: document.getElementById('website_url').value.trim(),
+      bio: document.getElementById('bio').value.trim(),
+      show_in_directory: document.getElementById('show_in_directory').checked
+    };
+
+    // The profile row is created by a database trigger from this metadata,
+    // so it works even when email confirmation means there's no session yet.
+    const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { data: profile } });
 
     if (error) {
       showMsg(error.message, 'error');
@@ -123,44 +137,20 @@
       return;
     }
 
-    const userId = data.user && data.user.id;
-    if (userId) {
-      let profile_photo_url = null;
-      const photoFile = document.getElementById('photo').files[0];
-      if (photoFile) {
-        const safeName = photoFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const path = `${userId}/${Date.now()}_${safeName}`;
-        const { error: uploadError } = await supabaseClient.storage.from('profile-photos').upload(path, photoFile);
-        if (!uploadError) {
-          profile_photo_url = supabaseClient.storage.from('profile-photos').getPublicUrl(path).data.publicUrl;
-        }
-        // If the upload fails (e.g. email confirmation required before a
-        // session exists), we still create the account — they can add a
-        // photo later from their profile.
-      }
-
-      const { error: insertError } = await supabaseClient.from('members').insert({
-        id: userId,
-        full_name: document.getElementById('full_name').value.trim(),
-        headline: document.getElementById('headline').value.trim(),
-        location: document.getElementById('location').value.trim(),
-        company: document.getElementById('company').value.trim() || null,
-        linkedin_url: document.getElementById('linkedin_url').value.trim() || null,
-        area_of_interest: document.getElementById('area_of_interest').value.trim() || null,
-        website_url: document.getElementById('website_url').value.trim() || null,
-        bio: document.getElementById('bio').value.trim() || null,
-        profile_photo_url,
-        show_in_directory: document.getElementById('show_in_directory').checked
-      });
-      if (insertError) {
-        showMsg('Account created, but your profile details could not be saved: ' + insertError.message, 'error');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Create account';
-        return;
+    // Photo upload needs a logged-in session; only possible if email
+    // confirmation is off. Otherwise they add it from their profile.
+    const photoFile = document.getElementById('photo').files[0];
+    if (photoFile && data.session && data.user) {
+      const safeName = photoFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `${data.user.id}/${Date.now()}_${safeName}`;
+      const { error: uploadError } = await supabaseClient.storage.from('profile-photos').upload(path, photoFile);
+      if (!uploadError) {
+        const url = supabaseClient.storage.from('profile-photos').getPublicUrl(path).data.publicUrl;
+        await supabaseClient.from('members').update({ profile_photo_url: url }).eq('id', data.user.id);
       }
     }
 
-    showMsg('Account created! Check your email to confirm it, then log in.', 'ok');
+    showMsg('Account created! Check your email to confirm it, then log in. (Photos can be added from your profile after you log in.)', 'ok');
     form.reset();
     submitBtn.disabled = false;
     submitBtn.textContent = 'Create account';
