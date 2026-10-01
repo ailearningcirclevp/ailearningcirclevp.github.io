@@ -28,7 +28,7 @@ const MAX_PER_WINDOW = 25;
 // "all" below), but it does NOT email you, the organizer, just
 // because a guest was added to your own event. This address gets a
 // short notification email on every successful registration instead.
-const ORGANIZER_EMAIL = "ailearningcirclevp@gmail.com";
+const ORGANIZER_EMAIL = "ailearningcirclevp@gmail.com,vivp.2901@gmail.com"; // comma-separated: every address gets each notification
 
 const SESSION_MAP = {
   "presentation-ai-01": {
@@ -209,7 +209,7 @@ function notifySignup(name, email, company) {
         "Want the full Knowledge Library (use cases, starter kits, cheat sheets, prompt library)? " +
         "Message us on WhatsApp: https://wa.me/919566430848\n\n" +
         "AI Learning Circle",
-      replyTo: ORGANIZER_EMAIL
+      replyTo: "ailearningcirclevp@gmail.com"
     });
   } catch (e) {}
 }
