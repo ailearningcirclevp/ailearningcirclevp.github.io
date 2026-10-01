@@ -53,7 +53,7 @@
     <div class="toggle-row">
       <div>
         <div class="label">Show me on Know Your Community</div>
-        <div class="hint">Off by default. When on, your photo, name, headline, location, company and the link/bio above are shown on our public Know Your Community page.</div>
+        <div class="hint">Off by default. Turning this on means your photo, name, headline, location, company, and the link/bio above (whichever you filled in) will be shown publicly on our Know Your Community page — visible to anyone who visits the site, not just members.</div>
       </div>
       <label class="switch"><input type="checkbox" id="show_in_directory"><span class="track"></span></label>
     </div>
@@ -71,6 +71,7 @@
 <script src="assets/supabase-client.js"></script>
 <script>
   document.getElementById('logout-link').addEventListener('click', (e) => { e.preventDefault(); signOut(); });
+  wireDirectoryConsent(document.getElementById('show_in_directory'));
 
   let userId = null;
   const msg = document.getElementById('form-msg');

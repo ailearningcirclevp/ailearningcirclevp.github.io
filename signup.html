@@ -76,7 +76,7 @@
       <div class="toggle-row">
         <div>
           <div class="label">Show me on Know Your Community</div>
-          <div class="hint">Off by default. Our public showcase page where members who opt in share a photo and a word about themselves.</div>
+          <div class="hint">Off by default. Turning this on means your photo, name, headline, location, company, and the link/bio above (whichever you filled in) will be shown publicly on our Know Your Community page — visible to anyone who visits the site, not just members.</div>
         </div>
         <label class="switch"><input type="checkbox" id="show_in_directory"><span class="track"></span></label>
       </div>
@@ -95,6 +95,7 @@
   const form = document.getElementById('signup-form');
   const msg = document.getElementById('form-msg');
   const submitBtn = document.getElementById('submit-btn');
+  wireDirectoryConsent(document.getElementById('show_in_directory'));
 
   function showMsg(text, kind) {
     msg.textContent = text;

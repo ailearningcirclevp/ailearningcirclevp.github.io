@@ -65,6 +65,24 @@ async function downloadResourceFile(filePath, fileName) {
   window.open(data.signedUrl, "_blank");
 }
 
+// Explicit consent for "Know Your Community": attach to the
+// show_in_directory checkbox so turning it ON requires an affirmative
+// confirm naming exactly what becomes public. Cancelling reverts the
+// checkbox. Turning it back OFF never needs confirmation.
+function wireDirectoryConsent(checkboxEl) {
+  checkboxEl.addEventListener('change', () => {
+    if (!checkboxEl.checked) return;
+    const ok = window.confirm(
+      "You're about to make this public on our Know Your Community page, visible to anyone who visits the site (not just members):\n\n" +
+      "• Your name, headline, location and company\n" +
+      "• Your photo, if you added one\n" +
+      "• Your bio and website/profile link, if you added them\n\n" +
+      "Continue?"
+    );
+    if (!ok) checkboxEl.checked = false;
+  });
+}
+
 // Adds an "Admin" tab to every ".tabs" nav on the page, only when the
 // logged-in member's role is 'admin'. Safe to call on every portal
 // page right after fetching the member record.
