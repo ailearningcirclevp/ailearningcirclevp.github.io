@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Session Calendar — AI Learning Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></a>
+  <div class="tabs">
+    <a class="tab-btn" href="dashboard.html">Home</a>
+    <a class="tab-btn" href="library.html">Library</a>
+    <a class="tab-btn active" href="sessions.html">Sessions</a>
+    <a class="tab-btn" href="saved.html">Saved</a>
+    <a class="tab-btn" href="profile.html">Profile</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="eyebrow" style="margin-top:20px;">Session Calendar</div>
+  <h1 style="font-size:24px;margin:4px 0 20px;">Your sessions</h1>
+
+  <div class="section-title">Upcoming Sessions</div>
+  <div id="upcoming-list"><div class="empty-state">Loading…</div></div>
+
+  <div class="section-title">Past Sessions</div>
+  <div id="past-list"><div class="empty-state">Loading…</div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+  function icsLink(s) {
+    if (!s.session_date) return null;
+    const dateStr = s.session_date.replace(/-/g, '');
+    const title = encodeURIComponent(s.title);
+    const desc = encodeURIComponent(s.description || '');
+    const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${s.title}\nDTSTART;VALUE=DATE:${dateStr}\nDESCRIPTION:${s.description || ''}\nEND:VEVENT\nEND:VCALENDAR`;
+    return 'data:text/calendar;charset=utf8,' + encodeURIComponent(ics);
+  }
+
+  function upcomingCard(s) {
+    const ics = icsLink(s);
+    return `<div class="card" id="${s.id}"><h3>${s.title}</h3>
+      <p>${s.session_date || 'Date to be announced'}${s.session_time ? ' · ' + s.session_time : ''}</p>
+      <p style="margin-top:6px;">${s.description || ''}</p>
+      <div class="chip-row"><span class="chip">${s.status === 'soon' ? 'Coming soon' : 'Open'}</span></div>
+      <div class="cta-row" style="margin-top:12px;">
+        ${ics ? `<a class="btn btn-secondary" download="session.ics" href="${ics}">Add to Calendar</a>` : ''}
+      </div></div>`;
+  }
+
+  function pastCard(s) {
+    return `<div class="card" id="${s.id}"><h3>${s.title}</h3>
+      <p>${s.session_date || ''}</p>
+      <p style="margin-top:6px;">${s.description || ''}</p>
+      <div class="cta-row" style="margin-top:12px;">
+        ${s.recording_url ? `<a class="btn btn-dark" href="${s.recording_url}" target="_blank" rel="noopener">Watch recording</a>` : '<span class="lock-badge">Recording in the Knowledge Library</span>'}
+      </div></div>`;
+  }
+
+  (async () => {
+    if (supabaseNotConfigured()) {
+      document.getElementById('upcoming-list').innerHTML = '<div class="empty-state">Not connected yet — the site owner still needs to add the Supabase project keys.</div>';
+      document.getElementById('past-list').innerHTML = '';
+      return;
+    }
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) { window.location.href = 'login.html'; return; }
+
+    const { data: sessions } = await supabaseClient.from('sessions').select('*').order('session_date', { ascending: true });
+
+    const upcoming = (sessions || []).filter(s => s.status === 'open' || s.status === 'soon');
+    const past = (sessions || []).filter(s => s.status === 'completed' || s.status === 'closed');
+
+    document.getElementById('upcoming-list').innerHTML = upcoming.length
+      ? upcoming.map(upcomingCard).join('')
+      : '<div class="empty-state">No upcoming sessions yet.</div>';
+
+    document.getElementById('past-list').innerHTML = past.length
+      ? past.map(pastCard).join('')
+      : '<div class="empty-state">No past sessions yet.</div>';
+  })();
+</script>
+
+</body>
+</html>

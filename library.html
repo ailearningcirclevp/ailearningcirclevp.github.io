@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knowledge Library — AI Learning Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+<style>
+  .lib-header{margin:20px 0;}
+  .lib-header h1{font-size:24px;margin:4px 0 6px;}
+  .lib-header p{font-size:14.5px;color:var(--slate-500);margin:0;}
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;}
+  .filter-row select{padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-1);font-family:inherit;font-size:13px;}
+  .cat-num{font-size:12px;color:var(--slate-500);font-weight:700;}
+  .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></a>
+  <div class="tabs" id="nav-tabs"></div>
+</nav>
+
+<div class="wrap">
+  <div class="lib-header">
+    <div class="eyebrow">Knowledge Library</div>
+    <h1 id="lib-title">Loading…</h1>
+    <p id="lib-sub"></p>
+  </div>
+
+  <div class="filter-row">
+    <select id="filter-category"><option value="">All categories</option></select>
+    <select id="filter-level">
+      <option value="">All levels</option>
+      <option value="beginner">Beginner</option>
+      <option value="intermediate">Intermediate</option>
+      <option value="advanced">Advanced</option>
+    </select>
+  </div>
+
+  <div id="resource-list"><div class="empty-state">Loading…</div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+  let isMember = false;
+  let userId = null;
+  let savedIds = new Set();
+  let allResources = [];
+
+  function lockedCard(r, i) {
+    const parts = [];
+    if (r.has_starter_kit) parts.push('Starter Kit');
+    if (r.has_cheat_sheet) parts.push('Cheat Sheet');
+    if (r.has_recording) parts.push('Recording');
+    return `<div class="card">
+      <div class="cat-num">${String(i + 1).padStart(3, '0')} · ${r.category}</div>
+      <h3>${r.title}</h3>
+      <div class="chip-row">${parts.map(p => `<span class="chip locked">${p} 🔒</span>`).join('')}</div>
+    </div>`;
+  }
+
+  function memberCard(r, i) {
+    const saved = savedIds.has(r.id);
+    return `<div class="card" id="${r.id}">
+      <div class="card-head">
+        <div>
+          <div class="cat-num">${String(i + 1).padStart(3, '0')} · ${r.category}</div>
+          <h3>${r.title}</h3>
+        </div>
+        <button class="save-btn ${saved ? 'saved' : ''}" data-id="${r.id}">${saved ? '♥ Saved' : '♡ Save'}</button>
+      </div>
+      <p>${r.business_problem || ''}</p>
+      ${r.what_you_learn ? `<p style="margin-top:8px;"><strong>What you'll learn:</strong> ${r.what_you_learn}</p>` : ''}
+      ${r.tool_used ? `<p style="margin-top:8px;"><strong>Tool used:</strong> ${r.tool_used}</p>` : ''}
+      ${r.tool_transferability_note ? `<p style="margin-top:8px;color:var(--slate-500);"><em>Can I do this with another tool?</em> ${r.tool_transferability_note}</p>` : ''}
+      <div class="chip-row">
+        ${r.recording_url ? `<a class="chip" href="${r.recording_url}" target="_blank" rel="noopener">Recording</a>` : ''}
+        ${r.starter_kit_url ? `<a class="chip" href="${r.starter_kit_url}" target="_blank" rel="noopener">Starter Kit</a>` : ''}
+        ${r.cheat_sheet_url ? `<a class="chip" href="${r.cheat_sheet_url}" target="_blank" rel="noopener">Cheat Sheet</a>` : ''}
+        ${r.level ? `<span class="chip">${r.level}</span>` : ''}
+      </div>
+    </div>`;
+  }
+
+  function render() {
+    const cat = document.getElementById('filter-category').value;
+    const level = document.getElementById('filter-level').value;
+    const filtered = allResources.filter(r =>
+      (!cat || r.category === cat) && (!level || r.level === level)
+    );
+    const list = document.getElementById('resource-list');
+    if (!filtered.length) {
+      list.innerHTML = '<div class="empty-state">Nothing matches those filters yet.</div>';
+      return;
+    }
+    list.innerHTML = filtered.map((r, i) => isMember ? memberCard(r, i) : lockedCard(r, i)).join('');
+
+    if (isMember) {
+      list.querySelectorAll('.save-btn').forEach(btn => {
+        btn.addEventListener('click', () => toggleSave(btn.dataset.id, btn));
+      });
+    }
+  }
+
+  async function toggleSave(resourceId, btn) {
+    if (savedIds.has(resourceId)) {
+      await supabaseClient.from('saved_items').delete().eq('member_id', userId).eq('resource_id', resourceId);
+      savedIds.delete(resourceId);
+      btn.textContent = '♡ Save';
+      btn.classList.remove('saved');
+    } else {
+      await supabaseClient.from('saved_items').insert({ member_id: userId, resource_id: resourceId });
+      savedIds.add(resourceId);
+      btn.textContent = '♥ Saved';
+      btn.classList.add('saved');
+    }
+  }
+
+  function setupCategoryFilter() {
+    const categories = [...new Set(allResources.map(r => r.category))].sort();
+    const sel = document.getElementById('filter-category');
+    categories.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c; opt.textContent = c;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener('change', render);
+    document.getElementById('filter-level').addEventListener('change', render);
+  }
+
+  (async () => {
+    if (supabaseNotConfigured()) {
+      document.getElementById('lib-title').textContent = 'Not connected yet';
+      document.getElementById('lib-sub').textContent = 'The site owner still needs to add the Supabase project keys.';
+      document.getElementById('resource-list').innerHTML = '';
+      return;
+    }
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (session) {
+      const member = await getMemberRecord(session.user.id);
+      isMember = !!member && member.role === 'member' || (member && member.role === 'admin');
+      userId = session.user.id;
+
+      document.getElementById('nav-tabs').innerHTML = `
+        <a class="tab-btn" href="dashboard.html">Home</a>
+        <a class="tab-btn active" href="library.html">Library</a>
+        <a class="tab-btn" href="sessions.html">Sessions</a>
+        <a class="tab-btn" href="saved.html">Saved</a>
+        <a class="tab-btn" href="profile.html">Profile</a>`;
+    } else {
+      document.getElementById('nav-tabs').innerHTML = `<a class="tab-btn" href="login.html">Member Login</a>`;
+    }
+
+    if (isMember) {
+      document.getElementById('lib-title').textContent = 'Knowledge Library';
+      document.getElementById('lib-sub').textContent = 'Every use case: the problem, the workflow, the resources.';
+      const { data: resources } = await supabaseClient.from('resources').select('*').order('created_at', { ascending: true });
+      allResources = resources || [];
+
+      const { data: saved } = await supabaseClient.from('saved_items').select('resource_id').eq('member_id', userId);
+      savedIds = new Set((saved || []).map(s => s.resource_id));
+    } else {
+      document.getElementById('lib-title').textContent = 'See what\'s inside';
+      document.getElementById('lib-sub').textContent = 'Every use case in the library — unlock membership to open the Starter Kits, Cheat Sheets and recordings.';
+      const { data: catalogue } = await supabaseClient.from('resource_catalogue').select('*').order('category', { ascending: true });
+      allResources = catalogue || [];
+    }
+
+    setupCategoryFilter();
+    render();
+
+    if (!isMember) {
+      document.getElementById('resource-list').insertAdjacentHTML('beforeend',
+        `<div class="cta-row"><a class="btn btn-primary" href="index.html#membership">Unlock the Member Library</a></div>`);
+    }
+  })();
+</script>
+
+</body>
+</html>

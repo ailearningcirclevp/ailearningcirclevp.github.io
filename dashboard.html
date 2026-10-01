@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — AI Learning Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+<style>
+  .welcome{font-size:22px;margin:20px 0 4px;}
+  .welcome-sub{font-size:14px;color:var(--slate-500);margin-bottom:20px;}
+  .card-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;}
+  .card-row .card{min-width:220px;flex:0 0 auto;margin-bottom:0;}
+  .logout-link{font-size:12.5px;color:var(--slate-500);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="dashboard.html" class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></a>
+  <div class="tabs">
+    <a class="tab-btn active" href="dashboard.html">Home</a>
+    <a class="tab-btn" href="library.html">Library</a>
+    <a class="tab-btn" href="sessions.html">Sessions</a>
+    <a class="tab-btn" href="saved.html">Saved</a>
+    <a class="tab-btn" href="profile.html">Profile</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="welcome" id="welcome">Welcome back</div>
+  <div class="welcome-sub">Here's what's next for you.</div>
+  <a href="#" id="logout-link" class="logout-link">Log out</a>
+
+  <div class="section-title">Next Session</div>
+  <div id="next-session"><div class="empty-state">Loading…</div></div>
+
+  <div class="section-title">Continue Learning</div>
+  <div id="continue-learning"><div class="empty-state">Loading…</div></div>
+
+  <div class="section-title">Latest Resource</div>
+  <div id="latest-resource"><div class="empty-state">Loading…</div></div>
+
+  <div class="section-title">My Saved Items</div>
+  <div class="card-row" id="saved-row"><div class="empty-state">Loading…</div></div>
+  <div class="cta-row"><a class="btn btn-secondary" href="saved.html">See all saved items</a></div>
+
+  <div class="section-title">Explore</div>
+  <div class="cta-row">
+    <a class="btn btn-dark" href="library.html">Knowledge Library</a>
+    <a class="btn btn-secondary" href="sessions.html">Session Library</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+  document.getElementById('logout-link').addEventListener('click', (e) => { e.preventDefault(); signOut(); });
+
+  function resourceCard(r) {
+    return `<div class="card"><h3>${r.title}</h3><p>${r.business_problem || ''}</p>
+      <div class="chip-row"><span class="chip">${r.category}</span>${r.tool_used ? `<span class="chip">${r.tool_used}</span>` : ''}</div>
+      <div class="cta-row" style="margin-top:12px;"><a class="btn btn-secondary" href="library.html#${r.id}">Open</a></div></div>`;
+  }
+
+  (async () => {
+    const session = await requireMember();
+    if (!session) return;
+
+    const member = await getMemberRecord(session.user.id);
+    if (!member) return;
+
+    if (!member.survey_completed) {
+      window.location.href = 'onboarding.html';
+      return;
+    }
+
+    document.getElementById('welcome').textContent = 'Welcome back, ' + (member.full_name ? member.full_name.split(' ')[0] : 'there');
+
+    // Next session: public or member sessions, status open/soon, soonest date first.
+    const { data: sessions } = await supabaseClient
+      .from('sessions')
+      .select('*')
+      .in('status', ['open', 'soon'])
+      .order('session_date', { ascending: true, nullsFirst: false })
+      .limit(1);
+
+    const nextEl = document.getElementById('next-session');
+    if (sessions && sessions.length) {
+      const s = sessions[0];
+      nextEl.innerHTML = `<div class="card"><h3>${s.title}</h3>
+        <p>${s.session_date || 'Date to be announced'}${s.session_time ? ' · ' + s.session_time : ''}</p>
+        <p style="margin-top:6px;">${s.description || ''}</p>
+        <div class="cta-row" style="margin-top:12px;">
+          <a class="btn btn-primary" href="sessions.html#${s.id}">Join / Details</a>
+        </div></div>`;
+    } else {
+      nextEl.innerHTML = '<div class="empty-state">No upcoming session yet — check back soon.</div>';
+    }
+
+    // Continue learning + saved items, via the saved_items join.
+    const { data: saved } = await supabaseClient
+      .from('saved_items')
+      .select('saved_at, resources(*)')
+      .eq('member_id', session.user.id)
+      .order('saved_at', { ascending: false });
+
+    const continueEl = document.getElementById('continue-learning');
+    const savedRow = document.getElementById('saved-row');
+
+    if (saved && saved.length) {
+      continueEl.innerHTML = resourceCard(saved[0].resources);
+      savedRow.innerHTML = saved.slice(0, 5).map(s => resourceCard(s.resources)).join('');
+    } else {
+      continueEl.innerHTML = '<div class="empty-state">Nothing saved yet — browse the Knowledge Library to get started.</div>';
+      savedRow.innerHTML = '<div class="empty-state">No saved items yet.</div>';
+    }
+
+    // Latest resource overall.
+    const { data: latest } = await supabaseClient
+      .from('resources')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    const latestEl = document.getElementById('latest-resource');
+    latestEl.innerHTML = (latest && latest.length) ? resourceCard(latest[0]) : '<div class="empty-state">No resources published yet.</div>';
+  })();
+</script>
+
+</body>
+</html>

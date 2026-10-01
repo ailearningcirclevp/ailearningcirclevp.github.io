@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Saved Items — AI Learning Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></a>
+  <div class="tabs">
+    <a class="tab-btn" href="dashboard.html">Home</a>
+    <a class="tab-btn" href="library.html">Library</a>
+    <a class="tab-btn" href="sessions.html">Sessions</a>
+    <a class="tab-btn active" href="saved.html">Saved</a>
+    <a class="tab-btn" href="profile.html">Profile</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="eyebrow" style="margin-top:20px;">My Saved Items</div>
+  <h1 style="font-size:24px;margin:4px 0 20px;">Saved for later</h1>
+  <div id="saved-list"><div class="empty-state">Loading…</div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+  let userId = null;
+
+  function card(r) {
+    return `<div class="card" id="${r.id}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+        <div><div class="cat-num" style="font-size:12px;color:var(--slate-500);font-weight:700;">${r.category}</div><h3>${r.title}</h3></div>
+        <button class="save-btn saved" data-id="${r.id}">♥ Saved</button>
+      </div>
+      <p>${r.business_problem || ''}</p>
+      <div class="chip-row">
+        ${r.recording_url ? `<a class="chip" href="${r.recording_url}" target="_blank" rel="noopener">Recording</a>` : ''}
+        ${r.starter_kit_url ? `<a class="chip" href="${r.starter_kit_url}" target="_blank" rel="noopener">Starter Kit</a>` : ''}
+        ${r.cheat_sheet_url ? `<a class="chip" href="${r.cheat_sheet_url}" target="_blank" rel="noopener">Cheat Sheet</a>` : ''}
+      </div>
+    </div>`;
+  }
+
+  async function unsave(resourceId, cardEl) {
+    await supabaseClient.from('saved_items').delete().eq('member_id', userId).eq('resource_id', resourceId);
+    cardEl.remove();
+  }
+
+  (async () => {
+    const session = await requireMember();
+    if (!session) return;
+    userId = session.user.id;
+
+    const { data: saved } = await supabaseClient
+      .from('saved_items')
+      .select('resources(*)')
+      .eq('member_id', userId)
+      .order('saved_at', { ascending: false });
+
+    const list = document.getElementById('saved-list');
+    if (!saved || !saved.length) {
+      list.innerHTML = '<div class="empty-state">Nothing saved yet — browse the <a href="library.html">Knowledge Library</a> and tap Save on anything useful.</div>';
+      return;
+    }
+
+    list.innerHTML = saved.map(s => card(s.resources)).join('');
+    list.querySelectorAll('.save-btn').forEach(btn => {
+      btn.addEventListener('click', () => unsave(btn.dataset.id, btn.closest('.card')));
+    });
+  })();
+</script>
+
+</body>
+</html>

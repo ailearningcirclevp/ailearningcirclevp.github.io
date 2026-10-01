@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Join — AI Learning Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></a>
+</nav>
+
+<div class="wrap">
+  <div class="auth-shell">
+    <div class="eyebrow">Create account</div>
+    <h1>Join AI Learning Circle</h1>
+    <p class="sub">Free to register. Membership (Knowledge Library, Starter Kits, Cheat Sheets) is approved separately after payment.</p>
+
+    <div class="form-msg" id="form-msg"></div>
+
+    <form id="signup-form">
+      <div class="field">
+        <label for="full_name">Full name</label>
+        <input id="full_name" type="text" required autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" required autocomplete="email">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input id="password" type="password" required minlength="8" autocomplete="new-password">
+        <div class="hint">At least 8 characters.</div>
+      </div>
+      <div class="field">
+        <label for="headline">Professional headline / role</label>
+        <input id="headline" type="text" placeholder="e.g. Finance Manager" required>
+      </div>
+      <div class="field">
+        <label for="location">Location</label>
+        <input id="location" type="text" placeholder="e.g. Dortmund, Germany" required>
+      </div>
+      <div class="field">
+        <label for="company">Company <span class="hint">(optional)</span></label>
+        <input id="company" type="text">
+      </div>
+      <div class="field">
+        <label for="linkedin_url">LinkedIn profile URL <span class="hint">(optional, never shown publicly)</span></label>
+        <input id="linkedin_url" type="url" placeholder="https://linkedin.com/in/...">
+      </div>
+      <div class="field">
+        <label for="area_of_interest">Area of interest <span class="hint">(optional)</span></label>
+        <input id="area_of_interest" type="text" placeholder="e.g. Finance automation">
+      </div>
+      <button class="btn btn-primary" type="submit" id="submit-btn" style="width:100%;">Create account</button>
+    </form>
+
+    <div class="auth-switch">Already a member? <a href="login.html">Log in</a></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+  const form = document.getElementById('signup-form');
+  const msg = document.getElementById('form-msg');
+  const submitBtn = document.getElementById('submit-btn');
+
+  function showMsg(text, kind) {
+    msg.textContent = text;
+    msg.className = 'form-msg show ' + kind;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (supabaseNotConfigured()) {
+      showMsg('Signup isn’t connected yet — the site owner still needs to add the Supabase project keys.', 'error');
+      return;
+    }
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating account…';
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+
+    if (error) {
+      showMsg(error.message, 'error');
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Create account';
+      return;
+    }
+
+    const userId = data.user && data.user.id;
+    if (userId) {
+      const { error: insertError } = await supabaseClient.from('members').insert({
+        id: userId,
+        full_name: document.getElementById('full_name').value.trim(),
+        headline: document.getElementById('headline').value.trim(),
+        location: document.getElementById('location').value.trim(),
+        company: document.getElementById('company').value.trim() || null,
+        linkedin_url: document.getElementById('linkedin_url').value.trim() || null,
+        area_of_interest: document.getElementById('area_of_interest').value.trim() || null
+      });
+      if (insertError) {
+        showMsg('Account created, but your profile details could not be saved: ' + insertError.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create account';
+        return;
+      }
+    }
+
+    showMsg('Account created! Check your email to confirm it, then log in.', 'ok');
+    form.reset();
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Create account';
+  });
+</script>
+
+</body>
+</html>

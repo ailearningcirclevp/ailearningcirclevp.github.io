@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profile — AI Learning Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+<style>
+  .toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-top:1px solid var(--line);}
+  .toggle-row .label{font-size:14.5px;}
+  .toggle-row .hint{font-size:12.5px;color:var(--slate-500);margin-top:2px;}
+  .switch{position:relative;width:42px;height:24px;flex:0 0 auto;}
+  .switch input{opacity:0;width:0;height:0;}
+  .switch .track{position:absolute;inset:0;background:var(--line);border-radius:999px;cursor:pointer;transition:.15s;}
+  .switch .track:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.15s;}
+  .switch input:checked + .track{background:var(--gold-500);}
+  .switch input:checked + .track:before{transform:translateX(18px);}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></a>
+  <div class="tabs">
+    <a class="tab-btn" href="dashboard.html">Home</a>
+    <a class="tab-btn" href="library.html">Library</a>
+    <a class="tab-btn" href="sessions.html">Sessions</a>
+    <a class="tab-btn" href="saved.html">Saved</a>
+    <a class="tab-btn active" href="profile.html">Profile</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="eyebrow" style="margin-top:20px;">Profile</div>
+  <h1 style="font-size:24px;margin:4px 0 20px;">Your details</h1>
+
+  <div class="form-msg" id="form-msg"></div>
+
+  <form id="profile-form">
+    <div class="field"><label for="full_name">Full name</label><input id="full_name" type="text" required></div>
+    <div class="field"><label for="headline">Professional headline / role</label><input id="headline" type="text"></div>
+    <div class="field"><label for="location">Location</label><input id="location" type="text"></div>
+    <div class="field"><label for="company">Company <span class="hint">(optional)</span></label><input id="company" type="text"></div>
+    <div class="field"><label for="linkedin_url">LinkedIn URL <span class="hint">(optional, never shown publicly unless you opt in below)</span></label><input id="linkedin_url" type="url"></div>
+    <div class="field"><label for="area_of_interest">Area of interest <span class="hint">(optional)</span></label><input id="area_of_interest" type="text"></div>
+
+    <div class="toggle-row">
+      <div>
+        <div class="label">Show me in Member Directory</div>
+        <div class="hint">Off by default. When on, your name, headline, location, company and LinkedIn (if provided) are visible to other logged-in members only — never to the public.</div>
+      </div>
+      <label class="switch"><input type="checkbox" id="show_in_directory"><span class="track"></span></label>
+    </div>
+
+    <button class="btn btn-primary" type="submit" style="width:100%;margin-top:20px;">Save changes</button>
+  </form>
+
+  <div class="cta-row" style="margin-top:24px;">
+    <a href="#" id="logout-link" class="btn btn-secondary">Log out</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+  document.getElementById('logout-link').addEventListener('click', (e) => { e.preventDefault(); signOut(); });
+
+  let userId = null;
+  const msg = document.getElementById('form-msg');
+
+  (async () => {
+    const session = await requireMember();
+    if (!session) return;
+    userId = session.user.id;
+
+    const member = await getMemberRecord(userId);
+    if (!member) return;
+
+    document.getElementById('full_name').value = member.full_name || '';
+    document.getElementById('headline').value = member.headline || '';
+    document.getElementById('location').value = member.location || '';
+    document.getElementById('company').value = member.company || '';
+    document.getElementById('linkedin_url').value = member.linkedin_url || '';
+    document.getElementById('area_of_interest').value = member.area_of_interest || '';
+    document.getElementById('show_in_directory').checked = !!member.show_in_directory;
+  })();
+
+  document.getElementById('profile-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const { error } = await supabaseClient.from('members').update({
+      full_name: document.getElementById('full_name').value.trim(),
+      headline: document.getElementById('headline').value.trim(),
+      location: document.getElementById('location').value.trim(),
+      company: document.getElementById('company').value.trim() || null,
+      linkedin_url: document.getElementById('linkedin_url').value.trim() || null,
+      area_of_interest: document.getElementById('area_of_interest').value.trim() || null,
+      show_in_directory: document.getElementById('show_in_directory').checked
+    }).eq('id', userId);
+
+    msg.textContent = error ? error.message : 'Saved.';
+    msg.className = 'form-msg show ' + (error ? 'error' : 'ok');
+  });
+</script>
+
+</body>
+</html>
