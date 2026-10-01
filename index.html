@@ -87,9 +87,11 @@
     pointer-events:none;
   }
   .hero .eyebrow{margin-block-end:14px;}
+  html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   .hero h1{
     font-size:clamp(28px,7vw,38px);
     line-height:1.08;
+    white-space:nowrap;
     margin:0 0 10px;
     font-weight:600;
     text-wrap:balance;
@@ -1233,4 +1235,16 @@ if(drawerSearch){
     renderSessions(q);
   });
 }
+
+/* keep each headline line on one line, whatever the phone's font settings */
+function fitHeadline(){
+  var h=document.querySelector('.hero h1'); if(!h) return;
+  h.style.fontSize='';
+  var size=parseFloat(getComputedStyle(h).fontSize), n=0;
+  var box=h.parentElement, max=box.clientWidth-parseFloat(getComputedStyle(box).paddingLeft)-parseFloat(getComputedStyle(box).paddingRight);
+  while(h.scrollWidth>max+1 && size>14 && n<60){ size-=1; h.style.fontSize=size+'px'; n++; }
+}
+window.addEventListener('load',fitHeadline);
+window.addEventListener('resize',fitHeadline);
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(fitHeadline);
 </script>
