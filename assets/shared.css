@@ -77,7 +77,7 @@ a{color:inherit;}
   border-bottom:1px solid var(--line);
 }
 .topnav .brand{display:flex;align-items:center;}
-.topnav .brand img{height:26px;width:auto;display:block;border-radius:4px;}
+.topnav .brand img{height:34px;width:auto;display:block;border-radius:4px;}
 .tabs{display:flex;gap:6px;background:var(--surface-1);border:1px solid var(--line);border-radius:999px;padding:3px;}
 .tab-btn{
   appearance:none;border:none;background:transparent;color:var(--slate-500);

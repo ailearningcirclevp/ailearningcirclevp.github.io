@@ -379,7 +379,7 @@
     align-items:center;
   }
   .topnav .brand img{
-    height:26px;
+    height:34px;
     width:auto;
     display:block;
     border-radius:4px;
@@ -416,7 +416,7 @@
   }
   .drawer.open{transform:translateX(0);}
   .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-  .drawer-head img{height:24px;}
+  .drawer-head img{height:32px;}
   .drawer-close{appearance:none;border:none;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:var(--slate-500);padding:4px;}
   .drawer-search{
     width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--line);
@@ -622,7 +622,7 @@
 <div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-head">
-    <img src="assets/logo.png" alt="AI Learning Circle">
+    <img src="assets/logo.svg" alt="AI Learning Circle">
     <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu">✕</button>
   </div>
   <input class="drawer-search" id="drawer-search" type="search" placeholder="Search sessions…">
@@ -639,7 +639,7 @@
 
 <nav class="topnav">
   <button class="menu-btn" id="menu-btn" onclick="openDrawer()" aria-label="Open menu"><span></span><span></span><span></span></button>
-  <div class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></div>
+  <div class="brand"><img src="assets/logo.svg" alt="AI Learning Circle"></div>
   <div class="tabs-desktop">
     <button class="tab-btn nav-home-link active" onclick="showView('home'); goToSlide(0);">Home</button>
     <button class="tab-btn nav-calendar-link" onclick="showView('calendar');">Session Calendar</button>
