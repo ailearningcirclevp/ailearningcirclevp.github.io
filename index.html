@@ -550,8 +550,10 @@
   @media (max-width:859px){
     .hero{padding:20px 20px 18px;margin-block-start:12px;border-radius:18px;}
     .hero .eyebrow{margin-block-end:8px;font-size:11px;}
-    .hero h1{font-size:26px;margin-bottom:8px;}
-    .hero p{font-size:14px;line-height:1.45;}
+    .swipe-slide:first-child > .wrap{min-height:100%;display:flex;flex-direction:column;}
+    .swipe-slide:first-child .hero{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;}
+    .hero h1{font-size:clamp(28px,4.6vh,38px);margin-bottom:12px;}
+    .hero p{font-size:clamp(14px,2.1vh,16px);line-height:1.5;}
     .hero-diff{display:none;}
     .start{gap:7px !important;margin-top:12px !important;}
     .start-card{padding:9px 14px !important;gap:12px !important;}
@@ -559,6 +561,8 @@
     .sc-text strong{font-size:14px !important;}
     .sc-text small{font-size:12px !important;}
   }
+  @media (max-width:859px) and (min-height:720px){ .hero-diff{display:block;} }
+  @media (max-width:859px) and (min-height:880px){ .hero .hero-lead{display:block;} }
   .start{margin:14px 0 8px;display:flex;flex-direction:column;gap:10px;}
   .start-label{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-500);}
   .start-card{
@@ -673,7 +677,7 @@
       <div class="wrap">
         <div class="hero">
           <div class="eyebrow">AI Learning Circle · Practical AI for work</div>
-          <h1>Real finance work. <em>Real use cases.</em> Built with AI.</h1>
+          <h1>Real finance work.<br><em>Real use cases.</em><br>Built with AI.</h1>
           <p>Learn AI by solving the problems you actually face: reporting, forecasting, presentations, analysis, and the everyday work around them.</p>
           <p class="hero-lead">Each session takes one real work situation and builds the AI workflow that solves it, so you leave with something you can reuse. Finance is at the heart of it.</p>
           <div class="hero-diff">Real problem → Build the workflow → Try it → Improve it together<br>Not a tools course. A use-case approach, close to how you actually work.</div>
