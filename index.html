@@ -543,13 +543,12 @@
 
   /* ---------- choose-your-path buttons (hero) ---------- */
   .paths{margin:20px 0 22px;display:flex;flex-direction:column;gap:14px;}
-  .path-q{font-size:13px;font-weight:600;color:var(--cream-100);margin-bottom:6px;opacity:.92;}
+  .path-q{font-size:12.5px;font-weight:500;color:var(--slate-400);margin-bottom:6px;}
   .path-btn{width:100%;gap:10px;justify-content:flex-start;padding:14px 18px;font-size:14.5px;}
   .path-btn svg{width:20px;height:20px;flex:0 0 auto;}
-  .btn.path-session{background:rgba(94,234,212,.12);border:1px solid rgba(94,234,212,.45) !important;}
-  .btn.path-session svg{color:#5eead4;}
-  .btn.path-member{background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.5) !important;}
-  .btn.path-member svg{color:#c4b5fd;}
+  .path .btn-secondary{background:transparent;color:var(--cream-100);border:1px solid rgba(247,244,236,.35) !important;font-weight:600;}
+  .path .btn-secondary:hover{background:rgba(247,244,236,.08);}
+  .path-btn svg{opacity:.9;}
   @media (min-width:860px){
     .paths{flex-direction:row;gap:18px;}
     .path{flex:1;}
