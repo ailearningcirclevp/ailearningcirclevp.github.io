@@ -10,8 +10,8 @@
 // policies (see supabase/schema.sql) allow. Never put the
 // "service_role" key here or in any file in this repository.
 
-const SUPABASE_URL = "PASTE_YOUR_SUPABASE_PROJECT_URL_HERE";
-const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_PUBLIC_KEY_HERE";
+const SUPABASE_URL = "https://fcrljnbuvfrhrpwavkji.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_lAvzAkI-r3v2sJa80zjy8Q_SHjCNELO";
 
 // The onboarding survey shown on first login. Reuses the existing
 // AI Pulse Google Form by default — replace with a dedicated
