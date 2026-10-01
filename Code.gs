@@ -68,6 +68,22 @@ function doPost(e) {
       return jsonOut({ success: false, message: "Too many requests right now. Please try again in a few minutes." });
     }
 
+    // WhatsApp interest form from the homepage: no calendar involved,
+    // just email the organizer so no one's interest is ever missed.
+    if (String(data.type || "") === "interest") {
+      var iName = String(data.name || "").trim().slice(0, 120);
+      var iPhone = String(data.whatsapp || "").replace(/[^0-9+]/g, "");
+      var iRole = String(data.role || "").trim().slice(0, 200);
+      if (!iName) {
+        return jsonOut({ success: false, message: "Please provide your name." });
+      }
+      if (iPhone.replace(/\+/g, "").length < 8 || iPhone.length > 18) {
+        return jsonOut({ success: false, message: "Please provide a valid WhatsApp number with country code." });
+      }
+      notifyInterest(iName, iPhone, iRole);
+      return jsonOut({ success: true, message: "Thanks! We'll message you on WhatsApp." });
+    }
+
     var sessionId = String(data.sessionId || "").trim();
     var name = String(data.name || "").trim();
     var email = String(data.email || "").trim();
@@ -146,6 +162,18 @@ function notifyOrganizer(event, name, email) {
   } catch (e) {
     // Notification failing should never block the registration.
   }
+}
+
+// Emails the organizer a new WhatsApp interest (name + number + role).
+function notifyInterest(name, phone, role) {
+  var digits = phone.replace(/[^0-9]/g, "");
+  var body =
+    "New WhatsApp interest from the AI Learning Circle website.\n\n" +
+    "Name: " + name + "\n" +
+    "WhatsApp: " + phone + "\n" +
+    (role ? "Role / company: " + role + "\n" : "") +
+    "\nOpen chat: https://wa.me/" + digits;
+  MailApp.sendEmail(ORGANIZER_EMAIL, "New WhatsApp interest: " + name, body);
 }
 
 function isRateLimited() {
