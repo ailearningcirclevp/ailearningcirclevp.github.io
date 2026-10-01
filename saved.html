@@ -35,16 +35,16 @@
   let userId = null;
 
   function card(r) {
+    const label = RESOURCE_TYPE_LABELS[r.type] || r.type;
     return `<div class="card" id="${r.id}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
-        <div><div class="cat-num" style="font-size:12px;color:var(--slate-500);font-weight:700;">${r.category}</div><h3>${r.title}</h3></div>
+        <div><div class="cat-num" style="font-size:12px;color:var(--slate-500);font-weight:700;">${label} · ${r.category}</div><h3>${r.title}</h3></div>
         <button class="save-btn saved" data-id="${r.id}">♥ Saved</button>
       </div>
-      <p>${r.business_problem || ''}</p>
+      <p>${r.description || r.business_problem || ''}</p>
       <div class="chip-row">
+        ${r.file_path ? `<button class="chip-btn" data-path="${r.file_path}" data-name="${r.file_name || ''}">⬇ Download${r.file_name ? ' · ' + r.file_name : ''}</button>` : ''}
         ${r.recording_url ? `<a class="chip" href="${r.recording_url}" target="_blank" rel="noopener">Recording</a>` : ''}
-        ${r.starter_kit_url ? `<a class="chip" href="${r.starter_kit_url}" target="_blank" rel="noopener">Starter Kit</a>` : ''}
-        ${r.cheat_sheet_url ? `<a class="chip" href="${r.cheat_sheet_url}" target="_blank" rel="noopener">Cheat Sheet</a>` : ''}
       </div>
     </div>`;
   }
@@ -74,6 +74,9 @@
     list.innerHTML = saved.map(s => card(s.resources)).join('');
     list.querySelectorAll('.save-btn').forEach(btn => {
       btn.addEventListener('click', () => unsave(btn.dataset.id, btn.closest('.card')));
+    });
+    list.querySelectorAll('.chip-btn').forEach(btn => {
+      btn.addEventListener('click', () => downloadResourceFile(btn.dataset.path, btn.dataset.name));
     });
   })();
 </script>

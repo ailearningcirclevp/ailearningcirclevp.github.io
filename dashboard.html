@@ -61,9 +61,19 @@
   document.getElementById('logout-link').addEventListener('click', (e) => { e.preventDefault(); signOut(); });
 
   function resourceCard(r) {
-    return `<div class="card"><h3>${r.title}</h3><p>${r.business_problem || ''}</p>
-      <div class="chip-row"><span class="chip">${r.category}</span>${r.tool_used ? `<span class="chip">${r.tool_used}</span>` : ''}</div>
-      <div class="cta-row" style="margin-top:12px;"><a class="btn btn-secondary" href="library.html#${r.id}">Open</a></div></div>`;
+    return `<div class="card"><h3>${r.title}</h3><p>${r.description || r.business_problem || ''}</p>
+      <div class="chip-row">
+        <span class="chip">${r.category}</span>
+        ${r.tool_used ? `<span class="chip">${r.tool_used}</span>` : ''}
+        ${r.file_path ? `<button class="chip-btn" data-path="${r.file_path}" data-name="${r.file_name || ''}">⬇ Download</button>` : ''}
+      </div>
+      <div class="cta-row" style="margin-top:12px;"><a class="btn btn-secondary" href="library.html#${r.id}">Open in Library</a></div></div>`;
+  }
+
+  function wireDownloadButtons(container) {
+    container.querySelectorAll('.chip-btn').forEach(btn => {
+      btn.addEventListener('click', () => downloadResourceFile(btn.dataset.path, btn.dataset.name));
+    });
   }
 
   (async () => {
@@ -79,6 +89,7 @@
     }
 
     document.getElementById('welcome').textContent = 'Welcome back, ' + (member.full_name ? member.full_name.split(' ')[0] : 'there');
+    injectAdminTab(member);
 
     // Next session: public or member sessions, status open/soon, soonest date first.
     const { data: sessions } = await supabaseClient
@@ -118,6 +129,8 @@
       continueEl.innerHTML = '<div class="empty-state">Nothing saved yet — browse the Knowledge Library to get started.</div>';
       savedRow.innerHTML = '<div class="empty-state">No saved items yet.</div>';
     }
+    wireDownloadButtons(continueEl);
+    wireDownloadButtons(savedRow);
 
     // Latest resource overall.
     const { data: latest } = await supabaseClient
@@ -128,6 +141,7 @@
 
     const latestEl = document.getElementById('latest-resource');
     latestEl.innerHTML = (latest && latest.length) ? resourceCard(latest[0]) : '<div class="empty-state">No resources published yet.</div>';
+    wireDownloadButtons(latestEl);
   })();
 </script>
 

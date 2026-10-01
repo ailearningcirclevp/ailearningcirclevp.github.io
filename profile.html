@@ -87,6 +87,7 @@
     document.getElementById('linkedin_url').value = member.linkedin_url || '';
     document.getElementById('area_of_interest').value = member.area_of_interest || '';
     document.getElementById('show_in_directory').checked = !!member.show_in_directory;
+    injectAdminTab(member);
   })();
 
   document.getElementById('profile-form').addEventListener('submit', async (e) => {

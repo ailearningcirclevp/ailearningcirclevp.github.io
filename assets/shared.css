@@ -145,3 +145,26 @@ a{color:inherit;}
 
 .section-title{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--slate-500);margin:28px 0 10px;}
 .section-title:first-child{margin-top:0;}
+
+/* ---------- file input (admin upload) ---------- */
+.field input[type="file"]{
+  width:100%;padding:11px 13px;border-radius:10px;border:1px dashed var(--line);
+  background:var(--surface-1);color:var(--ink-900);font-family:inherit;font-size:13.5px;
+}
+
+/* ---------- admin list rows ---------- */
+.admin-row{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  background:var(--surface-1);border:1px solid var(--line);border-radius:14px;
+  padding:14px 16px;margin-bottom:10px;
+}
+.admin-row .meta{font-size:12px;color:var(--slate-500);margin-top:3px;}
+.admin-row .title{font-size:14.5px;font-weight:600;}
+.btn-danger{background:transparent;color:#b3261e;border:1px solid #b3261e55;}
+
+/* ---------- download chip (acts as a button) ---------- */
+.chip-btn{
+  appearance:none;border:none;font:inherit;cursor:pointer;
+  font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;
+  background:var(--navy-900);color:var(--gold-500);
+}

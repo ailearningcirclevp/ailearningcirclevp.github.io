@@ -40,3 +40,39 @@ async function signOut() {
   await supabaseClient.auth.signOut();
   window.location.href = "login.html";
 }
+
+// Content-type labels used across the Knowledge Library pages.
+const RESOURCE_TYPE_LABELS = {
+  use_case: "Use Case Materials",
+  prompt: "Prompt Library",
+  cheat_sheet: "Cheat Sheet",
+  try_this_week: "Try This Week"
+};
+
+// Downloads a file from the private "library-files" Storage bucket.
+// Generates a short-lived signed URL (Supabase checks the member/admin
+// RLS policy first) and opens it so the browser starts the download.
+async function downloadResourceFile(filePath, fileName) {
+  if (!filePath || supabaseNotConfigured()) return;
+  const { data, error } = await supabaseClient
+    .storage
+    .from("library-files")
+    .createSignedUrl(filePath, 3600, fileName ? { download: fileName } : undefined);
+  if (error || !data) {
+    alert("Could not generate a download link: " + (error ? error.message : "unknown error"));
+    return;
+  }
+  window.open(data.signedUrl, "_blank");
+}
+
+// Adds an "Admin" tab to every ".tabs" nav on the page, only when the
+// logged-in member's role is 'admin'. Safe to call on every portal
+// page right after fetching the member record.
+function injectAdminTab(member) {
+  if (!member || member.role !== "admin") return;
+  document.querySelectorAll(".tabs").forEach((tabs) => {
+    if (!tabs.querySelector(".admin-tab-link")) {
+      tabs.insertAdjacentHTML("beforeend", '<a class="tab-btn admin-tab-link" href="admin.html">Admin</a>');
+    }
+  });
+}

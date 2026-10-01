@@ -16,6 +16,9 @@
   .filter-row select{padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-1);font-family:inherit;font-size:13px;}
   .cat-num{font-size:12px;color:var(--slate-500);font-weight:700;}
   .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .type-section-title{font-size:16px;font-family:'Fraunces',Georgia,serif;margin:30px 0 4px;}
+  .type-section-title:first-of-type{margin-top:10px;}
+  .type-section-sub{font-size:13px;color:var(--slate-500);margin:0 0 12px;}
 </style>
 </head>
 <body>
@@ -33,6 +36,7 @@
   </div>
 
   <div class="filter-row">
+    <select id="filter-type"><option value="">All types</option></select>
     <select id="filter-category"><option value="">All categories</option></select>
     <select id="filter-level">
       <option value="">All levels</option>
@@ -42,7 +46,7 @@
     </select>
   </div>
 
-  <div id="resource-list"><div class="empty-state">Loading…</div></div>
+  <div id="resource-sections"><div class="empty-state">Loading…</div></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -53,11 +57,11 @@
   let userId = null;
   let savedIds = new Set();
   let allResources = [];
+  const TYPE_ORDER = ['try_this_week', 'use_case', 'prompt', 'cheat_sheet'];
 
   function lockedCard(r, i) {
     const parts = [];
-    if (r.has_starter_kit) parts.push('Starter Kit');
-    if (r.has_cheat_sheet) parts.push('Cheat Sheet');
+    if (r.has_file) parts.push('Download');
     if (r.has_recording) parts.push('Recording');
     return `<div class="card">
       <div class="cat-num">${String(i + 1).padStart(3, '0')} · ${r.category}</div>
@@ -76,35 +80,46 @@
         </div>
         <button class="save-btn ${saved ? 'saved' : ''}" data-id="${r.id}">${saved ? '♥ Saved' : '♡ Save'}</button>
       </div>
-      <p>${r.business_problem || ''}</p>
+      <p>${r.description || r.business_problem || ''}</p>
       ${r.what_you_learn ? `<p style="margin-top:8px;"><strong>What you'll learn:</strong> ${r.what_you_learn}</p>` : ''}
       ${r.tool_used ? `<p style="margin-top:8px;"><strong>Tool used:</strong> ${r.tool_used}</p>` : ''}
       ${r.tool_transferability_note ? `<p style="margin-top:8px;color:var(--slate-500);"><em>Can I do this with another tool?</em> ${r.tool_transferability_note}</p>` : ''}
       <div class="chip-row">
+        ${r.file_path ? `<button class="chip-btn" data-path="${r.file_path}" data-name="${r.file_name || ''}">⬇ Download${r.file_name ? ' · ' + r.file_name : ''}</button>` : ''}
         ${r.recording_url ? `<a class="chip" href="${r.recording_url}" target="_blank" rel="noopener">Recording</a>` : ''}
-        ${r.starter_kit_url ? `<a class="chip" href="${r.starter_kit_url}" target="_blank" rel="noopener">Starter Kit</a>` : ''}
-        ${r.cheat_sheet_url ? `<a class="chip" href="${r.cheat_sheet_url}" target="_blank" rel="noopener">Cheat Sheet</a>` : ''}
         ${r.level ? `<span class="chip">${r.level}</span>` : ''}
       </div>
     </div>`;
   }
 
   function render() {
+    const type = document.getElementById('filter-type').value;
     const cat = document.getElementById('filter-category').value;
     const level = document.getElementById('filter-level').value;
     const filtered = allResources.filter(r =>
-      (!cat || r.category === cat) && (!level || r.level === level)
+      (!type || r.type === type) && (!cat || r.category === cat) && (!level || r.level === level)
     );
-    const list = document.getElementById('resource-list');
+    const container = document.getElementById('resource-sections');
+
     if (!filtered.length) {
-      list.innerHTML = '<div class="empty-state">Nothing matches those filters yet.</div>';
+      container.innerHTML = '<div class="empty-state">Nothing matches those filters yet.</div>';
       return;
     }
-    list.innerHTML = filtered.map((r, i) => isMember ? memberCard(r, i) : lockedCard(r, i)).join('');
+
+    const types = type ? [type] : TYPE_ORDER.filter(t => filtered.some(r => r.type === t));
+    container.innerHTML = types.map(t => {
+      const group = filtered.filter(r => r.type === t);
+      if (!group.length) return '';
+      const cards = group.map((r, i) => isMember ? memberCard(r, i) : lockedCard(r, i)).join('');
+      return `<div class="type-section-title">${RESOURCE_TYPE_LABELS[t] || t}</div>${cards}`;
+    }).join('');
 
     if (isMember) {
-      list.querySelectorAll('.save-btn').forEach(btn => {
+      container.querySelectorAll('.save-btn').forEach(btn => {
         btn.addEventListener('click', () => toggleSave(btn.dataset.id, btn));
+      });
+      container.querySelectorAll('.chip-btn').forEach(btn => {
+        btn.addEventListener('click', () => downloadResourceFile(btn.dataset.path, btn.dataset.name));
       });
     }
   }
@@ -123,15 +138,24 @@
     }
   }
 
-  function setupCategoryFilter() {
+  function setupFilters() {
     const categories = [...new Set(allResources.map(r => r.category))].sort();
-    const sel = document.getElementById('filter-category');
+    const catSel = document.getElementById('filter-category');
     categories.forEach(c => {
       const opt = document.createElement('option');
       opt.value = c; opt.textContent = c;
-      sel.appendChild(opt);
+      catSel.appendChild(opt);
     });
-    sel.addEventListener('change', render);
+
+    const typeSel = document.getElementById('filter-type');
+    TYPE_ORDER.filter(t => allResources.some(r => r.type === t)).forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t; opt.textContent = RESOURCE_TYPE_LABELS[t] || t;
+      typeSel.appendChild(opt);
+    });
+
+    typeSel.addEventListener('change', render);
+    catSel.addEventListener('change', render);
     document.getElementById('filter-level').addEventListener('change', render);
   }
 
@@ -139,7 +163,7 @@
     if (supabaseNotConfigured()) {
       document.getElementById('lib-title').textContent = 'Not connected yet';
       document.getElementById('lib-sub').textContent = 'The site owner still needs to add the Supabase project keys.';
-      document.getElementById('resource-list').innerHTML = '';
+      document.getElementById('resource-sections').innerHTML = '';
       return;
     }
 
@@ -147,7 +171,7 @@
 
     if (session) {
       const member = await getMemberRecord(session.user.id);
-      isMember = !!member && member.role === 'member' || (member && member.role === 'admin');
+      isMember = !!member && (member.role === 'member' || member.role === 'admin');
       userId = session.user.id;
 
       document.getElementById('nav-tabs').innerHTML = `
@@ -156,13 +180,14 @@
         <a class="tab-btn" href="sessions.html">Sessions</a>
         <a class="tab-btn" href="saved.html">Saved</a>
         <a class="tab-btn" href="profile.html">Profile</a>`;
+      injectAdminTab(member);
     } else {
       document.getElementById('nav-tabs').innerHTML = `<a class="tab-btn" href="login.html">Member Login</a>`;
     }
 
     if (isMember) {
       document.getElementById('lib-title').textContent = 'Knowledge Library';
-      document.getElementById('lib-sub').textContent = 'Every use case: the problem, the workflow, the resources.';
+      document.getElementById('lib-sub').textContent = 'Try This Week, Use Case Materials, Prompt Library and Cheat Sheets — download what you need.';
       const { data: resources } = await supabaseClient.from('resources').select('*').order('created_at', { ascending: true });
       allResources = resources || [];
 
@@ -170,16 +195,16 @@
       savedIds = new Set((saved || []).map(s => s.resource_id));
     } else {
       document.getElementById('lib-title').textContent = 'See what\'s inside';
-      document.getElementById('lib-sub').textContent = 'Every use case in the library — unlock membership to open the Starter Kits, Cheat Sheets and recordings.';
+      document.getElementById('lib-sub').textContent = 'Every item in the library — unlock membership to download it.';
       const { data: catalogue } = await supabaseClient.from('resource_catalogue').select('*').order('category', { ascending: true });
       allResources = catalogue || [];
     }
 
-    setupCategoryFilter();
+    setupFilters();
     render();
 
     if (!isMember) {
-      document.getElementById('resource-list').insertAdjacentHTML('beforeend',
+      document.getElementById('resource-sections').insertAdjacentHTML('beforeend',
         `<div class="cta-row"><a class="btn btn-primary" href="index.html#membership">Unlock the Member Library</a></div>`);
     }
   })();

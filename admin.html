@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — AI Learning Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+<style>
+  .type-only{display:none;}
+  .type-only.show{display:block;}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="dashboard.html" class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></a>
+  <div class="tabs">
+    <a class="tab-btn" href="dashboard.html">Home</a>
+    <a class="tab-btn" href="library.html">Library</a>
+    <a class="tab-btn" href="sessions.html">Sessions</a>
+    <a class="tab-btn" href="saved.html">Saved</a>
+    <a class="tab-btn" href="profile.html">Profile</a>
+    <a class="tab-btn active" href="admin.html">Admin</a>
+  </div>
+</nav>
+
+<div class="wrap" id="admin-wrap">
+  <div class="eyebrow" style="margin-top:20px;">Admin</div>
+  <h1 style="font-size:24px;margin:4px 0 20px;">Add to the Knowledge Library</h1>
+
+  <div id="not-admin" class="empty-state" style="display:none;">You need admin access to view this page.</div>
+
+  <div id="admin-area" style="display:none;">
+    <div class="form-msg" id="form-msg"></div>
+
+    <form id="upload-form">
+      <div class="field">
+        <label for="f-type">Content type</label>
+        <select id="f-type" required>
+          <option value="use_case">Use Case Materials</option>
+          <option value="prompt">Prompt Library</option>
+          <option value="cheat_sheet">Cheat Sheet</option>
+          <option value="try_this_week">Try This Week</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="f-category">Category</label>
+        <select id="f-category" required>
+          <option value="Finance & Reporting">Finance & Reporting</option>
+          <option value="Presentations">Presentations</option>
+          <option value="Meetings & Productivity">Meetings & Productivity</option>
+          <option value="Data & Dashboards">Data & Dashboards</option>
+          <option value="AI Agents & Automation">AI Agents & Automation</option>
+          <option value="General AI Skills">General AI Skills</option>
+          <option value="__other">Other (type below)</option>
+        </select>
+      </div>
+      <div class="field type-only" id="f-category-other-wrap"><input id="f-category-other" type="text" placeholder="Category name"></div>
+
+      <div class="field"><label for="f-title">Title</label><input id="f-title" type="text" required></div>
+
+      <div class="field"><label for="f-description">Short description</label><textarea id="f-description" rows="3" placeholder="What is this and who is it for?"></textarea></div>
+
+      <div id="use-case-fields" class="type-only">
+        <div class="field"><label for="f-problem">Business problem</label><textarea id="f-problem" rows="2"></textarea></div>
+        <div class="field"><label for="f-learn">What you'll learn</label><textarea id="f-learn" rows="2"></textarea></div>
+        <div class="field"><label for="f-tool">Tool used</label><input id="f-tool" type="text" placeholder="e.g. ChatGPT, Claude, Copilot"></div>
+        <div class="field"><label for="f-transfer">Tool transferability note <span class="hint">(optional)</span></label><textarea id="f-transfer" rows="2" placeholder="Can this be done with another tool?"></textarea></div>
+        <div class="field"><label for="f-level">Level</label>
+          <select id="f-level">
+            <option value="">—</option>
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field"><label for="f-recording">Recording / video link <span class="hint">(optional)</span></label><input id="f-recording" type="url" placeholder="https://…"></div>
+
+      <div class="field"><label for="f-file">File <span class="hint">(optional — PDF, slide deck, doc, etc.)</span></label><input id="f-file" type="file"></div>
+
+      <button class="btn btn-primary" type="submit" style="width:100%;margin-top:6px;">Add to library</button>
+    </form>
+
+    <div class="section-title" style="margin-top:36px;">Existing materials</div>
+    <div id="resource-list"><div class="empty-state">Loading…</div></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+  let member = null;
+
+  document.getElementById('f-category').addEventListener('change', (e) => {
+    document.getElementById('f-category-other-wrap').classList.toggle('show', e.target.value === '__other');
+  });
+  document.getElementById('f-type').addEventListener('change', (e) => {
+    document.getElementById('use-case-fields').classList.toggle('show', e.target.value === 'use_case');
+  });
+
+  function adminRow(r) {
+    const label = RESOURCE_TYPE_LABELS[r.type] || r.type;
+    return `<div class="admin-row" id="row-${r.id}">
+      <div>
+        <div class="title">${r.title}</div>
+        <div class="meta">${label} · ${r.category}${r.file_name ? ' · ' + r.file_name : ''}</div>
+      </div>
+      <button class="btn btn-danger" data-id="${r.id}" data-path="${r.file_path || ''}">Delete</button>
+    </div>`;
+  }
+
+  async function loadResources() {
+    const { data: resources } = await supabaseClient.from('resources').select('*').order('created_at', { ascending: false });
+    const list = document.getElementById('resource-list');
+    if (!resources || !resources.length) {
+      list.innerHTML = '<div class="empty-state">Nothing uploaded yet.</div>';
+      return;
+    }
+    list.innerHTML = resources.map(adminRow).join('');
+    list.querySelectorAll('.btn-danger').forEach(btn => {
+      btn.addEventListener('click', () => deleteResource(btn.dataset.id, btn.dataset.path));
+    });
+  }
+
+  async function deleteResource(id, filePath) {
+    if (!confirm('Delete this item from the library? This cannot be undone.')) return;
+    if (filePath) {
+      await supabaseClient.storage.from('library-files').remove([filePath]);
+    }
+    await supabaseClient.from('resources').delete().eq('id', id);
+    const row = document.getElementById('row-' + id);
+    if (row) row.remove();
+  }
+
+  const msg = document.getElementById('form-msg');
+
+  document.getElementById('upload-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Uploading…';
+
+    try {
+      const type = document.getElementById('f-type').value;
+      const categorySel = document.getElementById('f-category').value;
+      const category = categorySel === '__other' ? document.getElementById('f-category-other').value.trim() : categorySel;
+      const title = document.getElementById('f-title').value.trim();
+      const description = document.getElementById('f-description').value.trim() || null;
+      const recording_url = document.getElementById('f-recording').value.trim() || null;
+      const fileInput = document.getElementById('f-file');
+
+      if (!category) { msg.textContent = 'Please choose or enter a category.'; msg.className = 'form-msg show error'; submitBtn.disabled = false; submitBtn.textContent = 'Add to library'; return; }
+
+      let file_path = null, file_name = null;
+      if (fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const path = `${type}/${Date.now()}_${safeName}`;
+        const { error: uploadError } = await supabaseClient.storage.from('library-files').upload(path, file);
+        if (uploadError) throw uploadError;
+        file_path = path;
+        file_name = file.name;
+      }
+
+      const row = { type, category, title, description, recording_url, file_path, file_name };
+      if (type === 'use_case') {
+        row.business_problem = document.getElementById('f-problem').value.trim() || null;
+        row.what_you_learn = document.getElementById('f-learn').value.trim() || null;
+        row.tool_used = document.getElementById('f-tool').value.trim() || null;
+        row.tool_transferability_note = document.getElementById('f-transfer').value.trim() || null;
+        row.level = document.getElementById('f-level').value || null;
+      }
+
+      const { error: insertError } = await supabaseClient.from('resources').insert(row);
+      if (insertError) throw insertError;
+
+      msg.textContent = 'Added to the library.';
+      msg.className = 'form-msg show ok';
+      e.target.reset();
+      document.getElementById('use-case-fields').classList.remove('show');
+      document.getElementById('f-category-other-wrap').classList.remove('show');
+      loadResources();
+    } catch (err) {
+      msg.textContent = err.message || 'Something went wrong.';
+      msg.className = 'form-msg show error';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Add to library';
+    }
+  });
+
+  (async () => {
+    if (supabaseNotConfigured()) {
+      document.getElementById('not-admin').style.display = 'block';
+      document.getElementById('not-admin').textContent = 'Not connected yet — the site owner still needs to add the Supabase project keys.';
+      return;
+    }
+
+    const session = await requireMember();
+    if (!session) return;
+
+    member = await getMemberRecord(session.user.id);
+    if (!member || member.role !== 'admin') {
+      document.getElementById('not-admin').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('admin-area').style.display = 'block';
+    loadResources();
+  })();
+</script>
+
+</body>
+</html>
