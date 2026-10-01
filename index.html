@@ -546,6 +546,10 @@
   .path-q{font-size:13px;font-weight:600;color:var(--cream-100);margin-bottom:6px;opacity:.92;}
   .path-btn{width:100%;gap:10px;justify-content:flex-start;padding:14px 18px;font-size:14.5px;}
   .path-btn svg{width:20px;height:20px;flex:0 0 auto;}
+  .btn.path-session{background:rgba(94,234,212,.12);border:1px solid rgba(94,234,212,.45) !important;}
+  .btn.path-session svg{color:#5eead4;}
+  .btn.path-member{background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.5) !important;}
+  .btn.path-member svg{color:#c4b5fd;}
   @media (min-width:860px){
     .paths{flex-direction:row;gap:18px;}
     .path{flex:1;}
@@ -652,14 +656,14 @@
             </div>
             <div class="path">
               <div class="path-q">Ready to try a live session?</div>
-              <a class="btn btn-secondary path-btn" href="#calendar" onclick="showView('calendar')">
+              <a class="btn btn-secondary path-btn path-session" href="#calendar" onclick="showView('calendar')">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
                 Join a free live session
               </a>
             </div>
             <div class="path">
               <div class="path-q">Want the full library and community?</div>
-              <a class="btn btn-secondary path-btn" href="javascript:void(0)" onclick="goToSlide(1)">
+              <a class="btn btn-secondary path-btn path-member" href="javascript:void(0)" onclick="goToSlide(1)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
                 Explore membership
               </a>
