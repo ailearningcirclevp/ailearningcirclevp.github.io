@@ -137,6 +137,15 @@
       return;
     }
 
+    // Notify the organizer and send the member a welcome email via Apps Script.
+    try {
+      fetch('https://script.google.com/macros/s/AKfycbwlvWZHzkBzxouaoWTJizY__Gh6P5_JOAV-CXuxDPpBQrVyQ0wtF7gLrqh-sLvShvtF0Q/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ type: 'signup', name: profile.full_name, email: email, company: profile.company || '', key: 'm70wf5pfK60pOce1S_JKpgze', hp: '' })
+      }).catch(() => {});
+    } catch (e) {}
+
     // Photo upload needs a logged-in session; only possible if email
     // confirmation is off. Otherwise they add it from their profile.
     const photoFile = document.getElementById('photo').files[0];

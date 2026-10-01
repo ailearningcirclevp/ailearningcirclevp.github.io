@@ -84,6 +84,19 @@ function doPost(e) {
       return jsonOut({ success: true, message: "Thanks! We'll message you on WhatsApp." });
     }
 
+    // Free account created on the website: email the organizer and send
+    // the new member a welcome note. (Never include passwords.)
+    if (String(data.type || "") === "signup") {
+      var sName = String(data.name || "").trim().slice(0, 120);
+      var sEmail = String(data.email || "").trim();
+      var sCompany = String(data.company || "").trim().slice(0, 200);
+      if (!sName || !isValidEmail(sEmail)) {
+        return jsonOut({ success: false, message: "Invalid details." });
+      }
+      notifySignup(sName, sEmail, sCompany);
+      return jsonOut({ success: true });
+    }
+
     var sessionId = String(data.sessionId || "").trim();
     var name = String(data.name || "").trim();
     var email = String(data.email || "").trim();
@@ -174,6 +187,31 @@ function notifyInterest(name, phone, role) {
     (role ? "Role / company: " + role + "\n" : "") +
     "\nOpen chat: https://wa.me/" + digits;
   MailApp.sendEmail(ORGANIZER_EMAIL, "New WhatsApp interest: " + name, body);
+}
+
+// New free account: tell the organizer, and welcome the member.
+function notifySignup(name, email, company) {
+  try {
+    MailApp.sendEmail(ORGANIZER_EMAIL, "New free signup: " + name,
+      "A new free account was created on the AI Learning Circle website.\n\n" +
+      "Name: " + name + "\n" +
+      "Email: " + email + "\n" +
+      (company ? "Company: " + company + "\n" : "") +
+      "\nTo make them a paid member after payment, set their role to 'member' in Supabase.");
+  } catch (e) {}
+  try {
+    MailApp.sendEmail({
+      to: email,
+      subject: "Welcome to AI Learning Circle",
+      body: "Hi " + name + ",\n\n" +
+        "Thanks for creating your free AI Learning Circle account. " +
+        "Please confirm your email using the separate confirmation message, then log in at https://ailearningcirclevp.github.io/login.html to see free AI tips.\n\n" +
+        "Want the full Knowledge Library (use cases, starter kits, cheat sheets, prompt library)? " +
+        "Message us on WhatsApp: https://wa.me/919566430848\n\n" +
+        "AI Learning Circle",
+      replyTo: ORGANIZER_EMAIL
+    });
+  } catch (e) {}
 }
 
 function isRateLimited() {
