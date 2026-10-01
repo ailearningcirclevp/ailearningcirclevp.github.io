@@ -373,9 +373,14 @@
     border-bottom:1px solid var(--line);
   }
   .topnav .brand{
-    font-family:'Fraunces',serif;
-    font-weight:600;
-    font-size:15px;
+    display:flex;
+    align-items:center;
+  }
+  .topnav .brand img{
+    height:26px;
+    width:auto;
+    display:block;
+    border-radius:4px;
   }
   .tabs{display:flex;gap:6px;background:var(--surface-1);border:1px solid var(--line);border-radius:999px;padding:3px;}
   .tab-btn{
@@ -504,7 +509,7 @@
 </style>
 
 <nav class="topnav">
-  <div class="brand">AI Learning Circle</div>
+  <div class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></div>
   <div class="tabs">
     <button class="tab-btn active" id="tab-home" onclick="showView('home')">Home</button>
     <button class="tab-btn" id="tab-calendar" onclick="showView('calendar')">Session Calendar</button>
