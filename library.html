@@ -14,6 +14,7 @@
   .lib-header p{font-size:14.5px;color:var(--slate-500);margin:0;}
   .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;}
   .filter-row select{padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-1);font-family:inherit;font-size:13px;}
+  a.locked-card{display:block;text-decoration:none;color:inherit;opacity:.92;}
   .cat-num{font-size:12px;color:var(--slate-500);font-weight:700;}
   .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
 </style>
@@ -53,7 +54,6 @@
 <script>
   let isMember = false;
   let userId = null;
-  let savedIds = new Set();
   let allResources = [];
   const TYPE_ORDER = ['use_case', 'try_this_week', 'prompt'];
   let currentType = 'use_case';
@@ -69,22 +69,20 @@
       if (r.has_file) parts.push('Download');
       if (r.has_recording) parts.push('Recording');
     }
-    return `<div class="card">
-      <div class="cat-num">${String(i + 1).padStart(3, '0')} · ${r.category}</div>
+    return `<a class="card locked-card" href="index.html#membership" title="Members only — tap to see membership">
+      <div class="cat-num">🔒 ${String(i + 1).padStart(3, '0')} · ${r.category}</div>
       <h3>${r.title}</h3>
       <div class="chip-row">${parts.map(p => `<span class="chip locked">${p} 🔒</span>`).join('')}</div>
-    </div>`;
+    </a>`;
   }
 
   function memberCard(r, i) {
-    const saved = savedIds.has(r.id);
     return `<div class="card" id="${r.id}">
       <div class="card-head">
         <div>
           <div class="cat-num">${String(i + 1).padStart(3, '0')} · ${r.category}${r.level ? ' · ' + r.level : ''}</div>
           <h3>${r.title}</h3>
         </div>
-        <button class="save-btn ${saved ? 'saved' : ''}" data-id="${r.id}">${saved ? '♥ Saved' : '♡ Save'}</button>
       </div>
       <p>${r.description || r.business_problem || ''}</p>
       ${r.what_you_learn ? `<p style="margin-top:8px;"><strong>What you'll learn:</strong> ${r.what_you_learn}</p>` : ''}
@@ -96,7 +94,7 @@
 
   function renderTabs() {
     document.getElementById('type-tabs').innerHTML = TYPE_ORDER.map(t =>
-      `<button class="tab-chip ${t === currentType ? 'active' : ''}" data-type="${t}">${RESOURCE_TYPE_LABELS[t]}</button>`).join('');
+      `<button class="tab-chip ${t === currentType ? 'active' : ''}" data-type="${t}">${isMember ? '' : '🔒 '}${RESOURCE_TYPE_LABELS[t]}</button>`).join('');
     document.querySelectorAll('#type-tabs .tab-chip').forEach(btn => {
       btn.addEventListener('click', () => { currentType = btn.dataset.type; renderTabs(); render(); });
     });
@@ -118,24 +116,7 @@
     container.innerHTML = filtered.map((r, i) => isMember ? memberCard(r, i) : lockedCard(r, i)).join('');
 
     if (isMember) {
-      container.querySelectorAll('.save-btn').forEach(btn => {
-        btn.addEventListener('click', () => toggleSave(btn.dataset.id, btn));
-      });
       wireDownloadButtons(container);
-    }
-  }
-
-  async function toggleSave(resourceId, btn) {
-    if (savedIds.has(resourceId)) {
-      await supabaseClient.from('saved_items').delete().eq('member_id', userId).eq('resource_id', resourceId);
-      savedIds.delete(resourceId);
-      btn.textContent = '♡ Save';
-      btn.classList.remove('saved');
-    } else {
-      await supabaseClient.from('saved_items').insert({ member_id: userId, resource_id: resourceId });
-      savedIds.add(resourceId);
-      btn.textContent = '♥ Saved';
-      btn.classList.add('saved');
     }
   }
 
@@ -164,14 +145,13 @@
 
     if (session) {
       const member = await getMemberRecord(session.user.id);
-      isMember = !!member && (member.role === 'member' || member.role === 'admin');
+      isMember = isPaid(member);
       userId = session.user.id;
 
       document.getElementById('nav-tabs').innerHTML = `
         <a class="tab-btn" href="dashboard.html">Home</a>
         <a class="tab-btn active" href="library.html">Library</a>
         <a class="tab-btn" href="sessions.html">Sessions</a>
-        <a class="tab-btn" href="saved.html">Saved</a>
         <a class="tab-btn" href="profile.html">Profile</a>`;
       injectAdminTab(member);
     } else {
@@ -183,12 +163,9 @@
       document.getElementById('lib-sub').textContent = 'Pick a section, then open the session recording, cheat sheet, starter kit or materials for each use case.';
       const { data: resources } = await supabaseClient.from('resources').select('*').order('created_at', { ascending: true });
       allResources = resources || [];
-
-      const { data: saved } = await supabaseClient.from('saved_items').select('resource_id').eq('member_id', userId);
-      savedIds = new Set((saved || []).map(s => s.resource_id));
     } else {
       document.getElementById('lib-title').textContent = 'See what\'s inside';
-      document.getElementById('lib-sub').textContent = 'Every item in the library — unlock membership to download it.';
+      document.getElementById('lib-sub').textContent = 'Use Cases, Try This Week and the Prompt Library are for paid members. Tap any item to see membership.';
       const { data: catalogue } = await supabaseClient.from('resource_catalogue').select('*').order('category', { ascending: true });
       allResources = catalogue || [];
     }
@@ -198,7 +175,7 @@
 
     if (!isMember) {
       document.getElementById('resource-sections').insertAdjacentHTML('beforeend',
-        `<div class="cta-row"><a class="btn btn-primary" href="index.html#membership">Unlock the Member Library</a></div>`);
+        `<div class="cta-row"><a class="btn btn-primary" href="${MEMBERSHIP_WHATSAPP_URL}" target="_blank" rel="noopener">Subscribe on WhatsApp</a><a class="btn btn-secondary" href="index.html#membership">See membership</a></div>`);
     }
   })();
 </script>

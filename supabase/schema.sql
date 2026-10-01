@@ -21,7 +21,7 @@ create table if not exists public.members (
   profile_photo_url text,
   website_url text, -- optional personal site/profile link, shown on "Know Your Community"
   bio text,         -- optional short "about you", shown on "Know Your Community"
-  role text not null default 'member' check (role in ('member', 'admin', 'pending')),
+  role text not null default 'free' check (role in ('free', 'member', 'admin', 'pending')) -- 'member' = paid,
   show_in_directory boolean not null default false,
   survey_completed boolean not null default false,
   created_at timestamptz not null default now()
@@ -284,3 +284,5 @@ create policy "members manage own survey response"
 -- (Dashboard, Library, Profile) linking to admin.html, where you can
 -- upload new Knowledge Library materials yourself — no code or Table
 -- Editor required.
+
+-- NOTE: free tier, handle_new_user(), tips table and removal of saved_items live in supabase/migration_free_tier.sql

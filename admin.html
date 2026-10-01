@@ -21,7 +21,6 @@
     <a class="tab-btn" href="dashboard.html">Home</a>
     <a class="tab-btn" href="library.html">Library</a>
     <a class="tab-btn" href="sessions.html">Sessions</a>
-    <a class="tab-btn" href="saved.html">Saved</a>
     <a class="tab-btn" href="profile.html">Profile</a>
   </div>
 </nav>
@@ -89,6 +88,15 @@
       <button class="btn btn-primary" type="submit" style="width:100%;margin-top:6px;">Add to library</button>
     </form>
 
+    <div class="section-title" style="margin-top:36px;">Post a free AI tip <span style="text-transform:none;font-weight:500;">(visible to free users)</span></div>
+    <div class="form-msg" id="tip-msg"></div>
+    <form id="tip-form">
+      <div class="field"><label for="t-title">Title</label><input id="t-title" type="text" required></div>
+      <div class="field"><label for="t-body">Tip (paste text)</label><textarea id="t-body" rows="5" required></textarea></div>
+      <button class="btn btn-primary" type="submit" style="width:100%;">Post tip</button>
+    </form>
+    <div id="tip-list" style="margin-top:14px;"></div>
+
     <div class="section-title" style="margin-top:36px;">Existing materials</div>
     <div id="resource-list"><div class="empty-state">Loading…</div></div>
   </div>
@@ -148,6 +156,29 @@
   }
 
   const msg = document.getElementById('form-msg');
+
+  const escH = (t) => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  async function loadTips() {
+    const { data } = await supabaseClient.from('tips').select('*').order('created_at', { ascending: false });
+    const el = document.getElementById('tip-list');
+    el.innerHTML = (data || []).map(t => `<div class="admin-row" id="tip-${t.id}"><div><div class="title">${escH(t.title)}</div><div class="meta">${new Date(t.created_at).toLocaleDateString()}</div></div><button class="btn btn-danger" data-tip="${t.id}">Delete</button></div>`).join('');
+    el.querySelectorAll('[data-tip]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Delete this tip?')) return;
+      await supabaseClient.from('tips').delete().eq('id', b.dataset.tip);
+      loadTips();
+    }));
+  }
+  document.getElementById('tip-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const tm = document.getElementById('tip-msg');
+    const { error } = await supabaseClient.from('tips').insert({
+      title: document.getElementById('t-title').value.trim(),
+      body: document.getElementById('t-body').value.trim()
+    });
+    tm.textContent = error ? error.message : 'Tip posted.';
+    tm.className = 'form-msg show ' + (error ? 'error' : 'ok');
+    if (!error) { e.target.reset(); loadTips(); }
+  });
 
   document.getElementById('upload-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -228,6 +259,7 @@
     document.getElementById('admin-wrap').style.visibility = 'visible';
     document.getElementById('admin-area').style.display = 'block';
     loadResources();
+    loadTips();
   })();
 </script>
 

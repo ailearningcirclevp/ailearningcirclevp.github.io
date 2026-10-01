@@ -24,7 +24,6 @@
     <a class="tab-btn active" href="dashboard.html">Home</a>
     <a class="tab-btn" href="library.html">Library</a>
     <a class="tab-btn" href="sessions.html">Sessions</a>
-    <a class="tab-btn" href="saved.html">Saved</a>
     <a class="tab-btn" href="profile.html">Profile</a>
   </div>
 </nav>
@@ -37,15 +36,20 @@
   <div class="section-title">Next Session</div>
   <div id="next-session"><div class="empty-state">Loading…</div></div>
 
-  <div class="section-title">Continue Learning</div>
-  <div id="continue-learning"><div class="empty-state">Loading…</div></div>
+  <div id="free-block" style="display:none;">
+    <div class="section-title">Free AI Tips</div>
+    <div id="tips-list"><div class="empty-state">Loading…</div></div>
+    <div class="card">
+      <h3>🔒 Unlock the Knowledge Library</h3>
+      <p>Use Cases, Starter Kits, Cheat Sheets, Try This Week and the Prompt Library are for paid members (3 or 6 months).</p>
+      <div class="cta-row" style="margin-top:12px;"><a class="btn btn-primary" id="subscribe-btn" target="_blank" rel="noopener">Subscribe on WhatsApp</a></div>
+    </div>
+  </div>
 
-  <div class="section-title">Latest Resource</div>
-  <div id="latest-resource"><div class="empty-state">Loading…</div></div>
-
-  <div class="section-title">My Saved Items</div>
-  <div class="card-row" id="saved-row"><div class="empty-state">Loading…</div></div>
-  <div class="cta-row"><a class="btn btn-secondary" href="saved.html">See all saved items</a></div>
+  <div id="paid-block" style="display:none;">
+    <div class="section-title">Latest Resource</div>
+    <div id="latest-resource"><div class="empty-state">Loading…</div></div>
+  </div>
 
   <div class="section-title">Explore</div>
   <div class="cta-row">
@@ -104,25 +108,17 @@
       nextEl.innerHTML = '<div class="empty-state">No upcoming session yet — check back soon.</div>';
     }
 
-    // Continue learning + saved items, via the saved_items join.
-    const { data: saved } = await supabaseClient
-      .from('saved_items')
-      .select('saved_at, resources(*)')
-      .eq('member_id', session.user.id)
-      .order('saved_at', { ascending: false });
-
-    const continueEl = document.getElementById('continue-learning');
-    const savedRow = document.getElementById('saved-row');
-
-    if (saved && saved.length) {
-      continueEl.innerHTML = resourceCard(saved[0].resources);
-      savedRow.innerHTML = saved.slice(0, 5).map(s => resourceCard(s.resources)).join('');
-    } else {
-      continueEl.innerHTML = '<div class="empty-state">Nothing saved yet — browse the Knowledge Library to get started.</div>';
-      savedRow.innerHTML = '<div class="empty-state">No saved items yet.</div>';
+    document.getElementById('subscribe-btn').href = MEMBERSHIP_WHATSAPP_URL;
+    if (!isPaid(member)) {
+      document.getElementById('free-block').style.display = 'block';
+      const { data: tips } = await supabaseClient.from('tips').select('*').order('created_at', { ascending: false }).limit(20);
+      const esc = (t) => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+      document.getElementById('tips-list').innerHTML = (tips && tips.length)
+        ? tips.map(t => `<div class="card"><h3>${esc(t.title)}</h3><p style="white-space:pre-wrap;">${esc(t.body)}</p></div>`).join('')
+        : '<div class="empty-state">No tips posted yet — check back soon.</div>';
+      return;
     }
-    wireDownloadButtons(continueEl);
-    wireDownloadButtons(savedRow);
+    document.getElementById('paid-block').style.display = 'block';
 
     // Latest resource overall.
     const { data: latest } = await supabaseClient

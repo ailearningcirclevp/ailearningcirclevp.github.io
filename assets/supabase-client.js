@@ -41,6 +41,15 @@ async function signOut() {
   window.location.href = "login.html";
 }
 
+// Paid membership = role 'member' (or 'admin'). 'free' users get tips only.
+function isPaid(member) {
+  return !!member && (member.role === "member" || member.role === "admin");
+}
+
+// Membership enquiry: opens the owner's WhatsApp with a ready message.
+const MEMBERSHIP_WHATSAPP_URL = "https://wa.me/919566430848?text=" +
+  encodeURIComponent("I would like to subscribe for the membership for 3 months or 6 months. Kindly share me payment details");
+
 // Content-type labels used across the Knowledge Library pages.
 const RESOURCE_TYPE_LABELS = {
   use_case: "Use Cases",
