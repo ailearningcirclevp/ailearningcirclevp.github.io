@@ -1,3 +1,5 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AI Learning Circle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -426,7 +428,13 @@
     color:var(--ink-900);text-decoration:none;font-size:14.5px;font-weight:600;cursor:pointer;background:none;border:none;text-align:left;font-family:inherit;
   }
   .drawer-link:hover{background:var(--cream-200);}
+  .drawer-link.active{background:var(--navy-900);color:var(--gold-500);}
   .drawer-section-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-500);margin:14px 0 2px 8px;}
+  .nav-login{
+    font-size:13px;font-weight:700;color:var(--ink-900);text-decoration:none;
+    padding:8px 14px;border:1px solid var(--line);border-radius:999px;white-space:nowrap;
+  }
+  .tabs-desktop{display:none;}
 
   /* ---------- swipeable home ---------- */
   .swipe-track{
@@ -447,6 +455,27 @@
   }
   .swipe-dots .dot.active{background:var(--gold-500);width:18px;transition:width .15s ease;}
   .swipe-hint{text-align:center;font-size:11.5px;color:var(--slate-500);margin-top:2px;}
+
+  /* ---------- desktop / wide screens: plain stacked page, no swipe ---------- */
+  @media (min-width:860px){
+    body{padding-inline:32px;}
+    .wrap{max-width:760px;}
+    .menu-btn{display:none;}
+    .nav-login{display:none;}
+    .drawer{display:none;}
+    .drawer-backdrop{display:none;}
+    .tabs-desktop{display:flex;gap:6px;background:var(--surface-1);border:1px solid var(--line);border-radius:999px;padding:3px;}
+    .swipe-track{
+      display:block;height:auto;overflow:visible;
+    }
+    .swipe-slide{
+      width:100%;min-width:0;height:auto;overflow:visible;
+      padding-block:32px;
+    }
+    .swipe-dots, .swipe-hint{display:none;}
+    .hero{padding:48px 56px;}
+    .hero h1{font-size:38px;}
+  }
 
   /* ---------- session calendar ---------- */
   .cal-intro{margin-block-start:24px;}
@@ -571,10 +600,10 @@
   </div>
   <input class="drawer-search" id="drawer-search" type="search" placeholder="Search sessions…">
   <div class="drawer-section-label">Browse</div>
-  <button class="drawer-link" onclick="goToSlide(0); closeDrawer();">Home</button>
-  <button class="drawer-link" onclick="goToSlide(1); closeDrawer();">What You Get</button>
-  <button class="drawer-link" onclick="goToSlide(2); closeDrawer();">Stay Updated</button>
-  <button class="drawer-link" onclick="showView('calendar'); closeDrawer();">Session Calendar</button>
+  <button class="drawer-link nav-home-link active" onclick="showView('home'); goToSlide(0); closeDrawer();">Home</button>
+  <button class="drawer-link" onclick="showView('home'); goToSlide(1); closeDrawer();">What You Get</button>
+  <button class="drawer-link" onclick="showView('home'); goToSlide(2); closeDrawer();">Stay Updated</button>
+  <button class="drawer-link nav-calendar-link" onclick="showView('calendar'); closeDrawer();">Session Calendar</button>
   <div class="drawer-section-label">Account</div>
   <a class="drawer-link" href="login.html">Member Login</a>
 </div>
@@ -582,11 +611,12 @@
 <nav class="topnav">
   <button class="menu-btn" id="menu-btn" onclick="openDrawer()" aria-label="Open menu"><span></span><span></span><span></span></button>
   <div class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></div>
-  <div class="tabs">
-    <button class="tab-btn active" id="tab-home" onclick="showView('home')">Home</button>
-    <button class="tab-btn" id="tab-calendar" onclick="showView('calendar')">Session Calendar</button>
+  <div class="tabs-desktop">
+    <button class="tab-btn nav-home-link active" onclick="showView('home'); goToSlide(0);">Home</button>
+    <button class="tab-btn nav-calendar-link" onclick="showView('calendar');">Session Calendar</button>
     <a class="tab-btn" href="login.html">Member Login</a>
   </div>
+  <a class="nav-login" href="login.html">Login</a>
 </nav>
 
 <div id="view-home" class="view active">
@@ -831,8 +861,8 @@ const REGISTRATION_KEY = "m70wf5pfK60pOce1S_JKpgze";
 function showView(name){
   document.getElementById('view-home').classList.toggle('active', name === 'home');
   document.getElementById('view-calendar').classList.toggle('active', name === 'calendar');
-  document.getElementById('tab-home').classList.toggle('active', name === 'home');
-  document.getElementById('tab-calendar').classList.toggle('active', name === 'calendar');
+  document.querySelectorAll('.nav-home-link').forEach(function(el){ el.classList.toggle('active', name === 'home'); });
+  document.querySelectorAll('.nav-calendar-link').forEach(function(el){ el.classList.toggle('active', name === 'calendar'); });
   try{ history.replaceState(null, '', name === 'calendar' ? '#calendar' : '#home'); }catch(e){}
 }
 
