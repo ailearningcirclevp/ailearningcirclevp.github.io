@@ -38,10 +38,30 @@ create policy "members update own row"
   on public.members for update
   using (auth.uid() = id);
 
--- A member can create their own row at signup.
-create policy "members insert own row"
-  on public.members for insert
-  with check (auth.uid() = id);
+-- Member rows are created by the handle_new_user() trigger at signup
+-- (see the SQL run in the Supabase dashboard), so there is deliberately
+-- NO insert policy: nobody can insert themselves a row with role 'admin'.
+
+-- Members can edit their profile but never their own role.
+create or replace function public.protect_member_role()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.role is distinct from old.role
+     and auth.uid() is not null
+     and not exists (select 1 from public.members where id = auth.uid() and role = 'admin') then
+    raise exception 'Only an admin can change a member role';
+  end if;
+  return new;
+end;
+$$;
+
+create trigger protect_member_role_trg
+  before update on public.members
+  for each row execute function public.protect_member_role();
 
 -- "Know Your Community" — an opted-in public showcase. Anyone turned
 -- on via "Show me on Know Your Community" has these fields exposed

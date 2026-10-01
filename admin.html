@@ -23,15 +23,14 @@
     <a class="tab-btn" href="sessions.html">Sessions</a>
     <a class="tab-btn" href="saved.html">Saved</a>
     <a class="tab-btn" href="profile.html">Profile</a>
-    <a class="tab-btn active" href="admin.html">Admin</a>
   </div>
 </nav>
 
-<div class="wrap" id="admin-wrap">
+<div class="wrap" id="admin-wrap" style="visibility:hidden;">
   <div class="eyebrow" style="margin-top:20px;">Admin</div>
   <h1 style="font-size:24px;margin:4px 0 20px;">Add to the Knowledge Library</h1>
 
-  <div id="not-admin" class="empty-state" style="display:none;">You need admin access to view this page.</div>
+  <div id="not-admin" class="empty-state" style="display:none;"></div>
 
   <div id="admin-area" style="display:none;">
     <div class="form-msg" id="form-msg"></div>
@@ -210,6 +209,7 @@
 
   (async () => {
     if (supabaseNotConfigured()) {
+      document.getElementById('admin-wrap').style.visibility = 'visible';
       document.getElementById('not-admin').style.display = 'block';
       document.getElementById('not-admin').textContent = 'Not connected yet — the site owner still needs to add the Supabase project keys.';
       return;
@@ -220,10 +220,12 @@
 
     member = await getMemberRecord(session.user.id);
     if (!member || member.role !== 'admin') {
-      document.getElementById('not-admin').style.display = 'block';
+      window.location.replace('dashboard.html');
       return;
     }
+    document.querySelector('.tabs').insertAdjacentHTML('beforeend', '<a class="tab-btn active" href="admin.html">Admin</a>');
 
+    document.getElementById('admin-wrap').style.visibility = 'visible';
     document.getElementById('admin-area').style.display = 'block';
     loadResources();
   })();
