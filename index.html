@@ -552,7 +552,7 @@
     .hero .eyebrow{margin-block-end:8px;font-size:11px;}
     .swipe-slide:first-child > .wrap{min-height:100%;display:flex;flex-direction:column;}
     .swipe-slide:first-child .hero{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;}
-    .hero h1{font-size:clamp(28px,4.6vh,38px);margin-bottom:12px;}
+    .hero h1{font-size:min(clamp(24px,4.6vh,38px), calc((100vw - 84px) / 10.2));margin-bottom:12px;white-space:nowrap;}
     .hero p{font-size:clamp(14px,2.1vh,16px);line-height:1.5;}
     .hero-diff{display:none;}
     .start{gap:7px !important;margin-top:12px !important;}
