@@ -173,9 +173,20 @@ a{color:inherit;}
 .admin-row .title{font-size:14.5px;font-weight:600;}
 .btn-danger{background:transparent;color:#b3261e;border:1px solid #b3261e55;}
 
-/* ---------- download chip (acts as a button) ---------- */
+/* ---------- action buttons on library items ---------- */
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
 .chip-btn{
-  appearance:none;border:none;font:inherit;cursor:pointer;
-  font-size:11.5px;font-weight:600;padding:5px 11px;border-radius:999px;
-  background:var(--navy-900);color:var(--gold-500);
+  appearance:none;border:none;font:inherit;cursor:pointer;text-decoration:none;
+  font-size:12.5px;font-weight:600;padding:8px 13px;border-radius:999px;
+  background:var(--navy-900);color:var(--gold-500);display:inline-flex;align-items:center;
 }
+.chip-btn.disabled{background:transparent;border:1px dashed var(--line);color:var(--slate-500);cursor:default;font-weight:500;}
+
+/* ---------- library section tabs ---------- */
+.tab-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin:16px 0 4px;}
+.tab-chip{
+  appearance:none;border:1px solid var(--navy-700);background:transparent;color:var(--navy-700);
+  font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;
+}
+.tab-chip.active{background:var(--navy-900);color:var(--gold-500);border-color:var(--navy-900);}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tab-chip{color:var(--slate-400);border-color:var(--slate-500);}}

@@ -62,19 +62,11 @@
 
   function resourceCard(r) {
     return `<div class="card"><h3>${r.title}</h3><p>${r.description || r.business_problem || ''}</p>
-      <div class="chip-row">
-        <span class="chip">${r.category}</span>
-        ${r.tool_used ? `<span class="chip">${r.tool_used}</span>` : ''}
-        ${r.file_path ? `<button class="chip-btn" data-path="${r.file_path}" data-name="${r.file_name || ''}">⬇ Download</button>` : ''}
-      </div>
+      <div class="chip-row"><span class="chip">${r.category}</span>${r.tool_used ? `<span class="chip">${r.tool_used}</span>` : ''}</div>
+      <div class="btn-row">${resourceButtons(r)}</div>
       <div class="cta-row" style="margin-top:12px;"><a class="btn btn-secondary" href="library.html#${r.id}">Open in Library</a></div></div>`;
   }
 
-  function wireDownloadButtons(container) {
-    container.querySelectorAll('.chip-btn').forEach(btn => {
-      btn.addEventListener('click', () => downloadResourceFile(btn.dataset.path, btn.dataset.name));
-    });
-  }
 
   (async () => {
     const session = await requireMember();

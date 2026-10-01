@@ -40,10 +40,9 @@
       <div class="field">
         <label for="f-type">Content type</label>
         <select id="f-type" required>
-          <option value="use_case">Use Case Materials</option>
-          <option value="prompt">Prompt Library</option>
-          <option value="cheat_sheet">Cheat Sheet</option>
+          <option value="use_case">Use Case (recording + cheat sheet + starter kit + materials)</option>
           <option value="try_this_week">Try This Week</option>
+          <option value="prompt">Prompt Library</option>
         </select>
       </div>
 
@@ -82,7 +81,11 @@
 
       <div class="field"><label for="f-recording">Recording / video link <span class="hint">(optional)</span></label><input id="f-recording" type="url" placeholder="https://…"></div>
 
-      <div class="field"><label for="f-file">File <span class="hint">(optional — PDF, slide deck, doc, etc.)</span></label><input id="f-file" type="file"></div>
+      <div class="field" id="f-main-wrap"><label for="f-file" id="f-file-label">File <span class="hint">(optional — PDF, slide deck, doc, etc.)</span></label><input id="f-file" type="file"></div>
+      <div id="use-case-files" class="type-only">
+        <div class="field"><label for="f-cheat">Cheat sheet — 2 min read <span class="hint">(optional file)</span></label><input id="f-cheat" type="file"></div>
+        <div class="field"><label for="f-kit">Starter kit — across AI tools <span class="hint">(optional file)</span></label><input id="f-kit" type="file"></div>
+      </div>
 
       <button class="btn btn-primary" type="submit" style="width:100%;margin-top:6px;">Add to library</button>
     </form>
@@ -101,18 +104,23 @@
   document.getElementById('f-category').addEventListener('change', (e) => {
     document.getElementById('f-category-other-wrap').classList.toggle('show', e.target.value === '__other');
   });
-  document.getElementById('f-type').addEventListener('change', (e) => {
-    document.getElementById('use-case-fields').classList.toggle('show', e.target.value === 'use_case');
-  });
+  function syncTypeFields() {
+    const isUseCase = document.getElementById('f-type').value === 'use_case';
+    document.getElementById('use-case-fields').classList.toggle('show', isUseCase);
+    document.getElementById('use-case-files').classList.toggle('show', isUseCase);
+    document.getElementById('f-file-label').firstChild.textContent = isUseCase ? 'Use case materials ' : 'File ';
+  }
+  document.getElementById('f-type').addEventListener('change', syncTypeFields);
+  syncTypeFields();
 
   function adminRow(r) {
     const label = RESOURCE_TYPE_LABELS[r.type] || r.type;
     return `<div class="admin-row" id="row-${r.id}">
       <div>
         <div class="title">${r.title}</div>
-        <div class="meta">${label} · ${r.category}${r.file_name ? ' · ' + r.file_name : ''}</div>
+        <div class="meta">${label} · ${r.category}</div>
       </div>
-      <button class="btn btn-danger" data-id="${r.id}" data-path="${r.file_path || ''}">Delete</button>
+      <button class="btn btn-danger" data-id="${r.id}" data-paths="${[r.file_path, r.cheat_sheet_path, r.starter_kit_path].filter(Boolean).join(',')}">Delete</button>
     </div>`;
   }
 
@@ -125,14 +133,15 @@
     }
     list.innerHTML = resources.map(adminRow).join('');
     list.querySelectorAll('.btn-danger').forEach(btn => {
-      btn.addEventListener('click', () => deleteResource(btn.dataset.id, btn.dataset.path));
+      btn.addEventListener('click', () => deleteResource(btn.dataset.id, btn.dataset.paths));
     });
   }
 
-  async function deleteResource(id, filePath) {
+  async function deleteResource(id, paths) {
     if (!confirm('Delete this item from the library? This cannot be undone.')) return;
-    if (filePath) {
-      await supabaseClient.storage.from('library-files').remove([filePath]);
+    const list = (paths || '').split(',').filter(Boolean);
+    if (list.length) {
+      await supabaseClient.storage.from('library-files').remove(list);
     }
     await supabaseClient.from('resources').delete().eq('id', id);
     const row = document.getElementById('row-' + id);
@@ -158,19 +167,22 @@
 
       if (!category) { msg.textContent = 'Please choose or enter a category.'; msg.className = 'form-msg show error'; submitBtn.disabled = false; submitBtn.textContent = 'Add to library'; return; }
 
-      let file_path = null, file_name = null;
-      if (fileInput.files && fileInput.files[0]) {
-        const file = fileInput.files[0];
+      async function uploadFile(inputId) {
+        const input = document.getElementById(inputId);
+        if (!input.files || !input.files[0]) return [null, null];
+        const file = input.files[0];
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-        const path = `${type}/${Date.now()}_${safeName}`;
+        const path = `${type}/${Date.now()}_${inputId}_${safeName}`;
         const { error: uploadError } = await supabaseClient.storage.from('library-files').upload(path, file);
         if (uploadError) throw uploadError;
-        file_path = path;
-        file_name = file.name;
+        return [path, file.name];
       }
+      const [file_path, file_name] = await uploadFile('f-file');
 
       const row = { type, category, title, description, recording_url, file_path, file_name };
       if (type === 'use_case') {
+        [row.cheat_sheet_path, row.cheat_sheet_name] = await uploadFile('f-cheat');
+        [row.starter_kit_path, row.starter_kit_name] = await uploadFile('f-kit');
         row.business_problem = document.getElementById('f-problem').value.trim() || null;
         row.what_you_learn = document.getElementById('f-learn').value.trim() || null;
         row.tool_used = document.getElementById('f-tool').value.trim() || null;
@@ -184,7 +196,7 @@
       msg.textContent = 'Added to the library.';
       msg.className = 'form-msg show ok';
       e.target.reset();
-      document.getElementById('use-case-fields').classList.remove('show');
+      syncTypeFields();
       document.getElementById('f-category-other-wrap').classList.remove('show');
       loadResources();
     } catch (err) {

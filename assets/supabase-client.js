@@ -43,11 +43,38 @@ async function signOut() {
 
 // Content-type labels used across the Knowledge Library pages.
 const RESOURCE_TYPE_LABELS = {
-  use_case: "Use Case Materials",
+  use_case: "Use Cases",
+  try_this_week: "Try This Week",
   prompt: "Prompt Library",
-  cheat_sheet: "Cheat Sheet",
-  try_this_week: "Try This Week"
+  cheat_sheet: "Cheat Sheets"
 };
+
+// Bottom action buttons for a library item. Use cases get the four
+// standard buttons (greyed out when that asset hasn't been added yet);
+// other types get a Download button plus an optional recording link.
+// Wire clicks afterwards with wireDownloadButtons(container).
+function resourceButtons(r) {
+  const dl = (path, name, label) => path
+    ? `<button class="chip-btn" data-path="${path}" data-name="${name || ''}">${label}</button>`
+    : `<span class="chip-btn disabled">${label}</span>`;
+  const rec = r.recording_url
+    ? `<a class="chip-btn" href="${r.recording_url}" target="_blank" rel="noopener">▶ Session recording</a>`
+    : `<span class="chip-btn disabled">▶ Session recording</span>`;
+  if (r.type === "use_case") {
+    return rec
+      + dl(r.cheat_sheet_path, r.cheat_sheet_name, "📄 Cheat sheet · 2 min read")
+      + dl(r.starter_kit_path, r.starter_kit_name, "🧰 Starter kit · across AI tools")
+      + dl(r.file_path, r.file_name, "📁 Use case materials");
+  }
+  return (r.file_path ? dl(r.file_path, r.file_name, "⬇ Download" + (r.file_name ? " · " + r.file_name : "")) : "")
+    + (r.recording_url ? rec : "");
+}
+
+function wireDownloadButtons(container) {
+  container.querySelectorAll("button.chip-btn[data-path]").forEach((btn) => {
+    btn.addEventListener("click", () => downloadResourceFile(btn.dataset.path, btn.dataset.name));
+  });
+}
 
 // Downloads a file from the private "library-files" Storage bucket.
 // Generates a short-lived signed URL (Supabase checks the member/admin

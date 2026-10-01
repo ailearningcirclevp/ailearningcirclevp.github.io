@@ -108,8 +108,12 @@ create table if not exists public.resources (
   tool_transferability_note text,
   sample_input_output text,
   level text check (level in ('beginner', 'intermediate', 'advanced')),
-  file_path text,   -- object path inside the "library-files" Storage bucket
-  file_name text,   -- original filename, shown on the Download button
+  file_path text,   -- main file ("Use case materials" for a use case) in the "library-files" bucket
+  file_name text,   -- original filename of that file
+  cheat_sheet_path text, -- use cases: the 2-minute cheat sheet
+  cheat_sheet_name text,
+  starter_kit_path text, -- use cases: the starter kit across AI tools
+  starter_kit_name text,
   recording_url text, -- optional external video walkthrough link
   related_resource_ids uuid[],
   created_at timestamptz not null default now()
@@ -139,6 +143,8 @@ create view public.resource_catalogue as
     category,
     title,
     (file_path is not null) as has_file,
+    (cheat_sheet_path is not null) as has_cheat_sheet,
+    (starter_kit_path is not null) as has_starter_kit,
     (recording_url is not null) as has_recording
   from public.resources;
 

@@ -16,9 +16,6 @@
   .filter-row select{padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-1);font-family:inherit;font-size:13px;}
   .cat-num{font-size:12px;color:var(--slate-500);font-weight:700;}
   .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
-  .type-section-title{font-size:16px;font-family:'Fraunces',Georgia,serif;margin:30px 0 4px;}
-  .type-section-title:first-of-type{margin-top:10px;}
-  .type-section-sub{font-size:13px;color:var(--slate-500);margin:0 0 12px;}
 </style>
 </head>
 <body>
@@ -35,8 +32,9 @@
     <p id="lib-sub"></p>
   </div>
 
+  <div class="tab-chips" id="type-tabs"></div>
+
   <div class="filter-row">
-    <select id="filter-type"><option value="">All types</option></select>
     <select id="filter-category"><option value="">All categories</option></select>
     <select id="filter-level">
       <option value="">All levels</option>
@@ -57,12 +55,20 @@
   let userId = null;
   let savedIds = new Set();
   let allResources = [];
-  const TYPE_ORDER = ['try_this_week', 'use_case', 'prompt', 'cheat_sheet'];
+  const TYPE_ORDER = ['use_case', 'try_this_week', 'prompt'];
+  let currentType = 'use_case';
 
   function lockedCard(r, i) {
     const parts = [];
-    if (r.has_file) parts.push('Download');
-    if (r.has_recording) parts.push('Recording');
+    if (r.type === 'use_case') {
+      if (r.has_recording) parts.push('Session recording');
+      if (r.has_cheat_sheet) parts.push('Cheat sheet');
+      if (r.has_starter_kit) parts.push('Starter kit');
+      if (r.has_file) parts.push('Use case materials');
+    } else {
+      if (r.has_file) parts.push('Download');
+      if (r.has_recording) parts.push('Recording');
+    }
     return `<div class="card">
       <div class="cat-num">${String(i + 1).padStart(3, '0')} · ${r.category}</div>
       <h3>${r.title}</h3>
@@ -75,7 +81,7 @@
     return `<div class="card" id="${r.id}">
       <div class="card-head">
         <div>
-          <div class="cat-num">${String(i + 1).padStart(3, '0')} · ${r.category}</div>
+          <div class="cat-num">${String(i + 1).padStart(3, '0')} · ${r.category}${r.level ? ' · ' + r.level : ''}</div>
           <h3>${r.title}</h3>
         </div>
         <button class="save-btn ${saved ? 'saved' : ''}" data-id="${r.id}">${saved ? '♥ Saved' : '♡ Save'}</button>
@@ -84,43 +90,38 @@
       ${r.what_you_learn ? `<p style="margin-top:8px;"><strong>What you'll learn:</strong> ${r.what_you_learn}</p>` : ''}
       ${r.tool_used ? `<p style="margin-top:8px;"><strong>Tool used:</strong> ${r.tool_used}</p>` : ''}
       ${r.tool_transferability_note ? `<p style="margin-top:8px;color:var(--slate-500);"><em>Can I do this with another tool?</em> ${r.tool_transferability_note}</p>` : ''}
-      <div class="chip-row">
-        ${r.file_path ? `<button class="chip-btn" data-path="${r.file_path}" data-name="${r.file_name || ''}">⬇ Download${r.file_name ? ' · ' + r.file_name : ''}</button>` : ''}
-        ${r.recording_url ? `<a class="chip" href="${r.recording_url}" target="_blank" rel="noopener">Recording</a>` : ''}
-        ${r.level ? `<span class="chip">${r.level}</span>` : ''}
-      </div>
+      <div class="btn-row">${resourceButtons(r)}</div>
     </div>`;
   }
 
+  function renderTabs() {
+    document.getElementById('type-tabs').innerHTML = TYPE_ORDER.map(t =>
+      `<button class="tab-chip ${t === currentType ? 'active' : ''}" data-type="${t}">${RESOURCE_TYPE_LABELS[t]}</button>`).join('');
+    document.querySelectorAll('#type-tabs .tab-chip').forEach(btn => {
+      btn.addEventListener('click', () => { currentType = btn.dataset.type; renderTabs(); render(); });
+    });
+  }
+
   function render() {
-    const type = document.getElementById('filter-type').value;
     const cat = document.getElementById('filter-category').value;
     const level = document.getElementById('filter-level').value;
     const filtered = allResources.filter(r =>
-      (!type || r.type === type) && (!cat || r.category === cat) && (!level || r.level === level)
+      r.type === currentType && (!cat || r.category === cat) && (!level || r.level === level)
     );
     const container = document.getElementById('resource-sections');
 
     if (!filtered.length) {
-      container.innerHTML = '<div class="empty-state">Nothing matches those filters yet.</div>';
+      container.innerHTML = `<div class="empty-state">Nothing in ${RESOURCE_TYPE_LABELS[currentType]} yet.</div>`;
       return;
     }
 
-    const types = type ? [type] : TYPE_ORDER.filter(t => filtered.some(r => r.type === t));
-    container.innerHTML = types.map(t => {
-      const group = filtered.filter(r => r.type === t);
-      if (!group.length) return '';
-      const cards = group.map((r, i) => isMember ? memberCard(r, i) : lockedCard(r, i)).join('');
-      return `<div class="type-section-title">${RESOURCE_TYPE_LABELS[t] || t}</div>${cards}`;
-    }).join('');
+    container.innerHTML = filtered.map((r, i) => isMember ? memberCard(r, i) : lockedCard(r, i)).join('');
 
     if (isMember) {
       container.querySelectorAll('.save-btn').forEach(btn => {
         btn.addEventListener('click', () => toggleSave(btn.dataset.id, btn));
       });
-      container.querySelectorAll('.chip-btn').forEach(btn => {
-        btn.addEventListener('click', () => downloadResourceFile(btn.dataset.path, btn.dataset.name));
-      });
+      wireDownloadButtons(container);
     }
   }
 
@@ -146,17 +147,9 @@
       opt.value = c; opt.textContent = c;
       catSel.appendChild(opt);
     });
-
-    const typeSel = document.getElementById('filter-type');
-    TYPE_ORDER.filter(t => allResources.some(r => r.type === t)).forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t; opt.textContent = RESOURCE_TYPE_LABELS[t] || t;
-      typeSel.appendChild(opt);
-    });
-
-    typeSel.addEventListener('change', render);
     catSel.addEventListener('change', render);
     document.getElementById('filter-level').addEventListener('change', render);
+    renderTabs();
   }
 
   (async () => {
@@ -187,7 +180,7 @@
 
     if (isMember) {
       document.getElementById('lib-title').textContent = 'Knowledge Library';
-      document.getElementById('lib-sub').textContent = 'Try This Week, Use Case Materials, Prompt Library and Cheat Sheets — download what you need.';
+      document.getElementById('lib-sub').textContent = 'Pick a section, then open the session recording, cheat sheet, starter kit or materials for each use case.';
       const { data: resources } = await supabaseClient.from('resources').select('*').order('created_at', { ascending: true });
       allResources = resources || [];
 

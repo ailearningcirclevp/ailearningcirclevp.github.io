@@ -42,10 +42,7 @@
         <button class="save-btn saved" data-id="${r.id}">♥ Saved</button>
       </div>
       <p>${r.description || r.business_problem || ''}</p>
-      <div class="chip-row">
-        ${r.file_path ? `<button class="chip-btn" data-path="${r.file_path}" data-name="${r.file_name || ''}">⬇ Download${r.file_name ? ' · ' + r.file_name : ''}</button>` : ''}
-        ${r.recording_url ? `<a class="chip" href="${r.recording_url}" target="_blank" rel="noopener">Recording</a>` : ''}
-      </div>
+      <div class="btn-row">${resourceButtons(r)}</div>
     </div>`;
   }
 
@@ -75,9 +72,7 @@
     list.querySelectorAll('.save-btn').forEach(btn => {
       btn.addEventListener('click', () => unsave(btn.dataset.id, btn.closest('.card')));
     });
-    list.querySelectorAll('.chip-btn').forEach(btn => {
-      btn.addEventListener('click', () => downloadResourceFile(btn.dataset.path, btn.dataset.name));
-    });
+    wireDownloadButtons(list);
   })();
 </script>
 
