@@ -620,6 +620,7 @@
   <button class="drawer-link" onclick="showView('home'); goToSlide(2); closeDrawer();">Stay Updated</button>
   <button class="drawer-link nav-calendar-link" onclick="showView('calendar'); closeDrawer();">Session Calendar</button>
   <a class="drawer-link" href="community.html">Know Your Community</a>
+  <button class="drawer-link" onclick="closeDrawer(); openLibrary();">🔒 Knowledge Library</button>
   <div class="drawer-section-label">Account</div>
   <a class="drawer-link" href="login.html">Member Login</a>
 </div>
@@ -631,6 +632,7 @@
     <button class="tab-btn nav-home-link active" onclick="showView('home'); goToSlide(0);">Home</button>
     <button class="tab-btn nav-calendar-link" onclick="showView('calendar');">Session Calendar</button>
     <a class="tab-btn" href="community.html">Know Your Community</a>
+    <button class="tab-btn" onclick="openLibrary();">🔒 Knowledge Library</button>
     <a class="tab-btn" href="login.html">Member Login</a>
   </div>
   <a class="nav-login" href="login.html">Login</a>
@@ -1087,6 +1089,28 @@ function submitInterest(){
   .catch(function(){
     renderResultModal({ icon: '\u26A0\uFE0F', title: 'Couldn\u2019t send', message: 'Please check your connection and try again, or message us directly on WhatsApp.', showAddAnother: false, closeLabel: 'Close' });
   });
+}
+
+function openLibrary(){
+  var loggedIn = false;
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (/^sb-.*-auth-token$/.test(k)) { loggedIn = true; break; }
+    }
+  } catch(e) {}
+  if (loggedIn) { window.location.href = 'library.html'; return; }
+  renderResultModal({
+    icon: '🔒',
+    title: 'Members only',
+    message: 'Get membership to access the Knowledge Library — use cases, starter kits, cheat sheets and the prompt library.',
+    closeLabel: 'Close'
+  });
+  var actions = document.querySelector('#modal-box .actions');
+  actions.insertAdjacentHTML('afterbegin',
+    '<button onclick="window.open(\'https://wa.me/919566430848?text=I%20would%20like%20to%20subscribe%20for%20the%20membership%20for%203%20months%20or%206%20months.%20Kindly%20share%20me%20payment%20details\',\'_blank\'); closeModal();">Get membership on WhatsApp</button>' +
+    '<button onclick="window.location.href=\'login.html\'">I\'m a member — Log in</button>');
+  document.getElementById('modal-veil').classList.add('open');
 }
 
 function closeModal(){
