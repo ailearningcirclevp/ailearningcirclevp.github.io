@@ -24,10 +24,12 @@
   <h1 style="margin:6px 0 4px;">Welcome to AI Learning Circle</h1>
   <p style="color:var(--slate-500);font-size:14.5px;">Tell us where you are in your AI journey — it takes about two minutes and helps shape future sessions.</p>
 
-  <iframe class="survey-frame" id="survey-frame" src="" title="AI Learning Circle onboarding survey"></iframe>
-
   <div class="cta-row">
-    <button class="btn btn-primary" id="done-btn">I've completed the survey — take me to my dashboard</button>
+    <a class="btn btn-dark" id="survey-link" href="#" target="_blank" rel="noopener">1. Open the survey (new tab)</a>
+  </div>
+  <div class="cta-row">
+    <button class="btn btn-primary" id="done-btn">2. I've completed it — take me to my dashboard</button>
+    <button class="btn btn-secondary" id="skip-btn">Skip for now</button>
   </div>
   <div class="form-msg" id="form-msg"></div>
 </div>
@@ -36,7 +38,7 @@
 <script src="assets/supabase-config.js"></script>
 <script src="assets/supabase-client.js"></script>
 <script>
-  document.getElementById('survey-frame').src = ONBOARDING_SURVEY_URL;
+  document.getElementById('survey-link').href = ONBOARDING_SURVEY_URL.replace('?embedded=true', '');
   const msg = document.getElementById('form-msg');
   let currentSession = null;
 
@@ -48,6 +50,10 @@
       window.location.href = 'dashboard.html';
     }
   })();
+
+  document.getElementById('skip-btn').addEventListener('click', () => {
+    document.getElementById('done-btn').click();
+  });
 
   document.getElementById('done-btn').addEventListener('click', async () => {
     if (supabaseNotConfigured() || !currentSession) {
