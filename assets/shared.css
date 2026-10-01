@@ -146,6 +146,17 @@ a{color:inherit;}
 .section-title{font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--slate-500);margin:28px 0 10px;}
 .section-title:first-child{margin-top:0;}
 
+/* ---------- toggle switch ---------- */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-top:1px solid var(--line);}
+.toggle-row .label{font-size:14.5px;}
+.toggle-row .hint{font-size:12.5px;color:var(--slate-500);margin-top:2px;}
+.switch{position:relative;width:42px;height:24px;flex:0 0 auto;}
+.switch input{opacity:0;width:0;height:0;}
+.switch .track{position:absolute;inset:0;background:var(--line);border-radius:999px;cursor:pointer;transition:.15s;}
+.switch .track:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.15s;}
+.switch input:checked + .track{background:var(--gold-500);}
+.switch input:checked + .track:before{transform:translateX(18px);}
+
 /* ---------- file input (admin upload) ---------- */
 .field input[type="file"]{
   width:100%;padding:11px 13px;border-radius:10px;border:1px dashed var(--line);

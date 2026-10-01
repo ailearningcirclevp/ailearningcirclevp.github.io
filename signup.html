@@ -57,6 +57,30 @@
         <label for="area_of_interest">Area of interest <span class="hint">(optional)</span></label>
         <input id="area_of_interest" type="text" placeholder="e.g. Finance automation">
       </div>
+
+      <div class="section-title" style="margin-top:8px;">Know Your Community</div>
+      <p class="hint" style="margin:-4px 0 14px;">This is a great opportunity for the community to get to know who you are — add a photo, a link, and a short line about you. Completely optional, and off by default: nothing is shown until you turn it on below. You can always add or change this later from your profile.</p>
+
+      <div class="field">
+        <label for="photo">Photo <span class="hint">(optional)</span></label>
+        <input id="photo" type="file" accept="image/*">
+      </div>
+      <div class="field">
+        <label for="website_url">Website or profile link <span class="hint">(optional — your site, LinkedIn, portfolio, whatever you'd like to share)</span></label>
+        <input id="website_url" type="url" placeholder="https://…">
+      </div>
+      <div class="field">
+        <label for="bio">A brief about you <span class="hint">(optional)</span></label>
+        <textarea id="bio" rows="3" placeholder="A line or two about who you are and what you're working on"></textarea>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="label">Show me on Know Your Community</div>
+          <div class="hint">Off by default. Our public showcase page where members who opt in share a photo and a word about themselves.</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="show_in_directory"><span class="track"></span></label>
+      </div>
+
       <button class="btn btn-primary" type="submit" id="submit-btn" style="width:100%;">Create account</button>
     </form>
 
@@ -100,6 +124,20 @@
 
     const userId = data.user && data.user.id;
     if (userId) {
+      let profile_photo_url = null;
+      const photoFile = document.getElementById('photo').files[0];
+      if (photoFile) {
+        const safeName = photoFile.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const path = `${userId}/${Date.now()}_${safeName}`;
+        const { error: uploadError } = await supabaseClient.storage.from('profile-photos').upload(path, photoFile);
+        if (!uploadError) {
+          profile_photo_url = supabaseClient.storage.from('profile-photos').getPublicUrl(path).data.publicUrl;
+        }
+        // If the upload fails (e.g. email confirmation required before a
+        // session exists), we still create the account — they can add a
+        // photo later from their profile.
+      }
+
       const { error: insertError } = await supabaseClient.from('members').insert({
         id: userId,
         full_name: document.getElementById('full_name').value.trim(),
@@ -107,7 +145,11 @@
         location: document.getElementById('location').value.trim(),
         company: document.getElementById('company').value.trim() || null,
         linkedin_url: document.getElementById('linkedin_url').value.trim() || null,
-        area_of_interest: document.getElementById('area_of_interest').value.trim() || null
+        area_of_interest: document.getElementById('area_of_interest').value.trim() || null,
+        website_url: document.getElementById('website_url').value.trim() || null,
+        bio: document.getElementById('bio').value.trim() || null,
+        profile_photo_url,
+        show_in_directory: document.getElementById('show_in_directory').checked
       });
       if (insertError) {
         showMsg('Account created, but your profile details could not be saved: ' + insertError.message, 'error');

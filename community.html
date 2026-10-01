@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Know Your Community — AI Learning Circle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/shared.css">
+<style>
+  .wrap{max-width:760px;}
+  .member-card{display:flex;gap:14px;align-items:flex-start;}
+  .member-photo{width:56px;height:56px;border-radius:50%;object-fit:cover;flex:0 0 auto;background:var(--cream-200);border:1px solid var(--line);}
+  .member-photo.placeholder{display:flex;align-items:center;justify-content:center;font-family:'Fraunces',Georgia,serif;font-size:20px;color:var(--navy-700);}
+  .member-meta{font-size:12.5px;color:var(--slate-500);margin:2px 0 8px;}
+  .member-bio{font-size:14px;line-height:1.55;color:var(--ink-900);margin:0 0 8px;}
+  .member-link{font-size:13px;color:var(--gold-600);text-decoration:none;font-weight:600;}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a href="index.html" class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></a>
+  <div class="tabs">
+    <a class="tab-btn" href="index.html">Home</a>
+    <a class="tab-btn active" href="community.html">Know Your Community</a>
+    <a class="tab-btn" href="login.html">Member Login</a>
+  </div>
+</nav>
+
+<div class="wrap">
+  <div class="eyebrow" style="margin-top:20px;">Know Your Community</div>
+  <h1 style="font-size:24px;margin:4px 0 10px;">The people behind AI Learning Circle</h1>
+  <p style="font-size:14.5px;color:var(--slate-500);margin:0 0 24px;">A showcase of members who chose to share a bit about themselves — who they are, what they're working on, and where to find them.</p>
+
+  <div id="member-list"><div class="empty-state">Loading…</div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+  function initials(name) {
+    return (name || '?').trim().split(/\s+/).slice(0, 2).map(p => p[0]).join('').toUpperCase();
+  }
+
+  function memberCard(m) {
+    const photo = m.profile_photo_url
+      ? `<img class="member-photo" src="${m.profile_photo_url}" alt="${m.full_name}">`
+      : `<div class="member-photo placeholder">${initials(m.full_name)}</div>`;
+    const metaParts = [m.headline, m.location, m.company].filter(Boolean);
+    return `<div class="card member-card">
+      ${photo}
+      <div>
+        <h3 style="margin:0;">${m.full_name}</h3>
+        <div class="member-meta">${metaParts.join(' · ')}</div>
+        ${m.bio ? `<p class="member-bio">${m.bio}</p>` : ''}
+        ${m.website_url ? `<a class="member-link" href="${m.website_url}" target="_blank" rel="noopener">Visit link →</a>` : ''}
+      </div>
+    </div>`;
+  }
+
+  (async () => {
+    if (supabaseNotConfigured()) {
+      document.getElementById('member-list').innerHTML = '<div class="empty-state">Not connected yet — the site owner still needs to add the Supabase project keys.</div>';
+      return;
+    }
+
+    const { data: members, error } = await supabaseClient
+      .from('member_directory')
+      .select('*')
+      .order('full_name', { ascending: true });
+
+    const list = document.getElementById('member-list');
+    if (error) {
+      list.innerHTML = '<div class="empty-state">Could not load the community right now.</div>';
+      return;
+    }
+    if (!members || !members.length) {
+      list.innerHTML = '<div class="empty-state">No one has joined the showcase yet — be the first! <a href="signup.html">Sign up</a> and turn on "Show me on Know Your Community" in your profile.</div>';
+      return;
+    }
+    list.innerHTML = members.map(memberCard).join('');
+  })();
+</script>
+
+</body>
+</html>

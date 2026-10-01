@@ -19,6 +19,8 @@ create table if not exists public.members (
   company text,
   area_of_interest text,
   profile_photo_url text,
+  website_url text, -- optional personal site/profile link, shown on "Know Your Community"
+  bio text,         -- optional short "about you", shown on "Know Your Community"
   role text not null default 'member' check (role in ('member', 'admin', 'pending')),
   show_in_directory boolean not null default false,
   survey_completed boolean not null default false,
@@ -41,14 +43,20 @@ create policy "members insert own row"
   on public.members for insert
   with check (auth.uid() = id);
 
--- Opted-in directory: any authenticated member can read the public
--- fields of members who turned on "Show me in Member Directory".
--- (Handled via a view below, not a broad policy on this table.)
-
+-- "Know Your Community" — an opted-in public showcase. Anyone turned
+-- on via "Show me on Know Your Community" has these fields exposed
+-- through this narrow, read-only view (never the base table, and
+-- never fields they didn't choose to share). Currently granted to
+-- everyone (anon + authenticated) so it's open on the public site;
+-- to restrict it to paid members later, change the grant below to
+-- authenticated only and add a role/membership-tier check.
 create view public.member_directory as
-  select id, full_name, headline, location, company, area_of_interest, linkedin_url
+  select id, full_name, headline, location, company, area_of_interest,
+         linkedin_url, website_url, bio, profile_photo_url
   from public.members
   where show_in_directory = true;
+
+grant select on public.member_directory to anon, authenticated;
 
 -- ========== SESSIONS ==========
 -- Content you (admin) add directly via the Supabase Table Editor.
@@ -176,6 +184,38 @@ create policy "admins can delete library files"
   using (
     bucket_id = 'library-files'
     and exists (select 1 from public.members where id = auth.uid() and role = 'admin')
+  );
+
+-- ========== PROFILE PHOTOS (Storage) ==========
+-- A public bucket for "Know Your Community" photos — anyone can view
+-- a photo by its URL (that's the point, it's a public showcase), but
+-- only the member themselves (or an admin) can upload, replace or
+-- remove their own photo. Each member's files live under a folder
+-- named after their own user id (e.g. <user-id>/photo.jpg), which is
+-- how the policies below tell "your photo" from someone else's.
+insert into storage.buckets (id, name, public)
+  values ('profile-photos', 'profile-photos', true)
+  on conflict (id) do nothing;
+
+create policy "members can upload their own profile photo"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'profile-photos'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "members can replace their own profile photo"
+  on storage.objects for update
+  using (
+    bucket_id = 'profile-photos'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "members can delete their own profile photo"
+  on storage.objects for delete
+  using (
+    bucket_id = 'profile-photos'
+    and (storage.foldername(name))[1] = auth.uid()::text
   );
 
 -- ========== SAVED ITEMS (bookmarks) ==========
