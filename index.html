@@ -394,6 +394,60 @@
   .view{display:none;}
   .view.active{display:block;}
 
+  /* ---------- hamburger + drawer ---------- */
+  .menu-btn{
+    appearance:none;border:none;background:transparent;cursor:pointer;
+    display:flex;flex-direction:column;justify-content:center;gap:4px;
+    width:32px;height:32px;padding:0;
+  }
+  .menu-btn span{display:block;width:18px;height:2px;background:var(--ink-900);border-radius:2px;}
+  .drawer-backdrop{
+    position:fixed;inset:0;background:rgba(10,14,28,.45);z-index:29;
+    opacity:0;pointer-events:none;transition:opacity .2s ease;
+  }
+  .drawer-backdrop.open{opacity:1;pointer-events:auto;}
+  .drawer{
+    position:fixed;top:0;left:0;bottom:0;width:78%;max-width:300px;z-index:30;
+    background:var(--surface-1);box-shadow:var(--shadow);
+    transform:translateX(-100%);transition:transform .22s ease;
+    padding:20px;display:flex;flex-direction:column;gap:4px;
+  }
+  .drawer.open{transform:translateX(0);}
+  .drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .drawer-head img{height:24px;}
+  .drawer-close{appearance:none;border:none;background:transparent;font-size:20px;line-height:1;cursor:pointer;color:var(--slate-500);padding:4px;}
+  .drawer-search{
+    width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--line);
+    background:var(--surface-0);color:var(--ink-900);font-family:inherit;font-size:14px;margin-bottom:14px;
+  }
+  .drawer-search:focus{outline:2px solid var(--gold-500);outline-offset:1px;}
+  .drawer-link{
+    display:flex;align-items:center;gap:10px;padding:11px 8px;border-radius:10px;
+    color:var(--ink-900);text-decoration:none;font-size:14.5px;font-weight:600;cursor:pointer;background:none;border:none;text-align:left;font-family:inherit;
+  }
+  .drawer-link:hover{background:var(--cream-200);}
+  .drawer-section-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate-500);margin:14px 0 2px 8px;}
+
+  /* ---------- swipeable home ---------- */
+  .swipe-track{
+    display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+    scrollbar-width:none;-ms-overflow-style:none;
+    height:calc(100dvh - 65px - 46px);
+  }
+  .swipe-track::-webkit-scrollbar{display:none;}
+  .swipe-slide{
+    flex:0 0 100%;scroll-snap-align:start;min-width:100%;
+    height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding-block:4px 20px;
+  }
+  .swipe-dots{display:flex;justify-content:center;gap:7px;padding:4px 0 18px;}
+  .swipe-dots .dot{
+    appearance:none;border:none;width:7px;height:7px;border-radius:999px;background:var(--line);
+    padding:0;cursor:pointer;
+  }
+  .swipe-dots .dot.active{background:var(--gold-500);width:18px;transition:width .15s ease;}
+  .swipe-hint{text-align:center;font-size:11.5px;color:var(--slate-500);margin-top:2px;}
+
   /* ---------- session calendar ---------- */
   .cal-intro{margin-block-start:24px;}
   .cal-intro h1{font-size:clamp(24px,6vw,30px);margin:6px 0 8px;font-weight:600;text-wrap:balance;}
@@ -509,7 +563,24 @@
   }
 </style>
 
+<div class="drawer-backdrop" id="drawer-backdrop" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <img src="assets/logo.png" alt="AI Learning Circle">
+    <button class="drawer-close" onclick="closeDrawer()" aria-label="Close menu">✕</button>
+  </div>
+  <input class="drawer-search" id="drawer-search" type="search" placeholder="Search sessions…">
+  <div class="drawer-section-label">Browse</div>
+  <button class="drawer-link" onclick="goToSlide(0); closeDrawer();">Home</button>
+  <button class="drawer-link" onclick="goToSlide(1); closeDrawer();">What You Get</button>
+  <button class="drawer-link" onclick="goToSlide(2); closeDrawer();">Stay Updated</button>
+  <button class="drawer-link" onclick="showView('calendar'); closeDrawer();">Session Calendar</button>
+  <div class="drawer-section-label">Account</div>
+  <a class="drawer-link" href="login.html">Member Login</a>
+</div>
+
 <nav class="topnav">
+  <button class="menu-btn" id="menu-btn" onclick="openDrawer()" aria-label="Open menu"><span></span><span></span><span></span></button>
   <div class="brand"><img src="assets/logo.png" alt="AI Learning Circle"></div>
   <div class="tabs">
     <button class="tab-btn active" id="tab-home" onclick="showView('home')">Home</button>
@@ -518,119 +589,140 @@
   </div>
 </nav>
 
-<div class="wrap">
-
 <div id="view-home" class="view active">
 
-  <!-- SECTION 1 — HERO + VALUE PROPOSITION -->
-  <div class="hero">
-    <div class="eyebrow">AI Learning Circle</div>
-    <h1>AI is everywhere. <em>Using it confidently at work</em> is still hard.</h1>
-    <p>You may have watched courses, saved AI posts or tried ChatGPT — but still wonder where to start, what to use, and who to ask when something doesn't work.</p>
-    <p class="hero-lead">AI Learning Circle is a practical community where we learn one real use case at a time, try it ourselves, discuss what worked, and build AI capability together.</p>
-    <div class="hero-diff">Learn → Try → Discuss → Improve<br>Not another AI course. A place to actually use AI.</div>
-    <div class="cta-row">
-      <a class="btn btn-primary" href="#calendar" onclick="showView('calendar')">Join a Free Live Session</a>
-      <a class="btn btn-secondary" href="#membership">Explore Membership</a>
-    </div>
-  </div>
+  <div class="swipe-track" id="swipe-track">
 
-  <!-- SECTION 2 — WHAT YOU GET -->
-  <section id="membership">
-    <div class="section-head">
-      <div class="eyebrow">What you get</div>
-      <h2>Free to attend. Membership to go deeper.</h2>
-    </div>
-    <div class="split-grid">
-      <div class="split-card free">
-        <div class="split-tag">Free — attend and experience</div>
-        <h3>Live Sessions</h3>
-        <ul class="split-list">
-          <li>Twice a month</li>
-          <li>Practical AI use cases</li>
-          <li>Live demonstrations</li>
-          <li>Questions and discussion</li>
-        </ul>
-        <div class="cta-row">
-          <a class="btn btn-primary" href="#calendar" onclick="showView('calendar')">View Session Calendar</a>
-        </div>
-      </div>
-
-      <div class="split-card member">
-        <div class="split-tag">Membership — revisit, catch up, implement</div>
-        <h3>Membership</h3>
-        <ul class="split-list" style="margin-bottom:6px;">
-          <li>Session recordings</li>
-          <li>Use Case Starter Kits</li>
-          <li>Cheat sheets</li>
-          <li>Try This Week</li>
-          <li>Community discussion for questions &amp; clarifications<span class="lock-tag">Members only</span></li>
-        </ul>
-        <div style="font-size:12px;color:var(--slate-500);margin-bottom:16px;">All of this lives in your Knowledge Library<span class="lock-tag">Members</span>.</div>
-        <div class="pricing" style="margin-top:2px;">
-          <div class="price-grid" style="margin-top:0;">
-            <div class="price-tile"><div class="len">3 Months</div><div class="amt">₹2,500</div></div>
-            <div class="price-tile"><div class="len">6 Months</div><div class="amt">₹3,600</div></div>
+    <!-- SLIDE 1 — HERO + VALUE PROPOSITION -->
+    <div class="swipe-slide">
+      <div class="wrap">
+        <div class="hero">
+          <div class="eyebrow">AI Learning Circle</div>
+          <h1>AI is everywhere. <em>Using it confidently at work</em> is still hard.</h1>
+          <p>You may have watched courses, saved AI posts or tried ChatGPT — but still wonder where to start, what to use, and who to ask when something doesn't work.</p>
+          <p class="hero-lead">AI Learning Circle is a practical community where we learn one real use case at a time, try it ourselves, discuss what worked, and build AI capability together.</p>
+          <div class="hero-diff">Learn → Try → Discuss → Improve<br>Not another AI course. A place to actually use AI.</div>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#calendar" onclick="showView('calendar')">Join a Free Live Session</a>
+            <a class="btn btn-secondary" href="javascript:void(0)" onclick="goToSlide(1)">Explore Membership</a>
           </div>
-          <div class="note">Introductory membership for the first Learning Circle cycle.</div>
-        </div>
-        <div class="oneone">
-          <strong>1:1 coaching</strong>
-          Available separately on request — not included in membership.
-        </div>
-        <div class="cta-row">
-          <a class="btn btn-primary" href="mailto:ailearningcirclevp@gmail.com?subject=Membership%20interest%20%E2%80%94%20AI%20Learning%20Circle&body=Hi%2C%0A%0AI%27d%20like%20to%20express%20interest%20in%20AI%20Learning%20Circle%20membership.%0A%0APreferred%20plan%3A%20%5B3%20months%20/%206%20months%5D%0AName%3A%0ARole%2FCompany%3A%0A%0AThanks%21">Express Interest</a>
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- SECTION 3 — STAY UPDATED -->
-  <section>
-    <div class="section-head">
-      <div class="eyebrow">Stay updated</div>
-      <h2>Reminders, not noise.</h2>
-    </div>
-    <div class="community-card">
-      <p>This WhatsApp channel is one-way — session reminders, new-session announcements and occasional updates. For two-way discussion with the community, see Membership above.</p>
-      <div class="community-tags">
-        <span>Session reminders</span>
-        <span>New session announcements</span>
-        <span>Occasional updates</span>
-      </div>
-      <div class="cta-row">
-        <a class="btn btn-primary" href="https://wa.me/919566430848?text=Hi%21%20I%20am%20interested%20in%20the%20community%20and%20would%20like%20to%20join%20the%20sessions.%20Could%20you%20share%20me%20details%20of%20it.%20I%20am%20%28name%29%2C%20working%20as%20%28....%29." target="_blank" rel="noopener">Join WhatsApp for Updates</a>
-      </div>
-      <div class="community-contact">Or write to <a href="mailto:ailearningcirclevp@gmail.com">ailearningcirclevp@gmail.com</a></div>
-    </div>
-  </section>
+    <!-- SLIDE 2 — WHAT YOU GET -->
+    <div class="swipe-slide">
+      <div class="wrap">
+        <section id="membership">
+          <div class="section-head">
+            <div class="eyebrow">What you get</div>
+            <h2>Free to attend. Membership to go deeper.</h2>
+          </div>
+          <div class="split-grid">
+            <div class="split-card free">
+              <div class="split-tag">Free — attend and experience</div>
+              <h3>Live Sessions</h3>
+              <ul class="split-list">
+                <li>Twice a month</li>
+                <li>Practical AI use cases</li>
+                <li>Live demonstrations</li>
+                <li>Questions and discussion</li>
+              </ul>
+              <div class="cta-row">
+                <a class="btn btn-primary" href="#calendar" onclick="showView('calendar')">View Session Calendar</a>
+              </div>
+            </div>
 
-  <footer>
-    Learn together. Try it at work. Share what happens.<br>
-    <strong>AI Learning Circle</strong><br>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLScehQKlY-b5gAFt98ep4FeJ-jywcjLtImcIGGkeVLXI5iNROA/viewform" target="_blank" rel="noopener">Take the 1-min AI Pulse survey →</a>
-  </footer>
+            <div class="split-card member">
+              <div class="split-tag">Membership — revisit, catch up, implement</div>
+              <h3>Membership</h3>
+              <ul class="split-list" style="margin-bottom:6px;">
+                <li>Session recordings</li>
+                <li>Use Case Starter Kits</li>
+                <li>Cheat sheets</li>
+                <li>Try This Week</li>
+                <li>Community discussion for questions &amp; clarifications<span class="lock-tag">Members only</span></li>
+              </ul>
+              <div style="font-size:12px;color:var(--slate-500);margin-bottom:16px;">All of this lives in your Knowledge Library<span class="lock-tag">Members</span>.</div>
+              <div class="pricing" style="margin-top:2px;">
+                <div class="price-grid" style="margin-top:0;">
+                  <div class="price-tile"><div class="len">3 Months</div><div class="amt">₹2,500</div></div>
+                  <div class="price-tile"><div class="len">6 Months</div><div class="amt">₹3,600</div></div>
+                </div>
+                <div class="note">Introductory membership for the first Learning Circle cycle.</div>
+              </div>
+              <div class="oneone">
+                <strong>1:1 coaching</strong>
+                Available separately on request — not included in membership.
+              </div>
+              <div class="cta-row">
+                <a class="btn btn-primary" href="mailto:ailearningcirclevp@gmail.com?subject=Membership%20interest%20%E2%80%94%20AI%20Learning%20Circle&body=Hi%2C%0A%0AI%27d%20like%20to%20express%20interest%20in%20AI%20Learning%20Circle%20membership.%0A%0APreferred%20plan%3A%20%5B3%20months%20/%206%20months%5D%0AName%3A%0ARole%2FCompany%3A%0A%0AThanks%21">Express Interest</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 — STAY UPDATED -->
+    <div class="swipe-slide">
+      <div class="wrap">
+        <section>
+          <div class="section-head">
+            <div class="eyebrow">Stay updated</div>
+            <h2>Reminders, not noise.</h2>
+          </div>
+          <div class="community-card">
+            <p>This WhatsApp channel is one-way — session reminders, new-session announcements and occasional updates. For two-way discussion with the community, see Membership above.</p>
+            <div class="community-tags">
+              <span>Session reminders</span>
+              <span>New session announcements</span>
+              <span>Occasional updates</span>
+            </div>
+            <div class="cta-row">
+              <a class="btn btn-primary" href="https://wa.me/919566430848?text=Hi%21%20I%20am%20interested%20in%20the%20community%20and%20would%20like%20to%20join%20the%20sessions.%20Could%20you%20share%20me%20details%20of%20it.%20I%20am%20%28name%29%2C%20working%20as%20%28....%29." target="_blank" rel="noopener">Join WhatsApp for Updates</a>
+            </div>
+            <div class="community-contact">Or write to <a href="mailto:ailearningcirclevp@gmail.com">ailearningcirclevp@gmail.com</a></div>
+          </div>
+        </section>
+
+        <footer>
+          Learn together. Try it at work. Share what happens.<br>
+          <strong>AI Learning Circle</strong><br>
+          <a href="https://docs.google.com/forms/d/e/1FAIpQLScehQKlY-b5gAFt98ep4FeJ-jywcjLtImcIGGkeVLXI5iNROA/viewform" target="_blank" rel="noopener">Take the 1-min AI Pulse survey →</a>
+        </footer>
+      </div>
+    </div>
+
+  </div><!-- /swipe-track -->
+
+  <div class="swipe-dots" id="swipe-dots">
+    <button class="dot active" data-i="0" aria-label="Slide 1"></button>
+    <button class="dot" data-i="1" aria-label="Slide 2"></button>
+    <button class="dot" data-i="2" aria-label="Slide 3"></button>
+  </div>
+  <div class="swipe-hint">Swipe to explore →</div>
 
 </div><!-- /view-home -->
 
 <div id="view-calendar" class="view">
+  <div class="wrap">
 
-  <div class="cal-intro">
-    <div class="eyebrow">Session Calendar</div>
-    <h1>Upcoming AI Learning Circle Sessions</h1>
-    <p>Choose the sessions you're interested in. Once you register, the session is added to your calendar and you'll receive the Google Calendar invitation.</p>
+    <div class="cal-intro">
+      <div class="eyebrow">Session Calendar</div>
+      <h1>Upcoming AI Learning Circle Sessions</h1>
+      <p>Choose the sessions you're interested in. Once you register, the session is added to your calendar and you'll receive the Google Calendar invitation.</p>
+    </div>
+
+    <div class="sess-list" id="sess-list"><!-- rendered by script --></div>
+
+    <div class="cal-footer">
+      New sessions are added regularly.<br>
+      Join the <a href="https://wa.me/919566430848?text=Hi%21%20I%20am%20interested%20in%20the%20community%20and%20would%20like%20to%20join%20the%20sessions.%20Could%20you%20share%20me%20details%20of%20it.%20I%20am%20%28name%29%2C%20working%20as%20%28....%29." target="_blank" rel="noopener">AI Learning Circle WhatsApp group</a> for reminders and updates.
+    </div>
+
   </div>
-
-  <div class="sess-list" id="sess-list"><!-- rendered by script --></div>
-
-  <div class="cal-footer">
-    New sessions are added regularly.<br>
-    Join the <a href="https://wa.me/919566430848?text=Hi%21%20I%20am%20interested%20in%20the%20community%20and%20would%20like%20to%20join%20the%20sessions.%20Could%20you%20share%20me%20details%20of%20it.%20I%20am%20%28name%29%2C%20working%20as%20%28....%29." target="_blank" rel="noopener">AI Learning Circle WhatsApp group</a> for reminders and updates.
-  </div>
-
 </div><!-- /view-calendar -->
-
-</div><!-- /wrap -->
 
 <div class="modal-veil" id="modal-veil">
   <div class="modal" id="modal-box">
@@ -754,15 +846,60 @@ function statusLabel(s){
 function goToMembership(e){
   if(e) e.preventDefault();
   showView('home');
-  setTimeout(function(){
-    var el = document.getElementById('membership');
-    if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 50);
+  setTimeout(function(){ goToSlide(1); }, 50);
 }
 
-function renderSessions(){
+/* ---------- swipe (home) ---------- */
+function goToSlide(i){
+  var track = document.getElementById('swipe-track');
+  if(!track) return;
+  track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+}
+
+function initSwipeDots(){
+  var track = document.getElementById('swipe-track');
+  var dots = document.querySelectorAll('#swipe-dots .dot');
+  if(!track || !dots.length) return;
+  dots.forEach(function(d){
+    d.addEventListener('click', function(){ goToSlide(Number(d.dataset.i)); });
+  });
+  var ticking = false;
+  track.addEventListener('scroll', function(){
+    if(ticking) return;
+    ticking = true;
+    requestAnimationFrame(function(){
+      var i = Math.round(track.scrollLeft / track.clientWidth);
+      dots.forEach(function(d, idx){ d.classList.toggle('active', idx === i); });
+      ticking = false;
+    });
+  });
+}
+
+/* ---------- drawer ---------- */
+function openDrawer(){
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-backdrop').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-backdrop').classList.remove('open');
+}
+
+function renderSessions(filterText){
   var list = document.getElementById('sess-list');
-  list.innerHTML = sessions.map(function(s){
+  var q = (filterText || '').trim().toLowerCase();
+  var filtered = q ? sessions.filter(function(s){
+    return s.title.toLowerCase().indexOf(q) !== -1 ||
+           (s.tag && s.tag.toLowerCase().indexOf(q) !== -1) ||
+           (s.description && s.description.toLowerCase().indexOf(q) !== -1);
+  }) : sessions;
+
+  if(!filtered.length){
+    list.innerHTML = '<div class="empty-state" style="font-size:14px;color:var(--slate-500);padding:16px 0;">No sessions match “' + filterText + '”.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(function(s){
     if(s.status === 'completed'){
       return (
         '<div class="sess-card">' +
@@ -921,4 +1058,14 @@ function submitRegistration(sessionId){
 
 renderSessions();
 if(location.hash === '#calendar'){ showView('calendar'); }
+initSwipeDots();
+
+var drawerSearch = document.getElementById('drawer-search');
+if(drawerSearch){
+  drawerSearch.addEventListener('input', function(){
+    var q = drawerSearch.value;
+    showView('calendar');
+    renderSessions(q);
+  });
+}
 </script>
