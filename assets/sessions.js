@@ -23,7 +23,7 @@ const sessions = [
     date: "Sat, 10 Oct 2026",
     duration: "4:30 – 5:15 PM · Germany time",
     times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 6:30 PM · India 8:00 PM",
-    description: "Hand off deck-building, formatting and speaker-note preparation to AI while you keep the story, evidence and judgement calls.",
+    description: "Compare the AI presentation tools and learn to connect them in one workflow, working on your deck like a shared PPT with an AI analyst.",
     status: "open"
   },
   {
