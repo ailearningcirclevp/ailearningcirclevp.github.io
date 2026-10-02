@@ -1099,7 +1099,7 @@ function openInterestModal(){
   var box = document.getElementById('modal-box');
   box.innerHTML =
     '<h3>Get updates on WhatsApp</h3>' +
-    '<div class="sub">Share your number and we\u2019ll message you with session reminders and details. Used only for this.</div>' +
+    '<div class="sub">Enter your details and WhatsApp will open with a message to us. Just tap Send.</div>' +
     '<div class="field"><label for="f-name">Name</label><input id="f-name" type="text" autocomplete="name"></div>' +
     '<div class="field"><label for="f-phone">WhatsApp number (with country code)</label><input id="f-phone" type="tel" placeholder="+49 …" autocomplete="tel"></div>' +
     '<div class="field"><label for="f-role">Role / company (optional)</label><input id="f-role" type="text"></div>' +
@@ -1107,7 +1107,7 @@ function openInterestModal(){
     '<div class="form-error" id="f-error"></div>' +
     '<div class="modal-actions">' +
       '<button class="btn-cancel" onclick="closeModal()">Cancel</button>' +
-      '<button class="btn-confirm" id="f-confirm" onclick="submitInterest()">Send</button>' +
+      '<button class="btn-confirm" id="f-confirm" onclick="submitInterest()">Open WhatsApp</button>' +
     '</div>' +
     '<div class="sess-note" style="margin-top:12px;">Prefer to start the chat yourself? <a href="https://wa.me/919566430848?text=Hi%21%20I%20am%20interested%20in%20the%20AI%20Learning%20Circle." target="_blank" rel="noopener">Open WhatsApp</a></div>';
   document.getElementById('modal-veil').classList.add('open');
@@ -1123,24 +1123,15 @@ function submitInterest(){
   if(!name){ errEl.textContent = 'Please enter your name.'; return; }
   if(phone.replace(/[^0-9]/g,'').length < 8){ errEl.textContent = 'Please enter a valid WhatsApp number with country code.'; return; }
   errEl.textContent = '';
-  btn.disabled = true;
-  btn.textContent = 'Sending\u2026';
-  fetch(REGISTRATION_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ type: 'interest', name: name, whatsapp: phone, role: role, key: REGISTRATION_KEY, hp: hpEl ? hpEl.value : '' })
-  })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    if(data && data.success){
-      renderResultModal({ icon: '\uD83D\uDCAC', title: 'Thank you!', message: 'We\u2019ve got your interest and will message you on WhatsApp shortly.', showAddAnother: false, closeLabel: 'Close' });
-    } else {
-      renderResultModal({ icon: '\u26A0\uFE0F', title: 'Couldn\u2019t send', message: (data && data.message) || 'Please try again, or message us directly on WhatsApp.', showAddAnother: false, closeLabel: 'Close' });
-    }
-  })
-  .catch(function(){
-    renderResultModal({ icon: '\u26A0\uFE0F', title: 'Couldn\u2019t send', message: 'Please check your connection and try again, or message us directly on WhatsApp.', showAddAnother: false, closeLabel: 'Close' });
-  });
+  var msg = 'Hi! I am interested in the AI Learning Circle and would like to join the sessions.\n' +
+    'Name: ' + name + '\n' +
+    'My WhatsApp: ' + phone +
+    (role ? '\nRole / company: ' + role : '') +
+    '\nCould you share me the details?';
+  var url = 'https://wa.me/919566430848?text=' + encodeURIComponent(msg);
+  var w = window.open(url, '_blank');
+  if(!w){ window.location.href = url; }
+  renderResultModal({ icon: '\uD83D\uDCAC', title: 'Almost done', message: 'WhatsApp should now be open with your message ready. Tap Send in WhatsApp so it reaches us.', showAddAnother: false, closeLabel: 'Close' });
 }
 
 function openLibrary(){
