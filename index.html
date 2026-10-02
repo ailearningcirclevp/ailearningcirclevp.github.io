@@ -484,6 +484,25 @@
   .cal-intro h1{font-size:clamp(24px,6vw,30px);margin:6px 0 8px;font-weight:600;text-wrap:balance;}
   .cal-intro p{margin:0;font-size:14.5px;color:var(--slate-500);line-height:1.55;max-width:52ch;}
 
+
+  /* ---------- participant feedback ticker ---------- */
+  .sess-group{display:flex;flex-direction:column;gap:6px;min-width:0;}
+  .fb-strip{padding:2px 4px 0;min-width:0;}
+  .fb-label{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--slate-500);margin-bottom:3px;}
+  .fb-viewport{
+    overflow:hidden;white-space:nowrap;width:100%;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+            mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);
+  }
+  .fb-track{display:inline-flex;will-change:transform;animation:fb-scroll var(--fb-dur,40s) linear infinite;}
+  .fb-viewport:hover .fb-track{animation-play-state:paused;}
+  .fb-seq{display:inline-block;font-size:12.5px;color:var(--slate-500);font-style:italic;padding-right:0;}
+  .fb-sep{display:inline-block;margin:0 18px;font-style:normal;color:var(--gold-600);}
+  @keyframes fb-scroll{from{transform:translateX(0);}to{transform:translateX(calc(-1 * var(--fb-w,50%)));}}
+  @media (prefers-reduced-motion: reduce){
+    .fb-viewport{overflow-x:auto;-webkit-mask-image:none;mask-image:none;}
+    .fb-track{animation:none;}
+  }
   .sess-list{display:flex;flex-direction:column;gap:14px;margin-block-start:24px;}
   .sess-card{
     background:var(--surface-1);
@@ -827,6 +846,8 @@
   </div>
 </div>
 
+<script src="assets/supabase-config.js"></script>
+<script src="assets/sessions.js"></script>
 <script>
 function copyEmail(btn){
   var text = "ailearningcirclevp@gmail.com";
@@ -844,73 +865,7 @@ function fallbackCopy(text, done){
   }catch(e){}
 }
 
-/* =====================================================================
-   SESSION CALENDAR
-   Edit ONLY the `sessions` array below to add, remove, or change sessions.
-   status: "open" | "soon" | "closed"
-   ===================================================================== */
-const sessions = [
-  {
-    id: "messy-inputs-mgmt-report-01",
-    title: "From Messy Finance Data to Management Insight",
-    tag: "Finance",
-    date: "Sat, 26 Sep 2026",
-    duration: "4:30 – 5:15 PM · Germany time",
-    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 6:30 PM · India 8:00 PM",
-    description: "Build a practical AI workspace, then turn unstructured finance files into a financial model, management dashboard and prioritised improvement portfolio.",
-    status: "completed"
-  },
-  {
-    id: "presentation-ai-01",
-    title: "Outsource Your Presentation Tasks to AI",
-    tag: "Productivity",
-    date: "Sat, 10 Oct 2026",
-    duration: "4:30 – 5:15 PM · Germany time",
-    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 6:30 PM · India 8:00 PM",
-    description: "Hand off deck-building, formatting and speaker-note preparation to AI while you keep the story, evidence and judgement calls.",
-    status: "open"
-  },
-  {
-    id: "financial-modelling-01",
-    title: "Build Financial Model Using Messy Data + Interactive Dashboard",
-    tag: "Finance",
-    date: "Sat, 24 Oct 2026",
-    duration: "4:30 – 5:15 PM · Germany time",
-    times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 6:30 PM · India 8:00 PM",
-    description: "Turn scattered finance inputs into a structured financial model, then extend the model into an interactive dashboard, with a look at how the same concept can connect into Power BI through the Microsoft Copilot/Fabric ecosystem where organisational access allows.",
-    status: "open"
-  },
-  {
-    id: "prompt-context-01",
-    title: "AI Finance Command Center / Prompt Super-Skill",
-    tag: "Finance",
-    date: "Date to be announced",
-    duration: "",
-    times: "",
-    description: "Turn recurring Finance prompts and SOPs into reusable skills, then chain them into one controlled workflow: clean → analyse → dashboard → deck → review.",
-    status: "soon"
-  },
-  {
-    id: "budgeting-forecasting-01",
-    title: "Automated Finance Reporting Agent",
-    tag: "Finance",
-    date: "Date to be announced",
-    duration: "",
-    times: "",
-    description: "Finance data → management insights → on-brand deck → recurring written update → distribution draft, with human approval before publishing.",
-    status: "soon"
-  },
-  {
-    id: "website-ai-01",
-    title: "Inbox Workflow, Not Just Prompts",
-    tag: "Productivity",
-    date: "Date to be announced",
-    duration: "",
-    times: "",
-    description: "New email → AI classifies and prioritises → approved data lookup → draft response/action → human hand-off → follow-up tracking.",
-    status: "soon"
-  }
-];
+/* SESSION CALENDAR — the `sessions` array lives in assets/sessions.js */
 
 /* Paste your deployed Google Apps Script Web App URL here.
    See the deployment guide for how to get this. Until it's set,
@@ -931,6 +886,7 @@ function showView(name){
   document.querySelectorAll('.nav-home-link').forEach(function(el){ el.classList.toggle('active', name === 'home'); });
   document.querySelectorAll('.nav-calendar-link').forEach(function(el){ el.classList.toggle('active', name === 'calendar'); });
   try{ history.replaceState(null, '', name === 'calendar' ? '#calendar' : '#home'); }catch(e){}
+  if(name === 'calendar' && typeof startTickers === 'function') startTickers();
 }
 
 function statusLabel(s){
@@ -998,7 +954,9 @@ function renderSessions(filterText){
 
   list.innerHTML = filtered.map(function(s){
     if(s.status === 'completed'){
+      var fb = feedbackStrip(s.id);
       return (
+        (fb ? '<div class="sess-group">' : '') +
         '<div class="sess-card">' +
           '<div class="sess-top">' +
             '<div class="sess-tag">' + s.tag + '</div>' +
@@ -1009,7 +967,8 @@ function renderSessions(filterText){
           '<div class="sess-times">' + s.times + '</div>' +
           '<div class="sess-desc">' + s.description + '</div>' +
           '<a class="sess-btn link" href="#membership" onclick="goToMembership(event)">Watch in Knowledge Library — Members Only</a>' +
-        '</div>'
+        '</div>' +
+        (fb ? fb + '</div>' : '')
       );
     }
     var disabled = s.status !== 'open';
@@ -1031,7 +990,58 @@ function renderSessions(filterText){
       '</div>'
     );
   }).join('');
+  if(typeof startTickers === 'function') startTickers();
 }
+
+
+/* ---------- participant feedback ticker (comments come from Supabase) ---------- */
+var feedbackBySession = {};
+function escHtml(t){ return String(t).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+function feedbackStrip(sessionId){
+  var list = feedbackBySession[sessionId];
+  if(!list || !list.length) return '';
+  var seq = list.map(function(c){ return escHtml(c); }).join('<span class="fb-sep">\u2022</span>') + '<span class="fb-sep">\u2022</span>';
+  return '<div class="fb-strip" data-fb="1"><div class="fb-label">What participants said</div>' +
+         '<div class="fb-viewport"><div class="fb-track"><span class="fb-seq">' + seq + '</span></div></div></div>';
+}
+
+/* Repeat the text until it is wider than the strip, then loop it seamlessly, slowly. */
+function startTickers(){
+  document.querySelectorAll('.fb-strip').forEach(function(strip){
+    var vp = strip.querySelector('.fb-viewport'), track = strip.querySelector('.fb-track');
+    var first = track.querySelector('.fb-seq');
+    if(!vp || !first || !vp.clientWidth) return;
+    while(track.children.length > 1) track.removeChild(track.lastChild);
+    var w = first.getBoundingClientRect().width;
+    if(!w) return;
+    var copies = Math.max(2, Math.ceil(vp.clientWidth / w) + 1);
+    for(var i = 1; i < copies; i++){
+      var c = first.cloneNode(true); c.setAttribute('aria-hidden','true'); track.appendChild(c);
+    }
+    track.style.setProperty('--fb-w', w + 'px');
+    track.style.setProperty('--fb-dur', Math.max(20, w / 35) + 's');
+  });
+}
+
+function loadFeedback(){
+  if(typeof SUPABASE_URL === 'undefined' || String(SUPABASE_URL).indexOf('PASTE_') === 0) return;
+  fetch(SUPABASE_URL + '/rest/v1/session_feedback?select=session_id,comment&order=sort_order.asc,created_at.asc', {
+    headers: { apikey: SUPABASE_ANON_KEY, Authorization: 'Bearer ' + SUPABASE_ANON_KEY }
+  })
+  .then(function(r){ return r.ok ? r.json() : []; })
+  .then(function(rows){
+    feedbackBySession = {};
+    (rows || []).forEach(function(r){
+      if(!r.comment) return;
+      (feedbackBySession[r.session_id] = feedbackBySession[r.session_id] || []).push(r.comment);
+    });
+    var ds = document.getElementById('drawer-search');
+    renderSessions(ds ? ds.value : '');
+  })
+  .catch(function(){});
+}
+window.addEventListener('resize', function(){ startTickers(); });
 
 var registered = {};
 try{
@@ -1224,6 +1234,7 @@ function submitRegistration(sessionId){
 }
 
 renderSessions();
+loadFeedback();
 if(location.hash === '#calendar'){ showView('calendar'); }
 initSwipeDots();
 

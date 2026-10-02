@@ -97,6 +97,15 @@
     </form>
     <div id="tip-list" style="margin-top:14px;"></div>
 
+    <div class="section-title" style="margin-top:36px;">Participant Feedback <span style="text-transform:none;font-weight:500;">(anonymous ticker, shown only under Completed sessions)</span></div>
+    <div class="form-msg" id="fb-msg"></div>
+    <div class="field"><label for="fb-session">Session</label><select id="fb-session"></select></div>
+    <form id="fb-form" style="display:flex;gap:8px;">
+      <input id="fb-new" type="text" placeholder="Add a comment (plain text, no names)" required style="flex:1;padding:11px 13px;border-radius:10px;border:1px solid var(--line);background:var(--surface-1);color:var(--ink-900);font-family:inherit;font-size:14.5px;">
+      <button class="btn btn-primary" type="submit">Add</button>
+    </form>
+    <div id="fb-list" style="margin-top:12px;"></div>
+
     <div class="section-title" style="margin-top:36px;">Existing materials</div>
     <div id="resource-list"><div class="empty-state">Loading…</div></div>
   </div>
@@ -105,6 +114,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="assets/supabase-config.js"></script>
 <script src="assets/supabase-client.js"></script>
+<script src="assets/sessions.js"></script>
 <script>
   let member = null;
 
@@ -238,6 +248,64 @@
     }
   });
 
+
+  // ---------- Participant feedback ----------
+  const fbSel = document.getElementById('fb-session');
+  const fbMsg = document.getElementById('fb-msg');
+  function fbFlash(text, ok) { fbMsg.textContent = text; fbMsg.className = 'form-msg show ' + (ok ? 'ok' : 'error'); }
+  fbSel.innerHTML = sessions.map(s => `<option value="${s.id}">${escH(s.title)} — ${escH(s.date)} (${s.status === 'completed' ? 'Completed' : s.status})</option>`).join('');
+  fbSel.value = (sessions.find(s => s.status === 'completed') || sessions[0] || {}).id || '';
+
+  async function loadFeedback() {
+    const { data, error } = await supabaseClient.from('session_feedback').select('*')
+      .eq('session_id', fbSel.value).order('sort_order', { ascending: true }).order('created_at', { ascending: true });
+    const el = document.getElementById('fb-list');
+    if (error) { el.innerHTML = '<div class="empty-state">' + escH(error.message) + '</div>'; return; }
+    if (!data.length) { el.innerHTML = '<div class="empty-state">No feedback for this session yet — nothing is shown on the site.</div>'; return; }
+    el.innerHTML = data.map((c, i) => `<div class="admin-row" data-id="${c.id}" style="align-items:center;">
+      <input type="text" value="${escH(c.comment)}" style="flex:1;min-width:0;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:var(--surface-1);color:var(--ink-900);font-family:inherit;font-size:14px;">
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-secondary" data-act="up" ${i === 0 ? 'disabled' : ''} title="Move up">↑</button>
+        <button class="btn btn-secondary" data-act="down" ${i === data.length - 1 ? 'disabled' : ''} title="Move down">↓</button>
+        <button class="btn btn-dark" data-act="save">Save</button>
+        <button class="btn btn-danger" data-act="del">Delete</button>
+      </div></div>`).join('');
+    el.querySelectorAll('.admin-row').forEach((row, i) => {
+      row.querySelectorAll('button').forEach(b => b.addEventListener('click', async () => {
+        const id = row.dataset.id, act = b.dataset.act;
+        if (act === 'save') {
+          const { error: e } = await supabaseClient.from('session_feedback').update({ comment: row.querySelector('input').value.trim() }).eq('id', id);
+          fbFlash(e ? e.message : 'Saved.', !e);
+        } else if (act === 'del') {
+          if (!confirm('Delete this comment?')) return;
+          const { error: e } = await supabaseClient.from('session_feedback').delete().eq('id', id);
+          fbFlash(e ? e.message : 'Deleted.', !e); loadFeedback();
+        } else {
+          const j = act === 'up' ? i - 1 : i + 1;
+          const a = data[i], c = data[j];
+          // write explicit positions so ordering is stable
+          await Promise.all(data.map((d, k) => {
+            const pos = k === i ? j : k === j ? i : k;
+            return supabaseClient.from('session_feedback').update({ sort_order: pos }).eq('id', d.id);
+          }));
+          loadFeedback();
+        }
+      }));
+    });
+  }
+  fbSel.addEventListener('change', loadFeedback);
+  document.getElementById('fb-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('fb-new');
+    const text = input.value.trim();
+    if (!text) return;
+    const { data: last } = await supabaseClient.from('session_feedback').select('sort_order').eq('session_id', fbSel.value).order('sort_order', { ascending: false }).limit(1);
+    const next = last && last.length ? last[0].sort_order + 1 : 0;
+    const { error } = await supabaseClient.from('session_feedback').insert({ session_id: fbSel.value, comment: text, sort_order: next });
+    fbFlash(error ? error.message : 'Comment added.', !error);
+    if (!error) { input.value = ''; loadFeedback(); }
+  });
+
   (async () => {
     if (supabaseNotConfigured()) {
       document.getElementById('admin-wrap').style.visibility = 'visible';
@@ -260,6 +328,7 @@
     document.getElementById('admin-area').style.display = 'block';
     loadResources();
     loadTips();
+    loadFeedback();
   })();
 </script>
 
