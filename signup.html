@@ -139,7 +139,7 @@
 
     // Notify the organizer and send the member a welcome email via Apps Script.
     try {
-      fetch('https://script.google.com/macros/s/AKfycbwC4VU3171ptHctyta9Gm8OeTBjrabPNL-i-WuUGq9ynHq_7fv87cis7cYyk46A7GMM/exec', {
+      fetch('https://script.google.com/macros/s/AKfycbz05rnTsQQzUh5EDSu50X24qxE0Uyo_IWXpcKtoksqo7_hYhX6tdp62s1caqWxOPddW2g/exec', {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ type: 'signup', name: profile.full_name, email: email, company: profile.company || '', key: 'm70wf5pfK60pOce1S_JKpgze', hp: '' })
