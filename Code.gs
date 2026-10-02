@@ -200,15 +200,46 @@ function notifySignup(name, email, company) {
       "\nTo make them a paid member after payment, set their role to 'member' in Supabase.");
   } catch (e) {}
   try {
+    var SITE = "https://ailearningcirclevp.github.io/";
+    var WA_JOIN = "https://wa.me/919566430848?text=" + encodeURIComponent("Hi! I am interested in the community and would like to join the sessions. Could you share me details of it.");
+    var WA_MEMBER = "https://wa.me/919566430848?text=" + encodeURIComponent("I would like to subscribe for the membership for 3 months or 6 months. Kindly share me payment details");
+    var first = String(name).split(" ")[0];
+    var btn = function (href, label, bg, fg) {
+      return '<a href="' + href + '" style="display:inline-block;background:' + bg + ';color:' + fg + ';text-decoration:none;font-weight:700;font-size:14px;padding:11px 18px;border-radius:999px;">' + label + '</a>';
+    };
+    var html =
+      '<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#12182b;line-height:1.55;">' +
+      '<img src="' + SITE + 'assets/email-logo.png" alt="AI Learning Circle" width="270" style="display:block;margin-bottom:18px;">' +
+      '<p style="font-size:16px;">Hi ' + first + ',</p>' +
+      '<p>Welcome! Your free AI Learning Circle account is created. Please <b>confirm your email</b> using the separate confirmation message from us, then <a href="' + SITE + 'login.html" style="color:#1d3a6e;font-weight:700;">log in</a> to see free AI tips.</p>' +
+      '<h3 style="margin:22px 0 6px;color:#0f1e3d;">What you get</h3>' +
+      '<p style="margin:0 0 4px;"><b>Free:</b> live sessions, free AI tips in your account, and the Know Your Community page.</p>' +
+      '<p style="margin:0;"><b>Membership (3 or 6 months):</b> the full Knowledge Library with use cases, starter kits, cheat sheets, Try This Week and the Prompt Library.</p>' +
+      '<p style="margin:14px 0 0;">' + btn(WA_MEMBER, "Get membership on WhatsApp", "#f2c94c", "#0b1730") + ' &nbsp; ' + btn(SITE + "#membership", "See membership", "#ffffff", "#0f1e3d").replace("border-radius:999px;", "border-radius:999px;border:1px solid #0f1e3d;") + '</p>' +
+      '<h3 style="margin:24px 0 6px;color:#0f1e3d;">Join a free live session</h3>' +
+      '<p style="margin:0 0 10px;">See upcoming sessions and add yourself to the calendar in one tap.</p>' +
+      '<p style="margin:0;">' + btn(SITE + "#calendar", "Open the Session Calendar", "#0f1e3d", "#f2c94c") + '</p>' +
+      '<h3 style="margin:24px 0 6px;color:#0f1e3d;">Get updates on WhatsApp</h3>' +
+      '<p style="margin:0 0 10px;">Session reminders and new use cases, straight to your phone.</p>' +
+      '<p style="margin:0;">' + btn(WA_JOIN, "Enrol on WhatsApp", "#25d366", "#06361a") + '</p>' +
+      '<p style="margin:26px 0 0;color:#55608a;font-size:13px;">Questions? Just reply to this email.<br>AI Learning Circle</p>' +
+      '</div>';
+    var text =
+      "Hi " + first + ",\n\n" +
+      "Welcome! Your free AI Learning Circle account is created. Please confirm your email using the separate confirmation message, then log in: " + SITE + "login.html\n\n" +
+      "WHAT YOU GET\n" +
+      "Free: live sessions, free AI tips in your account, Know Your Community.\n" +
+      "Membership (3 or 6 months): the full Knowledge Library - use cases, starter kits, cheat sheets, Try This Week, Prompt Library.\n" +
+      "Get membership on WhatsApp: " + WA_MEMBER + "\nSee membership: " + SITE + "#membership\n\n" +
+      "JOIN A FREE LIVE SESSION\nSession Calendar: " + SITE + "#calendar\n\n" +
+      "GET UPDATES ON WHATSAPP\nEnrol: " + WA_JOIN + "\n\n" +
+      "Questions? Just reply to this email.\nAI Learning Circle";
     MailApp.sendEmail({
       to: email,
-      subject: "Welcome to AI Learning Circle",
-      body: "Hi " + name + ",\n\n" +
-        "Thanks for creating your free AI Learning Circle account. " +
-        "Please confirm your email using the separate confirmation message, then log in at https://ailearningcirclevp.github.io/login.html to see free AI tips.\n\n" +
-        "Want the full Knowledge Library (use cases, starter kits, cheat sheets, prompt library)? " +
-        "Message us on WhatsApp: https://wa.me/919566430848\n\n" +
-        "AI Learning Circle",
+      subject: "Welcome to AI Learning Circle \u2014 your free account, membership & sessions",
+      body: text,
+      htmlBody: html,
+      name: "AI Learning Circle",
       replyTo: "ailearningcirclevp@gmail.com"
     });
   } catch (e) {}
