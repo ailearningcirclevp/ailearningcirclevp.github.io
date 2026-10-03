@@ -74,7 +74,27 @@
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
     if (error) {
-      showMsg(error.message, 'error');
+      if (/not confirmed/i.test(error.message)) {
+        showMsg('Please confirm your email first. Open the confirmation email we sent (check Spam/Promotions) and tap the link. Free accounts do not need payment.', 'error');
+        let rb = document.getElementById('resend-btn');
+        if (!rb) {
+          rb = document.createElement('button');
+          rb.type = 'button';
+          rb.id = 'resend-btn';
+          rb.className = 'btn btn-secondary';
+          rb.style.cssText = 'width:100%;margin-top:10px;';
+          rb.textContent = 'Resend confirmation email';
+          rb.addEventListener('click', async () => {
+            rb.disabled = true;
+            const { error: rErr } = await supabaseClient.auth.resend({ type: 'signup', email: document.getElementById('email').value.trim() });
+            showMsg(rErr ? rErr.message : 'Confirmation email sent. Please check your inbox and Spam folder.', rErr ? 'error' : 'ok');
+            setTimeout(() => { rb.disabled = false; }, 30000);
+          });
+          msg.insertAdjacentElement('afterend', rb);
+        }
+      } else {
+        showMsg(error.message, 'error');
+      }
       submitBtn.disabled = false;
       submitBtn.textContent = 'Log in';
       return;
