@@ -32,6 +32,17 @@
   <div id="not-admin" class="empty-state" style="display:none;"></div>
 
   <div id="admin-area" style="display:none;">
+    <div class="section-title">Members <span style="text-transform:none;font-weight:500;">(approve paid access)</span></div>
+    <div class="form-msg" id="mem-msg"></div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;">
+      <input id="mem-search" type="search" placeholder="Search name, email or company" style="flex:1;padding:11px 13px;border-radius:10px;border:1px solid var(--line);background:var(--surface-1);color:var(--ink-900);font-family:inherit;">
+      <select id="mem-filter" style="padding:11px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface-1);color:var(--ink-900);font-family:inherit;">
+        <option value="all">All</option><option value="free">Free</option><option value="member">Paid</option><option value="admin">Admins</option>
+      </select>
+    </div>
+    <div id="mem-count" class="hint" style="margin-bottom:8px;"></div>
+    <div id="mem-list" style="margin-bottom:34px;"><div class="empty-state">Loading…</div></div>
+
     <div class="form-msg" id="form-msg"></div>
 
     <form id="upload-form">
@@ -413,6 +424,59 @@
     if (!error) { input.value = ''; loadFeedback(); }
   });
 
+  // ---------- Members: approve / remove paid access ----------
+  let allMembers = [];
+  const memRoleLabel = { free: 'Free', member: 'Paid', admin: 'Admin', pending: 'Pending' };
+  function renderMembers() {
+    const q = document.getElementById('mem-search').value.trim().toLowerCase();
+    const f = document.getElementById('mem-filter').value;
+    const rows = allMembers.filter(m =>
+      (f === 'all' || m.role === f) &&
+      (!q || [m.full_name, m.email, m.company, m.headline].some(v => (v || '').toLowerCase().includes(q))));
+    const paid = allMembers.filter(m => m.role === 'member').length;
+    document.getElementById('mem-count').textContent = allMembers.length + ' signed up · ' + paid + ' paid · showing ' + rows.length;
+    const el = document.getElementById('mem-list');
+    if (!rows.length) { el.innerHTML = '<div class="empty-state">No members match.</div>'; return; }
+    el.innerHTML = rows.map(m => {
+      const self = m.id === member.id;
+      let action = '';
+      if (m.role === 'admin') action = '<span class="meta">Admin</span>';
+      else if (m.role === 'member') action = '<button class="btn btn-danger" data-mid="' + m.id + '" data-role="free">Remove paid access</button>';
+      else action = '<button class="btn btn-primary" data-mid="' + m.id + '" data-role="member">Approve as paid</button>';
+      return '<div class="admin-row"><div><div class="title">' + escH(m.full_name || '(no name)') + ' <span class="meta">· ' + (memRoleLabel[m.role] || m.role) + (self ? ' · you' : '') + '</span></div>' +
+        '<div class="meta">' + escH(m.email || '') + (m.company ? ' · ' + escH(m.company) : '') + (m.headline ? ' · ' + escH(m.headline) : '') + ' · joined ' + new Date(m.created_at).toLocaleDateString() + '</div></div>' +
+        (self ? '' : action) + '</div>';
+    }).join('');
+    el.querySelectorAll('[data-mid]').forEach(b => b.addEventListener('click', () => setMemberRole(b.dataset.mid, b.dataset.role)));
+  }
+  async function loadMembers() {
+    const { data, error } = await supabaseClient.from('members')
+      .select('id, full_name, email, company, headline, role, created_at').order('created_at', { ascending: false });
+    const mm = document.getElementById('mem-msg');
+    if (error) {
+      mm.textContent = 'Could not load members: ' + error.message + ' (run supabase/migration_members_admin.sql once in Supabase).';
+      mm.className = 'form-msg show error';
+      document.getElementById('mem-list').innerHTML = '';
+      return;
+    }
+    allMembers = data || [];
+    renderMembers();
+  }
+  async function setMemberRole(id, role) {
+    const m = allMembers.find(x => x.id === id);
+    const verb = role === 'member' ? 'Approve ' + (m && m.full_name || 'this person') + ' as a PAID member? They will get full Knowledge Library access.'
+                                   : 'Remove paid access for ' + (m && m.full_name || 'this person') + '? They will go back to free.';
+    if (!confirm(verb)) return;
+    const { error } = await supabaseClient.from('members').update({ role }).eq('id', id);
+    const mm = document.getElementById('mem-msg');
+    if (error) { mm.textContent = error.message; mm.className = 'form-msg show error'; return; }
+    mm.textContent = role === 'member' ? 'Approved as paid member.' : 'Moved back to free.';
+    mm.className = 'form-msg show ok';
+    loadMembers();
+  }
+  document.getElementById('mem-search').addEventListener('input', renderMembers);
+  document.getElementById('mem-filter').addEventListener('change', renderMembers);
+
   (async () => {
     if (supabaseNotConfigured()) {
       document.getElementById('admin-wrap').style.visibility = 'visible';
@@ -433,6 +497,7 @@
 
     document.getElementById('admin-wrap').style.visibility = 'visible';
     document.getElementById('admin-area').style.display = 'block';
+    loadMembers();
     loadResources();
     loadTips();
     loadFeedback();
