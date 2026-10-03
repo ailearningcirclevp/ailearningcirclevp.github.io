@@ -755,6 +755,7 @@
                 <li>Practical AI use cases</li>
                 <li>Live demonstrations</li>
                 <li>Questions and discussion</li>
+                <li>Free account with AI tips</li>
               </ul>
               <div class="cta-row">
                 <a class="btn btn-primary" href="#calendar" onclick="showView('calendar')">View Session Calendar</a>
@@ -839,7 +840,7 @@
     <div class="cal-intro">
       <div class="eyebrow">Session Calendar</div>
       <h1>Upcoming AI Learning Circle Sessions</h1>
-      <p>Choose the sessions you're interested in. Once you register, the session is added to your calendar and you'll receive the Google Calendar invitation.</p>
+      <p>Choose the sessions you're interested in. Registering creates your free account and adds the session to your calendar. You'll receive the Google Calendar invitation by email.</p>
     </div>
 
     <div class="sess-list" id="sess-list"><!-- rendered by script --></div>
@@ -1082,13 +1083,13 @@ function openModal(sessionId){
     '<h3>' + session.title + '</h3>' +
     '<div class="sub">' + session.date + ' · ' + session.duration + '</div>' +
     '<div class="sub" style="margin-top:-10px;">' + session.times + '</div>' +
-    '<div class="sub" style="margin-top:-4px;">Registering also creates your <b>free</b> AI Learning Circle account (free AI tips and community).</div>' +
+    '<div class="sub" style="margin-top:-4px;">Registering also creates your <b>free</b> AI Learning Circle account (free AI tips and session invites).</div>' +
     '<div class="field"><label for="f-name">Full name</label><input id="f-name" type="text" autocomplete="name"></div>' +
     '<div class="field"><label for="f-email">Email address</label><input id="f-email" type="email" autocomplete="email"></div>' +
     '<div class="field"><label for="f-pass">Create a password <span style="font-weight:400;opacity:.7;">(min 8 characters)</span></label><input id="f-pass" type="password" autocomplete="new-password"></div>' +
     '<div class="field"><label for="f-role">Your role</label><input id="f-role" type="text" placeholder="e.g. Finance Manager" autocomplete="organization-title"></div>' +
     '<div class="field"><label for="f-company">Company <span style="font-weight:400;opacity:.7;">(optional)</span></label><input id="f-company" type="text" autocomplete="organization"></div>' +
-    '<label style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.45;margin:6px 0 4px;"><input type="checkbox" id="f-show" style="margin-top:2px;"><span>Show my name, role and company on the Know Your Community page <span style="opacity:.7;">(optional, you can change this later)</span></span></label>' +
+    '<label style="display:none;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.45;margin:6px 0 4px;"><input type="checkbox" id="f-show" style="margin-top:2px;"><span>Show my name, role and company on the Know Your Community page <span style="opacity:.7;">(optional, you can change this later)</span></span></label>' +
     '<input type="text" id="f-hp" name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">' +
     '<div class="form-error" id="f-error"></div>' +
     '<div class="modal-actions">' +

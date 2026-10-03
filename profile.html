@@ -38,6 +38,8 @@
     <div class="field"><label for="linkedin_url">LinkedIn URL <span class="hint">(optional, never shown publicly unless you opt in below)</span></label><input id="linkedin_url" type="url"></div>
     <div class="field"><label for="area_of_interest">Area of interest <span class="hint">(optional)</span></label><input id="area_of_interest" type="text"></div>
 
+    <!-- Know Your Community is switched off for now: remove display:none to bring it back -->
+    <div id="community-fields" style="display:none;">
     <div class="section-title" style="margin-top:8px;">Know Your Community</div>
     <p class="hint" style="margin:-4px 0 14px;">A great opportunity for the community to get to know who you are. Optional, and nothing is shown until you turn it on below.</p>
 
@@ -57,6 +59,7 @@
       <label class="switch"><input type="checkbox" id="show_in_directory"><span class="track"></span></label>
     </div>
 
+    </div><!-- /community-fields -->
     <button class="btn btn-primary" type="submit" style="width:100%;margin-top:20px;">Save changes</button>
   </form>
 
