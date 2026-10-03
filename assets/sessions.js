@@ -28,12 +28,12 @@ const sessions = [
   },
   {
     id: "financial-modelling-01",
-    title: "Build Financial Model Using Messy Data + Interactive Dashboard",
+    title: "Structuring Chaos: AI-Built Financial Models & Dashboards",
     tag: "Finance",
     date: "Sat, 24 Oct 2026",
     duration: "4:30 – 5:15 PM · Germany time",
     times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 6:30 PM · India 8:00 PM",
-    description: "Turn scattered finance inputs into a structured financial model, then extend the model into an interactive dashboard, with a look at how the same concept can connect into Power BI through the Microsoft Copilot/Fabric ecosystem where organisational access allows.",
+    description: "Turn scattered, messy finance inputs into a structured financial model using AI, then extend it into an interactive dashboard. See how it connects to Power BI via Microsoft Copilot where organisational access allows, and what to delegate to AI and what should stay with you.",
     status: "open"
   },
   {
