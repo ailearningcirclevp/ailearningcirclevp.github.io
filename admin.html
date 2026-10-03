@@ -79,10 +79,13 @@
 
       <div class="field"><label for="f-recording">Recording / video link <span class="hint">(optional)</span></label><input id="f-recording" type="url" placeholder="https://…"></div>
 
-      <div class="field" id="f-main-wrap"><label for="f-file" id="f-file-label">File <span class="hint">(optional — PDF, slide deck, doc, etc.)</span></label><input id="f-file" type="file"></div>
+      <div class="field" id="f-main-wrap"><label for="f-file" id="f-file-label">File <span class="hint">(optional — PDF, slide deck, doc, etc.)</span></label><input id="f-file" type="file">
+        <input id="f-file-link" type="url" placeholder="…or paste a Google Drive / cloud link (https://…)" style="margin-top:6px;"></div>
       <div id="use-case-files" class="type-only">
-        <div class="field"><label for="f-cheat">Cheat sheet — 2 min read <span class="hint">(optional file)</span></label><input id="f-cheat" type="file"></div>
-        <div class="field"><label for="f-kit">Starter kit — across AI tools <span class="hint">(optional file)</span></label><input id="f-kit" type="file"></div>
+        <div class="field"><label for="f-cheat">Cheat sheet — 2 min read <span class="hint">(optional file)</span></label><input id="f-cheat" type="file">
+        <input id="f-cheat-link" type="url" placeholder="…or paste a Google Drive / cloud link (https://…)" style="margin-top:6px;"></div>
+        <div class="field"><label for="f-kit">Starter kit — across AI tools <span class="hint">(optional file)</span></label><input id="f-kit" type="file">
+        <input id="f-kit-link" type="url" placeholder="…or paste a Google Drive / cloud link (https://…)" style="margin-top:6px;"></div>
       </div>
 
       <button class="btn btn-primary" type="submit" style="width:100%;margin-top:6px;">Add to library</button>
@@ -156,7 +159,7 @@
 
   async function deleteResource(id, paths) {
     if (!confirm('Delete this item from the library? This cannot be undone.')) return;
-    const list = (paths || '').split(',').filter(Boolean);
+    const list = (paths || '').split(',').filter(p => p && !/^https?:\/\//i.test(p));
     if (list.length) {
       await supabaseClient.storage.from('library-files').remove(list);
     }
@@ -209,7 +212,14 @@
 
       async function uploadFile(inputId) {
         const input = document.getElementById(inputId);
-        if (!input.files || !input.files[0]) return [null, null];
+        if (!input.files || !input.files[0]) {
+          // No file chosen: accept a pasted cloud link (Google Drive, OneDrive, etc.) instead.
+          const linkEl = document.getElementById(inputId + '-link');
+          const link = linkEl ? linkEl.value.trim() : '';
+          if (!link) return [null, null];
+          if (!/^https?:\/\//i.test(link)) throw new Error('Links must start with https://');
+          return [link, null];
+        }
         const file = input.files[0];
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
         const path = `${type}/${Date.now()}_${inputId}_${safeName}`;

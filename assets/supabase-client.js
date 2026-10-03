@@ -89,7 +89,10 @@ function wireDownloadButtons(container) {
 // Generates a short-lived signed URL (Supabase checks the member/admin
 // RLS policy first) and opens it so the browser starts the download.
 async function downloadResourceFile(filePath, fileName) {
-  if (!filePath || supabaseNotConfigured()) return;
+  if (!filePath) return;
+  // Links added by the admin (Google Drive, OneDrive, etc.) just open in a new tab.
+  if (/^https?:\/\//i.test(filePath)) { window.open(filePath, "_blank", "noopener"); return; }
+  if (supabaseNotConfigured()) return;
   const { data, error } = await supabaseClient
     .storage
     .from("library-files")
