@@ -858,7 +858,9 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="assets/supabase-config.js"></script>
+<script src="assets/supabase-client.js"></script>
 <script src="assets/sessions.js"></script>
 <script>
 function copyEmail(btn){
@@ -1080,17 +1082,202 @@ function openModal(sessionId){
     '<h3>' + session.title + '</h3>' +
     '<div class="sub">' + session.date + ' · ' + session.duration + '</div>' +
     '<div class="sub" style="margin-top:-10px;">' + session.times + '</div>' +
-    '<div class="field"><label for="f-name">Name</label><input id="f-name" type="text" autocomplete="name"></div>' +
+    '<div class="sub" style="margin-top:-4px;">Registering also creates your <b>free</b> AI Learning Circle account (free AI tips and community).</div>' +
+    '<div class="field"><label for="f-name">Full name</label><input id="f-name" type="text" autocomplete="name"></div>' +
     '<div class="field"><label for="f-email">Email address</label><input id="f-email" type="email" autocomplete="email"></div>' +
+    '<div class="field"><label for="f-pass">Create a password <span style="font-weight:400;opacity:.7;">(min 8 characters)</span></label><input id="f-pass" type="password" autocomplete="new-password"></div>' +
+    '<div class="field"><label for="f-role">Your role</label><input id="f-role" type="text" placeholder="e.g. Finance Manager" autocomplete="organization-title"></div>' +
+    '<div class="field"><label for="f-company">Company <span style="font-weight:400;opacity:.7;">(optional)</span></label><input id="f-company" type="text" autocomplete="organization"></div>' +
+    '<label style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.45;margin:6px 0 4px;"><input type="checkbox" id="f-show" style="margin-top:2px;"><span>Show my name, role and company on the Know Your Community page <span style="opacity:.7;">(optional, you can change this later)</span></span></label>' +
     '<input type="text" id="f-hp" name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">' +
     '<div class="form-error" id="f-error"></div>' +
     '<div class="modal-actions">' +
       '<button class="btn-cancel" onclick="closeModal()">Cancel</button>' +
-      '<button class="btn-confirm" id="f-confirm" onclick="submitRegistration(\'' + sessionId + '\')">Confirm &amp; Add to Calendar</button>' +
+      '<button class="btn-confirm" id="f-confirm" onclick="submitRegistration(\'' + sessionId + '\')">Join free &amp; add to calendar</button>' +
     '</div>' +
-    '<div class="sess-note" style="margin-top:12px;">Calendar invitations are sent to the email address you provide.</div>';
+    '<div class="sess-note" style="margin-top:12px;">Your calendar invitation is sent to this email. Already a member? <a href="login.html">Log in</a> or just use the same email here.</div>';
 
   document.getElementById('modal-veil').classList.add('open');
+  var showEl = document.getElementById('f-show');
+  if(showEl && typeof wireDirectoryConsent === 'function'){ wireDirectoryConsent(showEl); }
+}
+
+function openInterestModal(){
+  var box = document.getElementById('modal-box');
+  box.innerHTML =
+    '<h3>Get updates on WhatsApp</h3>' +
+    '<div class="sub">Enter your details and WhatsApp will open with a message to us. Just tap Send.</div>' +
+    '<div class="field"><label for="f-name">Name</label><input id="f-name" type="text" autocomplete="name"></div>' +
+    '<div class="field"><label for="f-phone">WhatsApp number (with country code)</label><input id="f-phone" type="tel" placeholder="+49 …" autocomplete="tel"></div>' +
+    '<div class="field"><label for="f-role">Role / company (optional)</label><input id="f-role" type="text"></div>' +
+    '<input type="text" id="f-hp" name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">' +
+    '<div class="form-error" id="f-error"></div>' +
+    '<div class="modal-actions">' +
+      '<button class="btn-cancel" onclick="closeModal()">Cancel</button>' +
+      '<button class="btn-confirm" id="f-confirm" onclick="submitInterest()">Open WhatsApp</button>' +
+    '</div>' +
+    '<div class="sess-note" style="margin-top:12px;">Prefer to start the chat yourself? <a href="https://wa.me/919566430848?text=Hi%21%20I%20am%20interested%20in%20the%20AI%20Learning%20Circle." target="_blank" rel="noopener">Open WhatsApp</a></div>';
+  document.getElementById('modal-veil').classList.add('open');
+}
+
+function submitInterest(){
+  var name = document.getElementById('f-name').value.trim();
+  var phone = document.getElementById('f-phone').value.trim();
+  var role = document.getElementById('f-role').value.trim();
+  var hpEl = document.getElementById('f-hp');
+  var errEl = document.getElementById('f-error');
+  var btn = document.getElementById('f-confirm');
+  if(!name){ errEl.textContent = 'Please enter your name.'; return; }
+  if(phone.replace(/[^0-9]/g,'').length < 8){ errEl.textContent = 'Please enter a valid WhatsApp number with country code.'; return; }
+  errEl.textContent = '';
+  var msg = 'Hi! I am interested in the AI Learning Circle and would like to join the sessions.\n' +
+    'Name: ' + name + '\n' +
+    'My WhatsApp: ' + phone +
+    (role ? '\nRole / company: ' + role : '') +
+    '\nCould you share me the details?';
+  var url = 'https://wa.me/919566430848?text=' + encodeURIComponent(msg);
+  var w = window.open(url, '_blank');
+  if(!w){ window.location.href = url; }
+  renderResultModal({ icon: '\uD83D\uDCAC', title: 'Almost done', message: 'WhatsApp should now be open with your message ready. Tap Send in WhatsApp so it reaches us.', showAddAnother: false, closeLabel: 'Close' });
+}
+
+function openLibrary(){
+  var loggedIn = false;
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (/^sb-.*-auth-token$/.test(k)) { loggedIn = true; break; }
+    }
+  } catch(e) {}
+  if (loggedIn) { window.location.href = 'library.html'; return; }
+  renderResultModal({
+    icon: '🔒',
+    title: 'Members only',
+    message: 'Get membership to access the Knowledge Library — use cases, starter kits, cheat sheets and the prompt library.',
+    closeLabel: 'Close'
+  });
+  var actions = document.querySelector('#modal-box .actions');
+  actions.insertAdjacentHTML('afterbegin',
+    '<button onclick="window.open(\'https://wa.me/919566430848?text=I%20would%20like%20to%20subscribe%20for%20the%20membership%20for%203%20months%20or%206%20months.%20Kindly%20share%20me%20payment%20details\',\'_blank\'); closeModal();">Get membership on WhatsApp</button>' +
+    '<button onclick="window.location.href=\'login.html\'">I\'m a member — Log in</button>');
+  document.getElementById('modal-veil').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modal-veil').classList.remove('open');
+}
+
+function renderResultModal(opts){
+  var box = document.getElementById('modal-box');
+  var addAnotherBtn = opts.showAddAnother ? '<button onclick="closeModal()">Add another session</button>' : '';
+  box.innerHTML =
+    '<div class="modal-result">' +
+      '<div class="big">' + opts.icon + '</div>' +
+      '<h3>' + opts.title + '</h3>' +
+      '<p>' + opts.message + '</p>' +
+      '<div class="actions">' +
+        addAnotherBtn +
+        '<button onclick="closeModal()">' + (opts.closeLabel || 'Back to Session Calendar') + '</button>' +
+      '</div>' +
+    '</div>';
+}
+
+function submitRegistration(sessionId){
+  var nameEl = document.getElementById('f-name');
+  var emailEl = document.getElementById('f-email');
+  var passEl = document.getElementById('f-pass');
+  var roleEl = document.getElementById('f-role');
+  var coEl = document.getElementById('f-company');
+  var showEl = document.getElementById('f-show');
+  var hpEl = document.getElementById('f-hp');
+  var errEl = document.getElementById('f-error');
+  var btn = document.getElementById('f-confirm');
+  var name = nameEl.value.trim();
+  var email = emailEl.value.trim();
+  var password = passEl.value;
+  var role = roleEl.value.trim();
+  var company = coEl.value.trim();
+  var hp = hpEl ? hpEl.value : '';
+  var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  if(!name){ errEl.textContent = 'Please enter your name.'; return; }
+  if(!emailOk){ errEl.textContent = 'Please enter a valid email address.'; return; }
+  if(password.length < 8){ errEl.textContent = 'Please choose a password of at least 8 characters.'; return; }
+  if(!role){ errEl.textContent = 'Please enter your role.'; return; }
+  errEl.textContent = '';
+
+  if(REGISTRATION_ENDPOINT.indexOf('PASTE_') === 0){
+    renderResultModal({ icon: '⚙️', title: 'Not connected yet', message: 'The calendar backend hasn’t been deployed yet.', showAddAnother: false });
+    return;
+  }
+  if(typeof supabaseNotConfigured !== 'function' || supabaseNotConfigured()){
+    errEl.textContent = 'Signup is temporarily unavailable. Please try again shortly.';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating your account…';
+
+  var profile = { full_name: name, headline: role, company: company, show_in_directory: !!(showEl && showEl.checked) };
+
+  supabaseClient.auth.signUp({ email: email, password: password, options: { data: profile } })
+  .then(function(res){
+    if(res.error){
+      var m = res.error.message || 'Could not create your account.';
+      errEl.textContent = m;
+      btn.disabled = false;
+      btn.textContent = 'Join free & add to calendar';
+      return null;
+    }
+    // Existing email: Supabase returns a user with no identities. They already
+    // have an account, so just register them for the session.
+    var existing = !!(res.data && res.data.user && res.data.user.identities && res.data.user.identities.length === 0);
+    btn.textContent = 'Adding you to the session…';
+    return fetch(REGISTRATION_ENDPOINT, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ sessionId: sessionId, name: name, email: email, key: REGISTRATION_KEY, hp: hp })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(data && data.success){
+        registered[sessionId] = true;
+        try{ localStorage.setItem('alc_registered', JSON.stringify(registered)); }catch(e){}
+        if(!existing){
+          try{
+            fetch(REGISTRATION_ENDPOINT, {
+              method: 'POST',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify({ type: 'signup', name: name, email: email, company: company, key: REGISTRATION_KEY, hp: '' })
+            }).catch(function(){});
+          }catch(e){}
+        }
+        renderResultModal({
+          icon: '🎉',
+          title: 'You’re in!',
+          message: 'A Google Calendar invitation has been sent to ' + email + '. ' +
+            (existing ? 'You already have an account with this email, so just log in to see your free tips.'
+                      : 'We also created your free account. Please confirm your email using the message we sent, then log in.'),
+          showAddAnother: true
+        });
+      } else {
+        renderResultModal({
+          icon: '⚠️',
+          title: 'Unable to register',
+          message: (data && data.message) || 'Unable to register. Please try again.',
+          showAddAnother: false
+        });
+      }
+    });
+  })
+  .catch(function(){
+    renderResultModal({
+      icon: '⚠️',
+      title: 'Unable to reach the calendar backend',
+      message: 'Please check your connection and try again.',
+      showAddAnother: false
+    });
+  });
 }
 
 function openInterestModal(){
