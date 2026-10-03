@@ -2,8 +2,6 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="refresh" content="0;url=index.html">
-<script>location.replace("index.html");</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Know Your Community — AI Learning Circle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +19,8 @@
   .member-co{font-size:13px;color:var(--slate-500);margin:2px 0 0;}
   .member-loc{font-size:12px;color:var(--slate-500);margin:2px 0 0;}
   .member-bio{font-size:13px;line-height:1.5;color:var(--ink-900);margin:10px 0 0;}
-  .member-link{display:inline-block;margin-top:12px;font-size:13px;color:var(--gold-600);text-decoration:none;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:6px 14px;}
+  .member-links{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:12px;}
+  .member-link{display:inline-block;font-size:13px;color:var(--navy-700);text-decoration:none;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:6px 14px;}
 </style>
 </head>
 <body>
@@ -62,15 +61,15 @@
     const photo = safeUrl(m.profile_photo_url)
       ? `<img class="member-photo" src="${safeUrl(m.profile_photo_url)}" alt="${esc(m.full_name)}">`
       : `<div class="member-photo placeholder">${esc(initials(m.full_name))}</div>`;
-    const link = safeUrl(m.website_url) || safeUrl(m.linkedin_url);
+    const li = safeUrl(m.linkedin_url), web = safeUrl(m.website_url);
+    const links = (li ? `<a class="member-link" href="${li}" target="_blank" rel="noopener">LinkedIn</a>` : '') + (web ? `<a class="member-link" href="${web}" target="_blank" rel="noopener">Website</a>` : '');
     return `<div class="card member-tile">
       ${photo}
       <h3 class="member-name">${esc(m.full_name)}</h3>
-      ${m.headline ? `<div class="member-role">${esc(m.headline)}</div>` : ''}
-      ${m.company ? `<div class="member-co">${esc(m.company)}</div>` : ''}
+      ${(m.headline || m.company) ? `<div class="member-role">${esc([m.headline, m.company].filter(Boolean).join(' · '))}</div>` : ''}
       ${m.location ? `<div class="member-loc">${esc(m.location)}</div>` : ''}
       ${m.bio ? `<p class="member-bio">${esc(m.bio)}</p>` : ''}
-      ${link ? `<a class="member-link" href="${link}" target="_blank" rel="noopener">View profile →</a>` : ''}
+      ${links ? `<div class="member-links">${links}</div>` : ''}
     </div>`;
   }
 

@@ -204,25 +204,21 @@ function notifySignup(name, email, company) {
     var WA_JOIN = "https://wa.me/919566430848?text=" + encodeURIComponent("Hi! I am interested in the community and would like to join the sessions. Could you share me details of it.");
     var WA_MEMBER = "https://wa.me/919566430848?text=" + encodeURIComponent("I would like to subscribe for the membership for 3 months or 6 months. Kindly share me payment details");
     var first = String(name).split(" ")[0];
-    var btn = function (href, label, bg, fg) {
-      return '<a href="' + href + '" style="display:inline-block;background:' + bg + ';color:' + fg + ';text-decoration:none;font-weight:700;font-size:14px;padding:11px 18px;border-radius:999px;">' + label + '</a>';
+    var link = function (href, label) {
+      return '<a href="' + href + '" style="color:#1d3a6e;text-decoration:underline;">' + label + '</a>';
     };
     var html =
-      '<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#12182b;line-height:1.55;">' +
-      '<img src="' + SITE + 'assets/email-logo.png" alt="AI Learning Circle" width="270" style="display:block;margin-bottom:18px;">' +
-      '<p style="font-size:16px;">Hi ' + first + ',</p>' +
-      '<p>Welcome! Your free AI Learning Circle account is created. Please <b>confirm your email</b> using the separate confirmation message from us, then <a href="' + SITE + 'login.html" style="color:#1d3a6e;font-weight:700;">log in</a> to see free AI tips.</p>' +
-      '<h3 style="margin:22px 0 6px;color:#0f1e3d;">What you get</h3>' +
-      '<p style="margin:0 0 4px;"><b>Free:</b> live sessions, free AI tips in your account, and the Know Your Community page.</p>' +
-      '<p style="margin:0;"><b>Membership (3 or 6 months):</b> the full Knowledge Library with use cases, starter kits, cheat sheets, Try This Week and the Prompt Library.</p>' +
-      '<p style="margin:14px 0 0;">' + btn(WA_MEMBER, "Get membership on WhatsApp", "#f2c94c", "#0b1730") + ' &nbsp; ' + btn(SITE + "#membership", "See membership", "#ffffff", "#0f1e3d").replace("border-radius:999px;", "border-radius:999px;border:1px solid #0f1e3d;") + '</p>' +
-      '<h3 style="margin:24px 0 6px;color:#0f1e3d;">Join a free live session</h3>' +
-      '<p style="margin:0 0 10px;">See upcoming sessions and add yourself to the calendar in one tap.</p>' +
-      '<p style="margin:0;">' + btn(SITE + "#calendar", "Open the Session Calendar", "#0f1e3d", "#f2c94c") + '</p>' +
-      '<h3 style="margin:24px 0 6px;color:#0f1e3d;">Get updates on WhatsApp</h3>' +
-      '<p style="margin:0 0 10px;">Session reminders and new use cases, straight to your phone.</p>' +
-      '<p style="margin:0;">' + btn(WA_JOIN, "Enrol on WhatsApp", "#25d366", "#06361a") + '</p>' +
-      '<p style="margin:26px 0 0;color:#55608a;font-size:13px;">Questions? Just reply to this email.<br>AI Learning Circle</p>' +
+      '<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#222;font-size:15px;line-height:1.6;">' +
+      '<p>Hi ' + first + ',</p>' +
+      '<p>Thank you for joining AI Learning Circle. Your free account has been created. Please confirm your email address using the separate confirmation message we sent, then ' + link(SITE + 'login.html', 'log in') + '.</p>' +
+      '<p style="margin-bottom:4px;"><b>With your free account</b></p>' +
+      '<ul style="margin:0 0 14px;padding-left:20px;"><li>Join our live sessions</li><li>Read free AI tips</li><li>Appear on the ' + link(SITE + 'community.html', 'Know Your Community') + ' page (optional)</li></ul>' +
+      '<p style="margin-bottom:4px;"><b>Membership (3 or 6 months)</b></p>' +
+      '<p style="margin-top:0;">Includes the full Knowledge Library: use cases, starter kits, cheat sheets and the Prompt Library. ' + link(WA_MEMBER, 'Message us on WhatsApp') + ' to subscribe, or ' + link(SITE + '#membership', 'see details') + '.</p>' +
+      '<p style="margin-bottom:4px;"><b>Upcoming sessions</b></p>' +
+      '<p style="margin-top:0;">' + link(SITE + '#calendar', 'View the session calendar') + ' and add a session to your calendar. For reminders, ' + link(WA_JOIN, 'join us on WhatsApp') + '.</p>' +
+      '<p style="margin-top:24px;">Questions? Simply reply to this email.</p>' +
+      '<p style="margin:0;">Regards,<br>AI Learning Circle</p>' +
       '</div>';
     var text =
       "Hi " + first + ",\n\n" +
@@ -236,7 +232,7 @@ function notifySignup(name, email, company) {
       "Questions? Just reply to this email.\nAI Learning Circle";
     MailApp.sendEmail({
       to: email,
-      subject: "Welcome to AI Learning Circle \u2014 your free account, membership & sessions",
+      subject: "Welcome to AI Learning Circle",
       body: text,
       htmlBody: html,
       name: "AI Learning Circle",

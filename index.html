@@ -683,6 +683,7 @@
   <button class="drawer-link nav-home-link active" onclick="showView('home'); goToSlide(0); closeDrawer();">Home</button>
   <button class="drawer-link" onclick="showView('home'); goToSlide(1); closeDrawer();">What You Get</button>
   <button class="drawer-link" onclick="showView('home'); goToSlide(2); closeDrawer();">Stay Updated</button>
+  <a class="drawer-link" href="community.html">Know Your Community</a>
   <button class="drawer-link nav-calendar-link" onclick="showView('calendar'); closeDrawer();">Session Calendar</button>
   <button class="drawer-link" onclick="closeDrawer(); openLibrary();">🔒 Knowledge Library</button>
   <div class="drawer-section-label">Account</div>
@@ -694,6 +695,7 @@
   <div class="brand"><img src="assets/logo.svg" alt="AI Learning Circle"></div>
   <div class="tabs-desktop">
     <button class="tab-btn nav-home-link active" onclick="showView('home'); goToSlide(0);">Home</button>
+    <a class="tab-btn" href="community.html">Know Your Community</a>
     <button class="tab-btn nav-calendar-link" onclick="showView('calendar');">Session Calendar</button>
     <button class="tab-btn" onclick="openLibrary();">🔒 Knowledge Library</button>
     <a class="tab-btn" href="login.html">Login for free</a>
@@ -1089,7 +1091,7 @@ function openModal(sessionId){
     '<div class="field"><label for="f-pass">Create a password <span style="font-weight:400;opacity:.7;">(min 8 characters)</span></label><input id="f-pass" type="password" autocomplete="new-password"></div>' +
     '<div class="field"><label for="f-role">Your role</label><input id="f-role" type="text" placeholder="e.g. Finance Manager" autocomplete="organization-title"></div>' +
     '<div class="field"><label for="f-company">Company <span style="font-weight:400;opacity:.7;">(optional)</span></label><input id="f-company" type="text" autocomplete="organization"></div>' +
-    '<label style="display:none;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.45;margin:6px 0 4px;"><input type="checkbox" id="f-show" style="margin-top:2px;"><span>Show my name, role and company on the Know Your Community page <span style="opacity:.7;">(optional, you can change this later)</span></span></label>' +
+    '<label style="display:flex;gap:8px;align-items:flex-start;font-size:12.5px;line-height:1.45;margin:6px 0 4px;"><input type="checkbox" id="f-show" style="margin-top:2px;"><span>Show my name, role and company on the Know Your Community page <span style="opacity:.7;">(optional, you can change this later)</span></span></label>' +
     '<input type="text" id="f-hp" name="company" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">' +
     '<div class="form-error" id="f-error"></div>' +
     '<div class="modal-actions">' +

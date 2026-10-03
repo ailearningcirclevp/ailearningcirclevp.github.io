@@ -10,6 +10,15 @@
 <link rel="stylesheet" href="assets/shared.css">
 <style>
   .photo-preview{width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid var(--line);background:var(--cream-200);display:block;margin-bottom:10px;}
+  .pcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 22px;text-align:center;max-width:460px;margin:0 auto 18px;}
+  .pcard .ph{width:112px;height:112px;border-radius:50%;object-fit:cover;border:2px solid var(--line);background:var(--cream-200);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',Georgia,serif;font-size:36px;color:var(--navy-700);margin:0 auto 12px;}
+  .pcard h2{margin:0;font-size:20px;}
+  .pcard .role{font-size:14px;font-weight:600;color:var(--navy-700);margin-top:4px;}
+  .pcard .meta{font-size:13px;color:var(--slate-500);margin-top:2px;}
+  .pcard .about{font-size:14px;line-height:1.55;margin:14px 0 0;text-align:left;}
+  .pcard .links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px;}
+  .pcard .links a{font-size:13px;font-weight:700;text-decoration:none;color:var(--navy-700);border:1px solid var(--line);border-radius:999px;padding:6px 14px;}
+  .pcard .vis{font-size:12px;color:var(--slate-500);margin-top:14px;}
 </style>
 </head>
 <body>
@@ -26,20 +35,31 @@
 
 <div class="wrap">
   <div class="eyebrow" style="margin-top:20px;">Profile</div>
-  <h1 style="font-size:24px;margin:4px 0 20px;">Your details</h1>
+  <h1 style="font-size:24px;margin:4px 0 20px;">Your profile</h1>
 
   <div class="form-msg" id="form-msg"></div>
 
-  <form id="profile-form">
+  <div id="card-view">
+    <div class="pcard">
+      <div id="pc-photo" class="ph"></div>
+      <h2 id="pc-name"></h2>
+      <div class="role" id="pc-role"></div>
+      <div class="meta" id="pc-meta"></div>
+      <p class="about" id="pc-about"></p>
+      <div class="links" id="pc-links"></div>
+      <div class="vis" id="pc-vis"></div>
+    </div>
+    <div style="text-align:center;"><button type="button" class="btn btn-primary" id="edit-btn">Edit profile</button></div>
+  </div>
+
+  <form id="profile-form" style="display:none;">
     <div class="field"><label for="full_name">Full name</label><input id="full_name" type="text" required></div>
     <div class="field"><label for="headline">Professional headline / role</label><input id="headline" type="text"></div>
     <div class="field"><label for="location">Location</label><input id="location" type="text"></div>
     <div class="field"><label for="company">Company <span class="hint">(optional)</span></label><input id="company" type="text"></div>
     <div class="field"><label for="linkedin_url">LinkedIn URL <span class="hint">(optional, never shown publicly unless you opt in below)</span></label><input id="linkedin_url" type="url"></div>
     <div class="field"><label for="area_of_interest">Area of interest <span class="hint">(optional)</span></label><input id="area_of_interest" type="text"></div>
-
-    <!-- Know Your Community is switched off for now: remove display:none to bring it back -->
-    <div id="community-fields" style="display:none;">
+    <div id="community-fields">
     <div class="section-title" style="margin-top:8px;">Know Your Community</div>
     <p class="hint" style="margin:-4px 0 14px;">A great opportunity for the community to get to know who you are. Optional, and nothing is shown until you turn it on below.</p>
 
@@ -77,6 +97,26 @@
   wireDirectoryConsent(document.getElementById('show_in_directory'));
 
   let userId = null;
+  const escH = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const okUrl = u => /^https?:\/\//i.test(u||'') ? escH(u) : '';
+  function renderCard(m){
+    const ph = document.getElementById('pc-photo');
+    if (okUrl(m.profile_photo_url)) ph.outerHTML = '<img id="pc-photo" class="ph" src="'+okUrl(m.profile_photo_url)+'" alt="">';
+    else { ph.textContent = (m.full_name||'?').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); }
+    document.getElementById('pc-name').textContent = m.full_name || '';
+    document.getElementById('pc-role').textContent = [m.headline, m.company].filter(Boolean).join(' \u00b7 ');
+    document.getElementById('pc-meta').textContent = m.location || '';
+    document.getElementById('pc-about').textContent = m.bio || 'Add a short about-me so others know what you do.';
+    let l = '';
+    if (okUrl(m.linkedin_url)) l += '<a href="'+okUrl(m.linkedin_url)+'" target="_blank" rel="noopener">LinkedIn</a>';
+    if (okUrl(m.website_url)) l += '<a href="'+okUrl(m.website_url)+'" target="_blank" rel="noopener">Website / other link</a>';
+    document.getElementById('pc-links').innerHTML = l;
+    document.getElementById('pc-vis').textContent = m.show_in_directory ? 'Visible on the Know Your Community page' : 'Not shown on the Know Your Community page';
+  }
+  document.getElementById('edit-btn').addEventListener('click', () => {
+    document.getElementById('card-view').style.display = 'none';
+    document.getElementById('profile-form').style.display = 'block';
+  });
   const msg = document.getElementById('form-msg');
 
   (async () => {
@@ -101,6 +141,7 @@
       preview.src = member.profile_photo_url;
       preview.style.display = 'block';
     }
+    renderCard(member);
     injectAdminTab(member);
   })();
 
@@ -137,6 +178,12 @@
 
     const { error } = await supabaseClient.from('members').update(update).eq('id', userId);
 
+    if (!error) {
+      const fresh = await getMemberRecord(userId);
+      if (fresh) { renderCard(fresh); }
+      document.getElementById('profile-form').style.display = 'none';
+      document.getElementById('card-view').style.display = 'block';
+    }
     msg.textContent = error ? error.message : 'Saved.';
     msg.className = 'form-msg show ' + (error ? 'error' : 'ok');
     submitBtn.disabled = false;
