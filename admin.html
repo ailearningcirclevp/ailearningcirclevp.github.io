@@ -120,6 +120,8 @@
 <script src="assets/sessions.js"></script>
 <script>
   let member = null;
+  let editing = null;        // resource row being edited, or null when adding
+  let resourceCache = [];
 
   document.getElementById('f-category').addEventListener('change', (e) => {
     document.getElementById('f-category-other-wrap').classList.toggle('show', e.target.value === '__other');
@@ -140,6 +142,7 @@
         <div class="title">${r.title}</div>
         <div class="meta">${label} · ${r.category}</div>
       </div>
+      <button class="btn btn-secondary" data-edit="${r.id}" style="margin-right:6px;">Edit</button>
       <button class="btn btn-danger" data-id="${r.id}" data-paths="${[r.file_path, r.cheat_sheet_path, r.starter_kit_path].filter(Boolean).join(',')}">Delete</button>
     </div>`;
   }
@@ -151,10 +154,90 @@
       list.innerHTML = '<div class="empty-state">Nothing uploaded yet.</div>';
       return;
     }
+    resourceCache = resources;
     list.innerHTML = resources.map(adminRow).join('');
+    list.querySelectorAll('[data-edit]').forEach(btn => {
+      btn.addEventListener('click', () => startEdit(btn.dataset.edit));
+    });
     list.querySelectorAll('.btn-danger').forEach(btn => {
       btn.addEventListener('click', () => deleteResource(btn.dataset.id, btn.dataset.paths));
     });
+  }
+
+  function submitLabel() { return editing ? 'Save changes' : 'Add to library'; }
+
+  function setCurrentHint(inputId, path, name) {
+    const linkEl = document.getElementById(inputId + '-link');
+    if (!linkEl) return;
+    let hint = document.getElementById(inputId + '-current');
+    if (!hint) {
+      hint = document.createElement('div');
+      hint.id = inputId + '-current';
+      hint.className = 'hint';
+      hint.style.marginTop = '4px';
+      linkEl.insertAdjacentElement('afterend', hint);
+    }
+    if (editing && path) {
+      hint.textContent = 'Current: ' + (/^https?:\/\//i.test(path) ? path : (name || path)) + ' — leave both empty to keep it, or add a new file/link to replace it.';
+    } else {
+      hint.textContent = '';
+    }
+  }
+
+  function startEdit(id) {
+    const r = resourceCache.find(x => x.id === id);
+    if (!r) return;
+    editing = r;
+    const form = document.getElementById('upload-form');
+    form.reset();
+    document.getElementById('f-type').value = r.type;
+    syncTypeFields();
+    const sel = document.getElementById('f-category');
+    const hasOpt = Array.from(sel.options).some(o => o.value === r.category);
+    if (hasOpt) { sel.value = r.category; }
+    else { sel.value = '__other'; document.getElementById('f-category-other').value = r.category || ''; }
+    document.getElementById('f-category-other-wrap').classList.toggle('show', !hasOpt);
+    document.getElementById('f-title').value = r.title || '';
+    document.getElementById('f-description').value = r.description || '';
+    document.getElementById('f-recording').value = r.recording_url || '';
+    document.getElementById('f-problem').value = r.business_problem || '';
+    document.getElementById('f-learn').value = r.what_you_learn || '';
+    document.getElementById('f-tool').value = r.tool_used || '';
+    document.getElementById('f-transfer').value = r.tool_transferability_note || '';
+    document.getElementById('f-level').value = r.level || '';
+    setCurrentHint('f-file', r.file_path, r.file_name);
+    setCurrentHint('f-cheat', r.cheat_sheet_path, r.cheat_sheet_name);
+    setCurrentHint('f-kit', r.starter_kit_path, r.starter_kit_name);
+    document.getElementById('f-type').disabled = true;
+    const btn = form.querySelector('button[type="submit"]');
+    btn.textContent = submitLabel();
+    let cancel = document.getElementById('edit-cancel');
+    if (!cancel) {
+      cancel = document.createElement('button');
+      cancel.type = 'button';
+      cancel.id = 'edit-cancel';
+      cancel.className = 'btn btn-secondary';
+      cancel.style.cssText = 'width:100%;margin-top:8px;';
+      cancel.textContent = 'Cancel editing';
+      cancel.addEventListener('click', exitEdit);
+      btn.insertAdjacentElement('afterend', cancel);
+    }
+    msg.textContent = 'Editing “' + (r.title || '') + '”';
+    msg.className = 'form-msg show ok';
+    form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function exitEdit() {
+    editing = null;
+    const form = document.getElementById('upload-form');
+    form.reset();
+    document.getElementById('f-type').disabled = false;
+    syncTypeFields();
+    document.getElementById('f-category-other-wrap').classList.remove('show');
+    ['f-file', 'f-cheat', 'f-kit'].forEach(id => setCurrentHint(id, null, null));
+    const cancel = document.getElementById('edit-cancel');
+    if (cancel) cancel.remove();
+    form.querySelector('button[type="submit"]').textContent = submitLabel();
   }
 
   async function deleteResource(id, paths) {
@@ -197,7 +280,7 @@
     e.preventDefault();
     const submitBtn = e.target.querySelector('button[type="submit"]');
     submitBtn.disabled = true;
-    submitBtn.textContent = 'Uploading…';
+    submitBtn.textContent = editing ? 'Saving…' : 'Uploading…';
 
     try {
       const type = document.getElementById('f-type').value;
@@ -208,7 +291,7 @@
       const recording_url = document.getElementById('f-recording').value.trim() || null;
       const fileInput = document.getElementById('f-file');
 
-      if (!category) { msg.textContent = 'Please choose or enter a category.'; msg.className = 'form-msg show error'; submitBtn.disabled = false; submitBtn.textContent = 'Add to library'; return; }
+      if (!category) { msg.textContent = 'Please choose or enter a category.'; msg.className = 'form-msg show error'; submitBtn.disabled = false; submitBtn.textContent = submitLabel(); return; }
 
       async function uploadFile(inputId) {
         const input = document.getElementById(inputId);
@@ -229,10 +312,13 @@
       }
       const [file_path, file_name] = await uploadFile('f-file');
 
-      const row = { type, category, title, description, recording_url, file_path, file_name };
+      const row = { type, category, title, description, recording_url };
+      if (!editing || file_path) { row.file_path = file_path; row.file_name = file_name; }
       if (type === 'use_case') {
-        [row.cheat_sheet_path, row.cheat_sheet_name] = await uploadFile('f-cheat');
-        [row.starter_kit_path, row.starter_kit_name] = await uploadFile('f-kit');
+        const [cp, cn] = await uploadFile('f-cheat');
+        const [kp, kn] = await uploadFile('f-kit');
+        if (!editing || cp) { row.cheat_sheet_path = cp; row.cheat_sheet_name = cn; }
+        if (!editing || kp) { row.starter_kit_path = kp; row.starter_kit_name = kn; }
         row.business_problem = document.getElementById('f-problem').value.trim() || null;
         row.what_you_learn = document.getElementById('f-learn').value.trim() || null;
         row.tool_used = document.getElementById('f-tool').value.trim() || null;
@@ -240,21 +326,31 @@
         row.level = document.getElementById('f-level').value || null;
       }
 
-      const { error: insertError } = await supabaseClient.from('resources').insert(row);
-      if (insertError) throw insertError;
+      if (editing) {
+        const { error: updateError } = await supabaseClient.from('resources').update(row).eq('id', editing.id);
+        if (updateError) throw updateError;
+        // Clean up any stored file that was just replaced (links aren't stored files).
+        const replaced = [
+          ['file_path', 'file_path'], ['cheat_sheet_path', 'cheat_sheet_path'], ['starter_kit_path', 'starter_kit_path']
+        ].filter(([k]) => row[k] && editing[k] && row[k] !== editing[k] && !/^https?:\/\//i.test(editing[k]))
+         .map(([k]) => editing[k]);
+        if (replaced.length) { await supabaseClient.storage.from('library-files').remove(replaced); }
+      } else {
+        const { error: insertError } = await supabaseClient.from('resources').insert(row);
+        if (insertError) throw insertError;
+      }
 
-      msg.textContent = 'Added to the library.';
+      const wasEditing = !!editing;
+      exitEdit();
+      msg.textContent = wasEditing ? 'Changes saved.' : 'Added to the library.';
       msg.className = 'form-msg show ok';
-      e.target.reset();
-      syncTypeFields();
-      document.getElementById('f-category-other-wrap').classList.remove('show');
       loadResources();
     } catch (err) {
       msg.textContent = err.message || 'Something went wrong.';
       msg.className = 'form-msg show error';
     } finally {
       submitBtn.disabled = false;
-      submitBtn.textContent = 'Add to library';
+      submitBtn.textContent = submitLabel();
     }
   });
 
