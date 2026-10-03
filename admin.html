@@ -443,15 +443,19 @@
       if (m.role === 'admin') action = '<span class="meta">Admin</span>';
       else if (m.role === 'member') action = '<button class="btn btn-danger" data-mid="' + m.id + '" data-role="free">Remove paid access</button>';
       else action = '<button class="btn btn-primary" data-mid="' + m.id + '" data-role="member">Approve as paid</button>';
+      const dirBtn = m.show_in_directory
+        ? '<button class="btn btn-secondary" style="margin-top:6px;padding:8px 14px;font-size:13px;" data-dir="' + m.id + '" data-show="false">Remove from community page</button>'
+        : '';
       return '<div class="admin-row"><div><div class="title">' + escH(m.full_name || '(no name)') + ' <span class="meta">· ' + (memRoleLabel[m.role] || m.role) + (self ? ' · you' : '') + '</span></div>' +
-        '<div class="meta">' + escH(m.email || '') + (m.company ? ' · ' + escH(m.company) : '') + (m.headline ? ' · ' + escH(m.headline) : '') + ' · joined ' + new Date(m.created_at).toLocaleDateString() + '</div></div>' +
+        '<div class="meta">' + escH(m.email || '') + (m.company ? ' · ' + escH(m.company) : '') + (m.headline ? ' · ' + escH(m.headline) : '') + ' · joined ' + new Date(m.created_at).toLocaleDateString() + (m.show_in_directory ? ' · <b>on community page</b>' : '') + '</div>' + dirBtn + '</div>' +
         (self ? '' : action) + '</div>';
     }).join('');
     el.querySelectorAll('[data-mid]').forEach(b => b.addEventListener('click', () => setMemberRole(b.dataset.mid, b.dataset.role)));
+    el.querySelectorAll('[data-dir]').forEach(b => b.addEventListener('click', () => setDirectory(b.dataset.dir, false)));
   }
   async function loadMembers() {
     const { data, error } = await supabaseClient.from('members')
-      .select('id, full_name, email, company, headline, role, created_at').order('created_at', { ascending: false });
+      .select('id, full_name, email, company, headline, role, created_at, show_in_directory').order('created_at', { ascending: false });
     const mm = document.getElementById('mem-msg');
     if (error) {
       mm.textContent = 'Could not load members: ' + error.message + ' (run supabase/migration_members_admin.sql once in Supabase).';
@@ -461,6 +465,16 @@
     }
     allMembers = data || [];
     renderMembers();
+  }
+  async function setDirectory(id, show) {
+    const m = allMembers.find(x => x.id === id);
+    if (!confirm('Remove ' + (m && m.full_name || 'this person') + ' from the Know Your Community page? Their account stays active.')) return;
+    const { error } = await supabaseClient.from('members').update({ show_in_directory: show }).eq('id', id);
+    const mm = document.getElementById('mem-msg');
+    if (error) { mm.textContent = error.message; mm.className = 'form-msg show error'; return; }
+    mm.textContent = 'Removed from the community page.';
+    mm.className = 'form-msg show ok';
+    loadMembers();
   }
   async function setMemberRole(id, role) {
     const m = allMembers.find(x => x.id === id);
