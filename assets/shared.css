@@ -190,3 +190,11 @@ a{color:inherit;}
 }
 .tab-chip.active{background:var(--navy-900);color:var(--gold-500);border-color:var(--navy-900);}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tab-chip{color:var(--slate-400);border-color:var(--slate-500);}}
+
+/* ---------- small screens: keep every nav tab reachable ---------- */
+@media (max-width: 640px){
+  .topnav{flex-wrap:wrap;row-gap:8px;}
+  .tabs{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;justify-content:flex-start;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab-btn{flex:0 0 auto;}
+}
