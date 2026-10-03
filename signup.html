@@ -128,7 +128,7 @@
 
     // The profile row is created by a database trigger from this metadata,
     // so it works even when email confirmation means there's no session yet.
-    const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { data: profile } });
+    const { data, error } = await supabaseClient.auth.signUp({ email, password, options: { data: profile, emailRedirectTo: 'https://ailearningcirclevp.github.io/login.html' } });
 
     if (error) {
       showMsg(error.message, 'error');

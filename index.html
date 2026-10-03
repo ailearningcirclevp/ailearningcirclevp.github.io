@@ -1220,7 +1220,7 @@ function submitRegistration(sessionId){
 
   var profile = { full_name: name, headline: role, company: company, show_in_directory: !!(showEl && showEl.checked) };
 
-  supabaseClient.auth.signUp({ email: email, password: password, options: { data: profile } })
+  supabaseClient.auth.signUp({ email: email, password: password, options: { data: profile, emailRedirectTo: 'https://ailearningcirclevp.github.io/login.html' } })
   .then(function(res){
     if(res.error){
       var m = res.error.message || 'Could not create your account.';
