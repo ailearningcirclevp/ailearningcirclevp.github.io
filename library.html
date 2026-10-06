@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Practice Materials — AI Learning Circle</title>
+<title>Knowledge Library — AI Learning Circle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,7 +28,7 @@
 
 <div class="wrap">
   <div class="lib-header">
-    <div class="eyebrow">Practice Materials</div>
+    <div class="eyebrow">Knowledge Library</div>
     <h1 id="lib-title">Loading…</h1>
     <p id="lib-sub"></p>
   </div>
@@ -160,8 +160,8 @@
     }
 
     if (isMember) {
-      document.getElementById('lib-title').textContent = 'Practice Materials';
-      document.getElementById('lib-sub').textContent = 'Missed a session? Use the Practice Materials to try it yourself, the How-To & Prompt Guide for steps, prompts and Copilot instructions, or the Session Recording for the full demo.';
+      document.getElementById('lib-title').textContent = 'Knowledge Library';
+      document.getElementById('lib-sub').textContent = 'Missed a session? Use the Use Case Knowledge Library to try it yourself, the How-To & Prompt Guide for steps, prompts and Copilot instructions, or the Session Recording for the full demo.';
       const { data: resources } = await supabaseClient.from('resources').select('*').order('created_at', { ascending: true });
       allResources = resources || [];
     } else {

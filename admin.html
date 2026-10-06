@@ -27,7 +27,7 @@
 
 <div class="wrap" id="admin-wrap" style="visibility:hidden;">
   <div class="eyebrow" style="margin-top:20px;">Admin</div>
-  <h1 style="font-size:24px;margin:4px 0 20px;">Add to the Practice Materials</h1>
+  <h1 style="font-size:24px;margin:4px 0 20px;">Add to the Knowledge Library</h1>
 
   <div id="not-admin" class="empty-state" style="display:none;"></div>
 
@@ -99,7 +99,7 @@
         <input id="f-kit-link" type="url" placeholder="…or paste a Google Drive / cloud link (https://…)" style="margin-top:6px;"></div>
       </div>
 
-      <button class="btn btn-primary" type="submit" style="width:100%;margin-top:6px;">Add to Practice Materials</button>
+      <button class="btn btn-primary" type="submit" style="width:100%;margin-top:6px;">Add to Knowledge Library</button>
     </form>
 
     <div class="section-title" style="margin-top:36px;">Post a free AI tip <span style="text-transform:none;font-weight:500;">(visible to free users)</span></div>
@@ -176,7 +176,7 @@
     });
   }
 
-  function submitLabel() { return editing ? 'Save changes' : 'Add to Practice Materials'; }
+  function submitLabel() { return editing ? 'Save changes' : 'Add to Knowledge Library'; }
 
   function setCurrentHint(inputId, path, name) {
     const linkEl = document.getElementById(inputId + '-link');
@@ -478,7 +478,7 @@
   }
   async function setMemberRole(id, role) {
     const m = allMembers.find(x => x.id === id);
-    const verb = role === 'member' ? 'Approve ' + (m && m.full_name || 'this person') + ' as a PAID member? They will get full Practice Materials access.'
+    const verb = role === 'member' ? 'Approve ' + (m && m.full_name || 'this person') + ' as a PAID member? They will get full Knowledge Library access.'
                                    : 'Remove paid access for ' + (m && m.full_name || 'this person') + '? They will go back to free.';
     if (!confirm(verb)) return;
     const { error } = await supabaseClient.from('members').update({ role }).eq('id', id);
