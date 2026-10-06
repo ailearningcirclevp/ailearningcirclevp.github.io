@@ -685,7 +685,7 @@
   <button class="drawer-link" onclick="showView('home'); goToSlide(2); closeDrawer();">Stay Updated</button>
   <a class="drawer-link" href="community.html">Know Your Community</a>
   <button class="drawer-link nav-calendar-link" onclick="showView('calendar'); closeDrawer();">Session Calendar</button>
-  <button class="drawer-link" onclick="closeDrawer(); openLibrary();">🔒 Knowledge Library</button>
+  <button class="drawer-link" onclick="closeDrawer(); openLibrary();">🔒 Practice Materials</button>
   <div class="drawer-section-label">Account</div>
   <a class="drawer-link" href="login.html">Login for free</a>
 </div>
@@ -697,7 +697,7 @@
     <button class="tab-btn nav-home-link active" onclick="showView('home'); goToSlide(0);">Home</button>
     <a class="tab-btn" href="community.html">Know Your Community</a>
     <button class="tab-btn nav-calendar-link" onclick="showView('calendar');">Session Calendar</button>
-    <button class="tab-btn" onclick="openLibrary();">🔒 Knowledge Library</button>
+    <button class="tab-btn" onclick="openLibrary();">🔒 Practice Materials</button>
     <a class="tab-btn" href="login.html">Login for free</a>
   </div>
   <a class="nav-login" href="login.html">Login for free</a>
@@ -733,7 +733,7 @@
           </a>
           <button class="start-card" onclick="goToSlide(1)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
-            <span class="sc-text"><strong>Explore membership</strong><small>Full library, starter kits and community</small></span>
+            <span class="sc-text"><strong>Explore membership</strong><small>Practice guides, recordings and community</small></span>
             <span class="sc-go">›</span>
           </button>
         </div>
@@ -768,13 +768,12 @@
               <div class="split-tag">Membership — revisit, catch up, implement</div>
               <h3>Membership</h3>
               <ul class="split-list" style="margin-bottom:6px;">
-                <li>Session recordings</li>
-                <li>Use Case Starter Kits</li>
-                <li>Cheat sheets</li>
+                <li>Session Recording: the full demo, if you missed it</li>
+                <li>Practice Guide: use case, steps and prompts to try it yourself</li>
                 <li>Try This Week</li>
                 <li>Community discussion for questions &amp; clarifications<span class="lock-tag">Members only</span></li>
               </ul>
-              <div style="font-size:12px;color:var(--slate-500);margin-bottom:16px;">All of this lives in your Knowledge Library<span class="lock-tag">Members</span>.</div>
+              <div style="font-size:12px;color:var(--slate-500);margin-bottom:16px;">All of this lives in your Practice Materials<span class="lock-tag">Members</span>.</div>
               <div class="pricing" style="margin-top:2px;">
                 <div class="price-grid" style="margin-top:0;">
                   <div class="price-tile"><div class="len">3 Months</div><div class="amt">₹2,500</div></div>
@@ -983,7 +982,7 @@ function renderSessions(filterText){
           '<div class="sess-meta">' + s.date + ' · ' + s.duration + '</div>' +
           '<div class="sess-times">' + s.times + '</div>' +
           '<div class="sess-desc">' + s.description + '</div>' +
-          '<a class="sess-btn link" href="#membership" onclick="goToMembership(event)">Watch in Knowledge Library — Members Only</a>' +
+          '<a class="sess-btn link" href="#membership" onclick="goToMembership(event)">Watch in Practice Materials — Members Only</a>' +
         '</div>' +
         (fb ? fb + '</div>' : '')
       );
@@ -1156,7 +1155,7 @@ function openLibrary(){
   renderResultModal({
     icon: '🔒',
     title: 'Members only',
-    message: 'Get membership to access the Knowledge Library — use cases, starter kits, cheat sheets and the prompt library.',
+    message: 'Get membership to access Practice Materials: a Practice Guide and Session Recording for every session, plus the prompt library.',
     closeLabel: 'Close'
   });
   var actions = document.querySelector('#modal-box .actions');
@@ -1334,7 +1333,7 @@ function openLibrary(){
   renderResultModal({
     icon: '🔒',
     title: 'Members only',
-    message: 'Get membership to access the Knowledge Library — use cases, starter kits, cheat sheets and the prompt library.',
+    message: 'Get membership to access Practice Materials: a Practice Guide and Session Recording for every session, plus the prompt library.',
     closeLabel: 'Close'
   });
   var actions = document.querySelector('#modal-box .actions');
