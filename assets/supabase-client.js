@@ -55,7 +55,7 @@ const RESOURCE_TYPE_LABELS = {
   use_case: "Use Cases",
   try_this_week: "Try This Week",
   prompt: "Prompt Library",
-  cheat_sheet: "Practice Guides"
+  cheat_sheet: "Cheat Sheets"
 };
 
 // Bottom action buttons for a library item. Use cases get the four
@@ -70,12 +70,9 @@ function resourceButtons(r) {
     ? `<a class="chip-btn" href="${r.recording_url}" target="_blank" rel="noopener">▶ Session recording</a>`
     : `<span class="chip-btn disabled">▶ Session recording</span>`;
   if (r.type === "use_case") {
-    // One combined guide (falls back to whichever older file was uploaded).
-    const g = r.file_path ? [r.file_path, r.file_name]
-      : r.starter_kit_path ? [r.starter_kit_path, r.starter_kit_name]
-      : [r.cheat_sheet_path, r.cheat_sheet_name];
-    return dl(g[0], g[1], "📘 Practice Guide · try it yourself")
-      + rec.replace("▶ Session recording", "▶ Session Recording · full demo");
+    return dl(r.file_path, r.file_name, "📘 Use Case Practice Materials")
+      + dl(r.starter_kit_path, r.starter_kit_name, "🧰 How-To & Prompt Guide")
+      + rec.replace("▶ Session recording", "▶ Session Recording");
   }
   return (r.file_path ? dl(r.file_path, r.file_name, "⬇ Download" + (r.file_name ? " · " + r.file_name : "")) : "")
     + (r.recording_url ? rec : "");

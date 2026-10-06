@@ -161,7 +161,7 @@
 
     if (isMember) {
       document.getElementById('lib-title').textContent = 'Practice Materials';
-      document.getElementById('lib-sub').textContent = 'Missed a session? Open its Practice Guide to try the use case yourself, or watch the Session Recording for the full demo.';
+      document.getElementById('lib-sub').textContent = 'Missed a session? Use the Practice Materials to try it yourself, the How-To & Prompt Guide for steps, prompts and Copilot instructions, or the Session Recording for the full demo.';
       const { data: resources } = await supabaseClient.from('resources').select('*').order('created_at', { ascending: true });
       allResources = resources || [];
     } else {

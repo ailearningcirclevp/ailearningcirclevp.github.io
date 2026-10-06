@@ -49,7 +49,7 @@
       <div class="field">
         <label for="f-type">Content type</label>
         <select id="f-type" required>
-          <option value="use_case">Use Case (session recording + practice guide)</option>
+          <option value="use_case">Use Case (practice materials + how-to &amp; prompt guide + recording)</option>
           <option value="try_this_week">Try This Week</option>
           <option value="prompt">Prompt Library</option>
         </select>
@@ -90,12 +90,12 @@
 
       <div class="field"><label for="f-recording">Session Recording link <span class="hint">(optional)</span></label><input id="f-recording" type="url" placeholder="https://…"></div>
 
-      <div class="field" id="f-main-wrap"><label for="f-file" id="f-file-label">Practice Guide <span class="hint">(one combined file: use case, steps, prompts &amp; expected output)</span></label><input id="f-file" type="file">
+      <div class="field" id="f-main-wrap"><label for="f-file" id="f-file-label">Use Case Practice Materials <span class="hint">(for trying it yourself — optional file)</span></label><input id="f-file" type="file">
         <input id="f-file-link" type="url" placeholder="…or paste a Google Drive / cloud link (https://…)" style="margin-top:6px;"></div>
-      <div id="use-case-files" class="type-only" style="display:none !important;"><!-- legacy cheat sheet / starter kit fields, replaced by the single Practice Guide -->
-        <div class="field"><label for="f-cheat">Cheat sheet — 2 min read <span class="hint">(optional file)</span></label><input id="f-cheat" type="file">
+      <div id="use-case-files" class="type-only">
+        <div class="field" style="display:none;"><label for="f-cheat">Cheat sheet — 2 min read <span class="hint">(optional file)</span></label><input id="f-cheat" type="file">
         <input id="f-cheat-link" type="url" placeholder="…or paste a Google Drive / cloud link (https://…)" style="margin-top:6px;"></div>
-        <div class="field"><label for="f-kit">Starter kit — across AI tools <span class="hint">(optional file)</span></label><input id="f-kit" type="file">
+        <div class="field"><label for="f-kit">How-To &amp; Prompt Guide <span class="hint">(steps, prompts &amp; Copilot instructions — optional file)</span></label><input id="f-kit" type="file">
         <input id="f-kit-link" type="url" placeholder="…or paste a Google Drive / cloud link (https://…)" style="margin-top:6px;"></div>
       </div>
 
@@ -142,7 +142,7 @@
     const isUseCase = document.getElementById('f-type').value === 'use_case';
     document.getElementById('use-case-fields').classList.toggle('show', isUseCase);
     document.getElementById('use-case-files').classList.toggle('show', isUseCase);
-    document.getElementById('f-file-label').firstChild.textContent = isUseCase ? 'Practice Guide ' : 'File ';
+    document.getElementById('f-file-label').firstChild.textContent = isUseCase ? 'Use Case Practice Materials ' : 'File ';
   }
   document.getElementById('f-type').addEventListener('change', syncTypeFields);
   syncTypeFields();

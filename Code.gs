@@ -214,7 +214,7 @@ function notifySignup(name, email, company) {
       '<p style="margin-bottom:4px;"><b>With your free account</b></p>' +
       '<ul style="margin:0 0 14px;padding-left:20px;"><li>Join our live sessions</li><li>Read free AI tips</li><li>Appear on the ' + link(SITE + 'community.html', 'Know Your Community') + ' page (optional)</li></ul>' +
       '<p style="margin-bottom:4px;"><b>Membership (3 or 6 months)</b></p>' +
-      '<p style="margin-top:0;">Includes Practice Materials: a Practice Guide (use case, steps and prompts to try it yourself) and the Session Recording for every session, plus the Prompt Library. ' + link(WA_MEMBER, 'Message us on WhatsApp') + ' to subscribe, or ' + link(SITE + '#membership', 'see details') + '.</p>' +
+      '<p style="margin-top:0;">Includes, for every session: use case practice materials, a How-To &amp; Prompt Guide (steps, prompts and Copilot instructions) and the Session Recording for every session. ' + link(WA_MEMBER, 'Message us on WhatsApp') + ' to subscribe, or ' + link(SITE + '#membership', 'see details') + '.</p>' +
       '<p style="margin-bottom:4px;"><b>Upcoming sessions</b></p>' +
       '<p style="margin-top:0;">' + link(SITE + '#calendar', 'View the session calendar') + ' and add a session to your calendar. For reminders, ' + link(WA_JOIN, 'join us on WhatsApp') + '.</p>' +
       '<p style="margin-top:24px;">Questions? Simply reply to this email.</p>' +
@@ -225,7 +225,7 @@ function notifySignup(name, email, company) {
       "Welcome! Your free AI Learning Circle account is created. Please confirm your email using the separate confirmation message, then log in: " + SITE + "login.html\n\n" +
       "WHAT YOU GET\n" +
       "Free: live sessions, free AI tips in your account, Know Your Community.\n" +
-      "Membership (3 or 6 months): Practice Materials - a Practice Guide and Session Recording for every session, Try This Week, Prompt Library.\n" +
+      "Membership (3 or 6 months): for every session, use case practice materials, a How-To & Prompt Guide and the Session Recording.\n" +
       "Get membership on WhatsApp: " + WA_MEMBER + "\nSee membership: " + SITE + "#membership\n\n" +
       "JOIN A FREE LIVE SESSION\nSession Calendar: " + SITE + "#calendar\n\n" +
       "GET UPDATES ON WHATSAPP\nEnrol: " + WA_JOIN + "\n\n" +
