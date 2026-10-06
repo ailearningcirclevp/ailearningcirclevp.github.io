@@ -254,3 +254,76 @@ function jsonOut(obj) {
     .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+
+// ---------------------------------------------------------------
+// Email reminders: about 2 hours before each session, every guest
+// on the calendar event gets a short reminder with the join link.
+//
+// ONE-TIME SETUP: in the Apps Script editor pick "setupReminderTrigger"
+// in the function dropdown and press Run (approve the permissions).
+// That creates a timer that checks every 15 minutes. Each guest is
+// reminded only once per session.
+// ---------------------------------------------------------------
+const REMINDER_HOURS_BEFORE = 2;
+
+function setupReminderTrigger() {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === "sendSessionReminders") ScriptApp.deleteTrigger(t);
+  });
+  ScriptApp.newTrigger("sendSessionReminders").timeBased().everyMinutes(15).create();
+}
+
+function sendSessionReminders() {
+  var props = PropertiesService.getScriptProperties();
+  var now = new Date().getTime();
+  Object.keys(SESSION_MAP).forEach(function (id) {
+    try {
+      var m = SESSION_MAP[id];
+      var ev = Calendar.Events.get(m.calendarId, m.eventId);
+      if (!ev || ev.status === "cancelled" || !ev.start || !ev.start.dateTime) return;
+      var start = new Date(ev.start.dateTime).getTime();
+      var minsToStart = (start - now) / 60000;
+      // Send once, when the session is between 0 and ~2h15m away.
+      if (minsToStart <= 0 || minsToStart > REMINDER_HOURS_BEFORE * 60 + 15) return;
+      var key = "reminded_" + m.eventId + "_" + ev.start.dateTime;
+      if (props.getProperty(key)) return;
+
+      var link = ev.hangoutLink || "";
+      if (!link && ev.conferenceData && ev.conferenceData.entryPoints) {
+        ev.conferenceData.entryPoints.forEach(function (p) { if (!link && p.uri) link = p.uri; });
+      }
+      if (!link) link = ev.htmlLink || "";
+      var tz = ev.start.timeZone || Session.getScriptTimeZone();
+      var when = Utilities.formatDate(new Date(start), tz, "EEEE d MMM, HH:mm") + " (" + tz + ")";
+      var title = ev.summary || "AI Learning Circle session";
+
+      (ev.attendees || []).forEach(function (a) {
+        if (!a.email || a.responseStatus === "declined" || a.resource) return;
+        var first = String(a.displayName || "").split(" ")[0] || "there";
+        var text =
+          "Hi " + first + ",\n\n" +
+          "A quick reminder that your AI Learning Circle session starts soon.\n\n" +
+          title + "\n" + when + "\n\n" +
+          "Join here: " + link + "\n\n" +
+          "See you there.\nAI Learning Circle";
+        var html =
+          '<div style="font-family:Arial,Helvetica,sans-serif;max-width:520px;color:#222;font-size:15px;line-height:1.6;">' +
+          '<p>Hi ' + first + ',</p>' +
+          '<p>A quick reminder that your AI Learning Circle session starts soon.</p>' +
+          '<p><b>' + title + '</b><br>' + when + '</p>' +
+          '<p><a href="' + link + '" style="color:#1d3a6e;text-decoration:underline;">Join the session</a></p>' +
+          '<p style="margin:0;">See you there.<br>AI Learning Circle</p></div>';
+        try {
+          MailApp.sendEmail({
+            to: a.email,
+            subject: "Reminder: " + title + " starts in about 2 hours",
+            body: text, htmlBody: html,
+            name: "AI Learning Circle", replyTo: "ailearningcirclevp@gmail.com"
+          });
+        } catch (e) {}
+      });
+      props.setProperty(key, "1");
+    } catch (err) {}
+  });
+}
