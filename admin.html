@@ -99,6 +99,12 @@
         <input id="f-kit-link" type="url" placeholder="…or paste a Google Drive / cloud link (https://…)" style="margin-top:6px;"></div>
       </div>
 
+      <div class="field" id="f-extra-wrap"><label for="f-extra">More attachments <span class="hint">(optional — select several files at once, add more any time)</span></label>
+        <input id="f-extra" type="file" multiple>
+        <textarea id="f-extra-links" rows="3" placeholder="…or paste links, one per line. Optional label first: Excel template | https://drive.google.com/…" style="margin-top:6px;"></textarea>
+        <div id="f-extra-current" style="margin-top:6px;"></div>
+      </div>
+
       <button class="btn btn-primary" type="submit" style="width:100%;margin-top:6px;">Add to Knowledge Library</button>
     </form>
 
@@ -126,13 +132,26 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=202610061030"></script>
-<script src="assets/supabase-client.js?v=202610061030"></script>
-<script src="assets/member-menu.js?v=202610061030"></script>
-<script src="assets/sessions.js?v=202610061030"></script>
+<script src="assets/supabase-config.js?v=202610101153"></script>
+<script src="assets/supabase-client.js?v=202610101153"></script>
+<script src="assets/member-menu.js?v=202610101153"></script>
+<script src="assets/sessions.js?v=202610101153"></script>
 <script>
   let member = null;
   let editing = null;        // resource row being edited, or null when adding
+  let keptAttachments = [];  // existing extra attachments still kept while editing
+  function renderCurrentAttachments() {
+    const box = document.getElementById('f-extra-current');
+    if (!keptAttachments.length) { box.innerHTML = ''; return; }
+    box.innerHTML = '<div class="hint" style="margin-bottom:4px;">Current attachments:</div>' + keptAttachments.map((a, i) =>
+      `<div style="display:flex;gap:8px;align-items:center;font-size:13px;margin:2px 0;"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;">${escH(a.name || a.path)}</span><button type="button" class="btn btn-secondary" data-rm="${i}" style="padding:2px 10px;font-size:12px;">Remove</button></div>`).join('');
+    box.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => {
+      keptAttachments.splice(parseInt(b.dataset.rm, 10), 1);
+      attachmentsChanged = true;
+      renderCurrentAttachments();
+    }));
+  }
+  let attachmentsChanged = false;
   let resourceCache = [];
 
   document.getElementById('f-category').addEventListener('change', (e) => {
@@ -155,7 +174,7 @@
         <div class="meta">${label} · ${r.category}</div>
       </div>
       <button class="btn btn-secondary" data-edit="${r.id}" style="margin-right:6px;">Edit</button>
-      <button class="btn btn-danger" data-id="${r.id}" data-paths="${[r.file_path, r.cheat_sheet_path, r.starter_kit_path].filter(Boolean).join(',')}">Delete</button>
+      <button class="btn btn-danger" data-id="${r.id}" data-paths="${[r.file_path, r.cheat_sheet_path, r.starter_kit_path].concat((r.attachments || []).map(a => a.path)).filter(Boolean).join(',')}">Delete</button>
     </div>`;
   }
 
@@ -217,6 +236,9 @@
     document.getElementById('f-tool').value = r.tool_used || '';
     document.getElementById('f-transfer').value = r.tool_transferability_note || '';
     document.getElementById('f-level').value = r.level || '';
+    keptAttachments = Array.isArray(r.attachments) ? r.attachments.slice() : [];
+    attachmentsChanged = false;
+    renderCurrentAttachments();
     setCurrentHint('f-file', r.file_path, r.file_name);
     setCurrentHint('f-cheat', r.cheat_sheet_path, r.cheat_sheet_name);
     setCurrentHint('f-kit', r.starter_kit_path, r.starter_kit_name);
@@ -241,6 +263,9 @@
 
   function exitEdit() {
     editing = null;
+    keptAttachments = [];
+    attachmentsChanged = false;
+    renderCurrentAttachments();
     const form = document.getElementById('upload-form');
     form.reset();
     document.getElementById('f-type').disabled = false;
@@ -324,7 +349,26 @@
       }
       const [file_path, file_name] = await uploadFile('f-file');
 
+      // Extra attachments: several files and/or links, kept alongside the main ones.
+      const extraNew = [];
+      const extraInput = document.getElementById('f-extra');
+      for (const f of Array.from(extraInput.files || [])) {
+        const safe = f.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const p = `${type}/${Date.now()}_x_${Math.random().toString(36).slice(2, 7)}_${safe}`;
+        const { error: upErr } = await supabaseClient.storage.from('library-files').upload(p, f);
+        if (upErr) throw upErr;
+        extraNew.push({ path: p, name: f.name });
+      }
+      document.getElementById('f-extra-links').value.split('\n').map(l => l.trim()).filter(Boolean).forEach(line => {
+        const parts = line.split('|');
+        const url = parts.pop().trim();
+        const label = parts.join('|').trim();
+        if (!/^https?:\/\//i.test(url)) throw new Error('Attachment links must start with https:// (line: ' + line + ')');
+        extraNew.push({ path: url, name: label || url.replace(/^https?:\/\//i, '').slice(0, 50) });
+      });
+
       const row = { type, category, title, description, recording_url };
+      if (extraNew.length || attachmentsChanged) row.attachments = keptAttachments.concat(extraNew);
       if (!editing || file_path) { row.file_path = file_path; row.file_name = file_name; }
       if (type === 'use_case') {
         const [cp, cn] = await uploadFile('f-cheat');
@@ -346,6 +390,8 @@
           ['file_path', 'file_path'], ['cheat_sheet_path', 'cheat_sheet_path'], ['starter_kit_path', 'starter_kit_path']
         ].filter(([k]) => row[k] && editing[k] && row[k] !== editing[k] && !/^https?:\/\//i.test(editing[k]))
          .map(([k]) => editing[k]);
+        const removedAtt = (editing.attachments || []).filter(a => !keptAttachments.some(k => k.path === a.path) && !/^https?:\/\//i.test(a.path)).map(a => a.path);
+        if (removedAtt.length) replaced.push(...removedAtt);
         if (replaced.length) { await supabaseClient.storage.from('library-files').remove(replaced); }
       } else {
         const { error: insertError } = await supabaseClient.from('resources').insert(row);

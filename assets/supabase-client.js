@@ -62,6 +62,12 @@ const RESOURCE_TYPE_LABELS = {
 // standard buttons (greyed out when that asset hasn't been added yet);
 // other types get a Download button plus an optional recording link.
 // Wire clicks afterwards with wireDownloadButtons(container).
+function extraAttachmentButtons(r) {
+  const esc = (t) => String(t).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+  return (Array.isArray(r.attachments) ? r.attachments : []).map((a) =>
+    `<button class="chip-btn" data-path="${esc(a.path)}" data-name="${esc(a.name || "")}">📎 ${esc(a.name || "Attachment")}</button>`).join("");
+}
+
 function resourceButtons(r) {
   const dl = (path, name, label) => path
     ? `<button class="chip-btn" data-path="${path}" data-name="${name || ''}">${label}</button>`
@@ -72,10 +78,12 @@ function resourceButtons(r) {
   if (r.type === "use_case") {
     return dl(r.file_path, r.file_name, "📘 Use Case Practice Materials")
       + dl(r.starter_kit_path, r.starter_kit_name, "🧰 How-To & Prompt Guide")
-      + rec.replace("▶ Session recording", "▶ Session Recording");
+      + rec.replace("▶ Session recording", "▶ Session Recording")
+      + extraAttachmentButtons(r);
   }
   return (r.file_path ? dl(r.file_path, r.file_name, "⬇ Download" + (r.file_name ? " · " + r.file_name : "")) : "")
-    + (r.recording_url ? rec : "");
+    + (r.recording_url ? rec : "")
+    + extraAttachmentButtons(r);
 }
 
 function wireDownloadButtons(container) {
