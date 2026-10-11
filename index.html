@@ -1431,6 +1431,7 @@ function submitRegistration(sessionId){
 renderSessions();
 loadFeedback();
 if(location.hash === '#calendar'){ showView('calendar'); }
+if(location.hash === '#membership'){ goToMembership(); }
 initSwipeDots();
 
 var drawerSearch = document.getElementById('drawer-search');
