@@ -144,6 +144,7 @@ function doPost(e) {
 
     notifyOrganizer(event, name, email);
     logRegistrant(name, email, "session registration", event.summary || sessionId, data.whatsappOptIn === true);
+    sendWelcomeEmail(name, email, { hasAccount: data.accountCreated === true, session: event.summary || "" });
 
     return jsonOut({ success: true, message: "Calendar invitation sent" });
 
@@ -203,44 +204,84 @@ function notifySignup(name, email, company, whatsappOptIn) {
       (whatsappOptIn ? "WhatsApp community: they ticked the box, please add them\n" : "") +
       "\nTo make them a paid member after payment, set their role to 'member' in Supabase.");
   } catch (e) {}
+  sendWelcomeEmail(name, email, { hasAccount: true });
+}
+
+// Welcome / introduction email. Sent to EVERYONE new: people who create a
+// free account and people who only register for a session. Each email address
+// gets it once (so a session registration followed by a signup does not send
+// two). opts: { hasAccount: bool, session: "session title" }
+function sendWelcomeEmail(name, email, opts) {
+  opts = opts || {};
   try {
+    var props = PropertiesService.getScriptProperties();
+    var key = "welcomed_" + String(email).toLowerCase();
+    if (props.getProperty(key)) return;
+    props.setProperty(key, "1");
+
     var SITE = "https://ailearningcirclevp.github.io/";
+    var WA_NUMBER = "+91 95664 30848";
     var WA_JOIN = "https://wa.me/919566430848?text=" + encodeURIComponent("Hi! I am interested in the community and would like to join the sessions. Could you share me details of it.");
     var WA_MEMBER = "https://wa.me/919566430848?text=" + encodeURIComponent("I would like to subscribe for the membership for 3 months or 6 months. Kindly share me payment details");
-    var first = String(name).split(" ")[0];
+    var CONTACT_EMAIL = "ailearningcirclevp@gmail.com";
+    var first = String(name || "").split(" ")[0] || "there";
     var link = function (href, label) {
       return '<a href="' + href + '" style="color:#1d3a6e;text-decoration:underline;">' + label + '</a>';
     };
+    var h = function (t) { return '<p style="margin:22px 0 4px;"><b>' + t + '</b></p>'; };
+
+    var intro = opts.session
+      ? 'Thank you for registering for <b>' + opts.session + '</b>. A Google Calendar invitation is on its way separately; please accept it so the session is in your calendar.'
+      : 'Thank you for joining AI Learning Circle.';
+    var accountLine = opts.hasAccount
+      ? 'Your free account has been created. Please confirm your email address using the separate confirmation message we sent, then ' + link(SITE + 'login.html', 'log in') + '.'
+      : 'You can also create a free account at any time at ' + link(SITE + 'signup.html', 'our sign-up page') + ' to read free AI tips.';
+
     var html =
       '<div style="font-family:Arial,Helvetica,sans-serif;max-width:560px;margin:0 auto;color:#222;font-size:15px;line-height:1.6;">' +
       '<p>Hi ' + first + ',</p>' +
-      '<p>Thank you for joining AI Learning Circle. Your free account has been created. Please confirm your email address using the separate confirmation message we sent, then ' + link(SITE + 'login.html', 'log in') + '.</p>' +
-      '<p style="margin-bottom:4px;"><b>With your free account</b></p>' +
-      '<ul style="margin:0 0 14px;padding-left:20px;"><li>Join our live sessions</li><li>Read free AI tips</li><li>Appear on the ' + link(SITE + 'community.html', 'Know Your Community') + ' page (optional)</li></ul>' +
-      '<p style="margin-bottom:4px;"><b>Membership (3 or 6 months)</b></p>' +
-      '<p style="margin-top:0;">Includes the Knowledge Library, with these for every session: use case practice materials, a How-To &amp; Prompt Guide (steps, prompts and Copilot instructions) and the Session Recording. ' + link(WA_MEMBER, 'Message us on WhatsApp') + ' to subscribe, or ' + link(SITE + '#membership', 'see details') + '.</p>' +
-      '<p style="margin-bottom:4px;"><b>Upcoming sessions</b></p>' +
-      '<p style="margin-top:0;">' + link(SITE + '#calendar', 'View the session calendar') + ' and add a session to your calendar. For reminders, ' + link(WA_JOIN, 'join us on WhatsApp') + '.</p>' +
-      '<p style="margin-top:24px;">Questions? Simply reply to this email.</p>' +
-      '<p style="margin:0;">Regards,<br>AI Learning Circle</p>' +
+      '<p>' + intro + ' ' + accountLine + '</p>' +
+      h('What AI Learning Circle is') +
+      '<p style="margin:0;">A live learning community for finance and business professionals who want to use AI in real work. Each session takes one practical use case from a messy starting point to a usable result, using tools such as ChatGPT, Claude and Microsoft Copilot.</p>' +
+      h('Join the WhatsApp community') +
+      '<p style="margin:0;">Session reminders and updates are shared on WhatsApp. ' + link(WA_JOIN, 'Message us on WhatsApp') + ' and we will add you.</p>' +
+      h('Upcoming sessions') +
+      '<p style="margin:0;">' + link(SITE + '#calendar', 'View the session calendar') + ' and add any session to your calendar. Sessions are free to attend.</p>' +
+      h('Membership') +
+      '<p style="margin:0 0 6px;">Members get the Knowledge Library. For every session it includes the use case practice materials, a How-To &amp; Prompt Guide (steps, prompts and Copilot instructions) and the Session Recording. Pay once for the whole period; there are no monthly charges.</p>' +
+      '<ul style="margin:0;padding-left:20px;"><li>3 months: &#8377;2,100 (regular &#8377;2,500)</li><li>6 months: &#8377;2,600 (regular &#8377;3,600)</li></ul>' +
+      '<p style="margin:8px 0 0;">' + link(WA_MEMBER, 'Subscribe on WhatsApp') + ' or ' + link(SITE + '#membership', 'see membership details') + '.</p>' +
+      h('Questions') +
+      '<p style="margin:0;">WhatsApp ' + WA_NUMBER + ' or email ' + link('mailto:' + CONTACT_EMAIL, CONTACT_EMAIL) + '. You can also just reply to this email.</p>' +
+      '<p style="margin:24px 0 0;">Regards,<br>AI Learning Circle</p>' +
       '</div>';
+
     var text =
       "Hi " + first + ",\n\n" +
-      "Welcome! Your free AI Learning Circle account is created. Please confirm your email using the separate confirmation message, then log in: " + SITE + "login.html\n\n" +
-      "WHAT YOU GET\n" +
-      "Free: live sessions, free AI tips in your account, Know Your Community.\n" +
-      "Membership (3 or 6 months): the Knowledge Library, with these for every session: use case practice materials, a How-To & Prompt Guide and the Session Recording.\n" +
-      "Get membership on WhatsApp: " + WA_MEMBER + "\nSee membership: " + SITE + "#membership\n\n" +
-      "JOIN A FREE LIVE SESSION\nSession Calendar: " + SITE + "#calendar\n\n" +
-      "GET UPDATES ON WHATSAPP\nEnrol: " + WA_JOIN + "\n\n" +
-      "Questions? Just reply to this email.\nAI Learning Circle";
+      (opts.session
+        ? "Thank you for registering for " + opts.session + ". A Google Calendar invitation is on its way separately; please accept it. "
+        : "Thank you for joining AI Learning Circle. ") +
+      (opts.hasAccount
+        ? "Your free account has been created. Please confirm your email address using the separate confirmation message, then log in: " + SITE + "login.html"
+        : "You can also create a free account any time: " + SITE + "signup.html") + "\n\n" +
+      "WHAT AI LEARNING CIRCLE IS\n" +
+      "A live learning community for finance and business professionals who want to use AI in real work. Each session takes one practical use case from a messy starting point to a usable result, using tools such as ChatGPT, Claude and Microsoft Copilot.\n\n" +
+      "JOIN THE WHATSAPP COMMUNITY\nSession reminders and updates are shared on WhatsApp. Message us and we will add you: " + WA_JOIN + "\n\n" +
+      "UPCOMING SESSIONS\nSession calendar: " + SITE + "#calendar (sessions are free to attend)\n\n" +
+      "MEMBERSHIP\n" +
+      "Members get the Knowledge Library. For every session: use case practice materials, a How-To & Prompt Guide (steps, prompts and Copilot instructions) and the Session Recording. Pay once for the whole period; no monthly charges.\n" +
+      "- 3 months: Rs 2,100 (regular Rs 2,500)\n- 6 months: Rs 2,600 (regular Rs 3,600)\n" +
+      "Subscribe on WhatsApp: " + WA_MEMBER + "\nDetails: " + SITE + "#membership\n\n" +
+      "QUESTIONS\nWhatsApp " + WA_NUMBER + " or email " + CONTACT_EMAIL + ". You can also reply to this email.\n\n" +
+      "Regards,\nAI Learning Circle";
+
     MailApp.sendEmail({
       to: email,
       subject: "Welcome to AI Learning Circle",
       body: text,
       htmlBody: html,
       name: "AI Learning Circle",
-      replyTo: "ailearningcirclevp@gmail.com"
+      replyTo: CONTACT_EMAIL
     });
   } catch (e) {}
 }

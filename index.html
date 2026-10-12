@@ -1244,7 +1244,7 @@ function submitRegistration(sessionId){
     return fetch(REGISTRATION_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ sessionId: sessionId, name: name, email: email, whatsappOptIn: wantsWa, key: REGISTRATION_KEY, hp: hp })
+      body: JSON.stringify({ sessionId: sessionId, name: name, email: email, whatsappOptIn: wantsWa, accountCreated: !existing, key: REGISTRATION_KEY, hp: hp })
     })
     .then(function(r){ return r.json(); })
     .then(function(data){
