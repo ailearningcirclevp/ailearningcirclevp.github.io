@@ -58,7 +58,11 @@
         <input id="area_of_interest" type="text" placeholder="e.g. Finance automation">
       </div>
 
-    <!-- Know Your Community is switched off for now: remove display:none to bring it back -->
+      <div class="field" style="display:flex;gap:8px;align-items:flex-start;">
+        <input type="checkbox" id="wa_optin" style="margin-top:4px;">
+        <label for="wa_optin" style="margin:0;font-weight:400;">Add me to the AI Learning Circle WhatsApp community <span class="hint">(session reminders and updates, if I am not already in it)</span></label>
+      </div>
+
     <div id="community-fields">
       <div class="section-title" style="margin-top:8px;">Know Your Community</div>
       <p class="hint" style="margin:-4px 0 14px;">This is a great opportunity for the community to get to know who you are — add a photo, a link, and a short line about you. Completely optional, and off by default: nothing is shown until you turn it on below. You can always add or change this later from your profile.</p>
@@ -92,8 +96,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=202610101153"></script>
-<script src="assets/supabase-client.js?v=202610101153"></script>
+<script src="assets/supabase-config.js?v=202610120653"></script>
+<script src="assets/supabase-client.js?v=202610120653"></script>
 <script>
   const form = document.getElementById('signup-form');
   const msg = document.getElementById('form-msg');
@@ -145,7 +149,7 @@
       fetch('https://script.google.com/macros/s/AKfycbxRuI7tR61gMLMzg0GbFFl22_r6m2pUPNtB77alVpTiyLqYCcyv1NLfllE-1W6keBDOpw/exec', {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ type: 'signup', name: profile.full_name, email: email, company: profile.company || '', key: 'm70wf5pfK60pOce1S_JKpgze', hp: '' })
+        body: JSON.stringify({ type: 'signup', name: profile.full_name, email: email, company: profile.company || '', whatsappOptIn: document.getElementById('wa_optin').checked, key: 'm70wf5pfK60pOce1S_JKpgze', hp: '' })
       }).catch(() => {});
     } catch (e) {}
 
@@ -162,7 +166,15 @@
       }
     }
 
+    const wantsWa = document.getElementById('wa_optin').checked;
     showMsg('Account created! Check your email to confirm it, then log in. (Photos can be added from your profile after you log in.)', 'ok');
+    if (wantsWa) {
+      const a = document.createElement('a');
+      a.href = 'https://wa.me/919566430848?text=Hi!%20Please%20add%20me%20to%20the%20AI%20Learning%20Circle%20WhatsApp%20community.';
+      a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = ' To join the WhatsApp community, tap here to message us and we will add you.';
+      msg.appendChild(a);
+    }
     form.reset();
     submitBtn.disabled = false;
     submitBtn.textContent = 'Create account';

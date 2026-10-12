@@ -93,7 +93,9 @@ function doPost(e) {
       if (!sName || !isValidEmail(sEmail)) {
         return jsonOut({ success: false, message: "Invalid details." });
       }
-      notifySignup(sName, sEmail, sCompany);
+      var sWa = data.whatsappOptIn === true;
+      notifySignup(sName, sEmail, sCompany, sWa);
+      logRegistrant(sName, sEmail, "website signup", "", sWa);
       return jsonOut({ success: true });
     }
 
@@ -141,6 +143,7 @@ function doPost(e) {
     );
 
     notifyOrganizer(event, name, email);
+    logRegistrant(name, email, "session registration", event.summary || sessionId, data.whatsappOptIn === true);
 
     return jsonOut({ success: true, message: "Calendar invitation sent" });
 
@@ -190,13 +193,14 @@ function notifyInterest(name, phone, role) {
 }
 
 // New free account: tell the organizer, and welcome the member.
-function notifySignup(name, email, company) {
+function notifySignup(name, email, company, whatsappOptIn) {
   try {
     MailApp.sendEmail(ORGANIZER_EMAIL, "New free signup: " + name,
       "A new free account was created on the AI Learning Circle website.\n\n" +
       "Name: " + name + "\n" +
       "Email: " + email + "\n" +
       (company ? "Company: " + company + "\n" : "") +
+      (whatsappOptIn ? "WhatsApp community: they ticked the box, please add them\n" : "") +
       "\nTo make them a paid member after payment, set their role to 'member' in Supabase.");
   } catch (e) {}
   try {
@@ -326,4 +330,60 @@ function sendSessionReminders() {
       props.setProperty(key, "1");
     } catch (err) {}
   });
+}
+
+
+// ---------------------------------------------------------------
+// Registrations sheet: every sign-up and session registration is
+// saved as a row in a private Google Sheet in YOUR Google Drive
+// ("AI Learning Circle - Registrations"), created automatically the
+// first time it is needed. Only you can open it unless you share it.
+// ---------------------------------------------------------------
+function getRegistrationsSheet() {
+  var props = PropertiesService.getScriptProperties();
+  var id = props.getProperty("REGISTRATIONS_SHEET_ID");
+  var ss = null;
+  if (id) { try { ss = SpreadsheetApp.openById(id); } catch (e) { ss = null; } }
+  if (!ss) {
+    ss = SpreadsheetApp.create("AI Learning Circle - Registrations");
+    props.setProperty("REGISTRATIONS_SHEET_ID", ss.getId());
+    ss.getSheets()[0].setName("Registrations");
+    ss.getSheets()[0].appendRow(["Date", "Name", "Email", "Source", "Session", "WhatsApp community requested"]);
+    ss.getSheets()[0].setFrozenRows(1);
+  }
+  return ss.getSheets()[0];
+}
+
+function logRegistrant(name, email, source, session, whatsappOptIn) {
+  try {
+    var sh = getRegistrationsSheet();
+    sh.appendRow([new Date(), name, email, source, session || "", whatsappOptIn ? "Yes" : "No"]);
+  } catch (e) {}
+}
+
+// ONE-TIME: run this by hand (function dropdown -> exportCalendarGuests -> Run)
+// to copy everyone who is already a guest on your session events into the
+// sheet. Safe to run again: it skips emails already listed for that session.
+function exportCalendarGuests() {
+  var sh = getRegistrationsSheet();
+  var seen = {};
+  var rows = sh.getDataRange().getValues();
+  for (var i = 1; i < rows.length; i++) { seen[String(rows[i][2]).toLowerCase() + "|" + rows[i][4]] = true; }
+  var added = 0;
+  Object.keys(SESSION_MAP).forEach(function (id) {
+    try {
+      var m = SESSION_MAP[id];
+      var ev = Calendar.Events.get(m.calendarId, m.eventId);
+      (ev.attendees || []).forEach(function (a) {
+        if (!a.email || a.organizer || a.self || a.resource) return;
+        var title = ev.summary || id;
+        var key = a.email.toLowerCase() + "|" + title;
+        if (seen[key]) return;
+        seen[key] = true;
+        sh.appendRow([new Date(), a.displayName || "", a.email, "calendar guest (export)", title, "Unknown"]);
+        added++;
+      });
+    } catch (e) {}
+  });
+  Logger.log("Added " + added + " guests. Sheet: " + sh.getParent().getUrl());
 }
