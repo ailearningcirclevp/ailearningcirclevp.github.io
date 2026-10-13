@@ -59,6 +59,7 @@
         '<div class="mm-label">My account</div>' +
         link('dashboard.html', 'My Dashboard', 'dashboard.html') +
         link('library.html', 'Knowledge Library', 'library.html') +
+        link('feed.html', 'AI Feed', 'feed.html') +
         link('sessions.html', 'Sessions', 'sessions.html') +
         link('profile.html', 'Profile', 'profile.html') +
         (isAdmin ? link('admin.html', 'Admin', 'admin.html') : '') +

@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/shared.css?v=202610061103">
+<link rel="stylesheet" href="assets/shared.css?v=202610131212">
 <style>
   .type-only{display:none;}
   .type-only.show{display:block;}
@@ -117,6 +117,18 @@
     </form>
     <div id="tip-list" style="margin-top:14px;"></div>
 
+    <div class="section-title" style="margin-top:36px;">AI Feed <span style="text-transform:none;font-weight:500;">(short articles, pictures, PDFs and links for paid members, shown in the Knowledge Library)</span></div>
+    <div class="form-msg" id="feed-msg"></div>
+    <form id="feed-form">
+      <div class="field"><label for="p-title">Title</label><input id="p-title" type="text" required></div>
+      <div class="field"><label for="p-body">Short text <span class="hint">(optional, plain text; line breaks are kept)</span></label><textarea id="p-body" rows="5"></textarea></div>
+      <div class="field"><label for="p-file">Picture, PDF or other file <span class="hint">(optional)</span></label><input id="p-file" type="file"></div>
+      <div class="field"><label for="p-link">Link <span class="hint">(optional, https://…)</span></label><input id="p-link" type="url" placeholder="https://…"></div>
+      <label style="display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0 10px;"><input type="checkbox" id="p-pin"> Pin to the top of the feed</label>
+      <button class="btn btn-primary" type="submit" style="width:100%;">Post to AI Feed</button>
+    </form>
+    <div id="feed-list-admin" style="margin-top:14px;"></div>
+
     <div class="section-title" style="margin-top:36px;">Participant Feedback <span style="text-transform:none;font-weight:500;">(anonymous ticker, shown only under Completed sessions)</span></div>
     <div class="form-msg" id="fb-msg"></div>
     <div class="field"><label for="fb-session">Session</label><select id="fb-session"></select></div>
@@ -132,10 +144,10 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=202610131141"></script>
-<script src="assets/supabase-client.js?v=202610131141"></script>
-<script src="assets/member-menu.js?v=202610131141"></script>
-<script src="assets/sessions.js?v=202610131141"></script>
+<script src="assets/supabase-config.js?v=202610131212"></script>
+<script src="assets/supabase-client.js?v=202610131212"></script>
+<script src="assets/member-menu.js?v=202610131212"></script>
+<script src="assets/sessions.js?v=202610131212"></script>
 <script>
   let member = null;
   let editing = null;        // resource row being edited, or null when adding
@@ -412,6 +424,66 @@
     }
   });
 
+
+  // ---------- AI Feed ----------
+  const feedMsg = document.getElementById('feed-msg');
+  function feedFlash(text, ok) { feedMsg.textContent = text; feedMsg.className = 'form-msg show ' + (ok ? 'ok' : 'error'); }
+  let feedCache = [];
+  async function loadFeedAdmin() {
+    const { data, error } = await supabaseClient.from('feed_posts').select('*').order('pinned', { ascending: false }).order('created_at', { ascending: false });
+    const el = document.getElementById('feed-list-admin');
+    if (error) { el.innerHTML = '<div class="empty-state">Run supabase/migration_feed.sql in Supabase first (' + escH(error.message) + ').</div>'; return; }
+    feedCache = data || [];
+    el.innerHTML = feedCache.length ? feedCache.map(p => `<div class="admin-row"><div><div class="title">${p.pinned ? '📌 ' : ''}${escH(p.title)}</div><div class="meta">${escH(p.kind)} · ${new Date(p.created_at).toLocaleDateString()}</div></div>
+      <button class="btn btn-secondary" data-pin="${p.id}" style="margin-right:6px;">${p.pinned ? 'Unpin' : 'Pin'}</button>
+      <button class="btn btn-danger" data-delpost="${p.id}">Delete</button></div>`).join('') : '<div class="empty-state">No posts yet.</div>';
+    el.querySelectorAll('[data-pin]').forEach(b => b.addEventListener('click', async () => {
+      const p = feedCache.find(x => x.id === b.dataset.pin);
+      const { error: e } = await supabaseClient.from('feed_posts').update({ pinned: !p.pinned }).eq('id', p.id);
+      if (e) feedFlash(e.message, false); else loadFeedAdmin();
+    }));
+    el.querySelectorAll('[data-delpost]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Delete this post? This cannot be undone.')) return;
+      const p = feedCache.find(x => x.id === b.dataset.delpost);
+      if (p && p.file_path) await supabaseClient.storage.from('library-files').remove([p.file_path]);
+      const { error: e } = await supabaseClient.from('feed_posts').delete().eq('id', b.dataset.delpost);
+      if (e) feedFlash(e.message, false); else loadFeedAdmin();
+    }));
+  }
+  document.getElementById('feed-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true; btn.textContent = 'Posting…';
+    try {
+      const title = document.getElementById('p-title').value.trim();
+      const body = document.getElementById('p-body').value.trim() || null;
+      const link = document.getElementById('p-link').value.trim() || null;
+      if (link && !/^https?:\/\//i.test(link)) throw new Error('The link must start with https://');
+      const file = document.getElementById('p-file').files[0];
+      if (!body && !link && !file) throw new Error('Add some text, a file or a link.');
+      const row = { title, body, link_url: link, pinned: document.getElementById('p-pin').checked, kind: 'article' };
+      if (file) {
+        const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const path = `feed/${Date.now()}_${safe}`;
+        const { error: upErr } = await supabaseClient.storage.from('library-files').upload(path, file);
+        if (upErr) throw upErr;
+        row.file_path = path; row.file_name = file.name;
+        row.kind = file.type.startsWith('image/') ? 'image' : (file.type === 'application/pdf' ? 'pdf' : 'file');
+      } else if (link && !body) {
+        row.kind = 'link';
+      }
+      const { error: insErr } = await supabaseClient.from('feed_posts').insert(row);
+      if (insErr) throw insErr;
+      e.target.reset();
+      feedFlash('Posted to the AI Feed.', true);
+      loadFeedAdmin();
+    } catch (err) {
+      feedFlash(err.message || 'Something went wrong.', false);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Post to AI Feed';
+    }
+  });
+  loadFeedAdmin();
 
   // ---------- Participant feedback ----------
   const fbSel = document.getElementById('fb-session');
