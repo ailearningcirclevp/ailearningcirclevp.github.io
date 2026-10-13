@@ -18,6 +18,8 @@
   .post .text{font-size:14.5px;line-height:1.65;white-space:pre-wrap;}
   .post img.pic{display:block;width:100%;max-height:520px;object-fit:contain;background:var(--cream-200);border-radius:12px;margin:10px 0;}
   .post .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+  .text.clamp{max-height:9.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent);}
+  .more{background:none;border:0;padding:6px 0 0;color:var(--navy-700);font-weight:700;font-family:inherit;font-size:13.5px;cursor:pointer;}
   .pin{font-size:11px;font-weight:800;color:var(--gold-600);letter-spacing:.06em;text-transform:uppercase;}
 </style>
 </head>
@@ -86,10 +88,15 @@
         <div class="when">${p.pinned ? '<span class="pin">Pinned</span> · ' : ''}${when}</div>
         <h3>${esc(p.title)}</h3>
         ${p.kind === 'image' && p.file_path ? `<img class="pic" data-img="${esc(p.id)}" alt="${esc(p.title)}">` : ''}
-        ${p.body ? `<div class="text">${esc(p.body)}</div>` : ''}
+        ${p.body ? `<div class="text${p.body.length > 500 ? ' clamp' : ''}">${esc(p.body)}</div>${p.body.length > 500 ? '<button class="more">Read more</button>' : ''}` : ''}
         ${actions ? `<div class="actions">${actions}</div>` : ''}
       </div>`;
     }).join('');
+    listEl.querySelectorAll('.more').forEach(b => b.addEventListener('click', () => {
+      const t = b.previousElementSibling;
+      const open = t.classList.toggle('clamp');
+      b.textContent = open ? 'Read more' : 'Show less';
+    }));
     listEl.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => {
       const p = posts.find(x => x.id === b.dataset.open);
       if (p) openFile(p.file_path, p.file_name, p.kind === 'pdf');
