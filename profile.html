@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/shared.css?v=202610131212">
+<link rel="stylesheet" href="assets/shared.css?v=1791912870">
 <style>
   .photo-preview{width:72px;height:72px;border-radius:50%;object-fit:cover;border:1px solid var(--line);background:var(--cream-200);display:block;margin-bottom:10px;}
   .pcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:26px 22px;text-align:center;max-width:460px;margin:0 auto 18px;}
@@ -59,7 +59,7 @@
     <div class="field"><label for="company">Company <span class="hint">(optional)</span></label><input id="company" type="text"></div>
     <div class="field"><label for="linkedin_url">LinkedIn URL <span class="hint">(optional, never shown publicly unless you opt in below)</span></label><input id="linkedin_url" type="url"></div>
     <div class="field"><label for="area_of_interest">Area of interest <span class="hint">(optional)</span></label><input id="area_of_interest" type="text"></div>
-    <div id="community-fields">
+    <div id="community-fields" style="display:none">
     <div class="section-title" style="margin-top:8px;">Know Your Community</div>
     <p class="hint" style="margin:-4px 0 14px;">A great opportunity for the community to get to know who you are. Optional, and nothing is shown until you turn it on below.</p>
 
@@ -89,9 +89,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=202610131449"></script>
-<script src="assets/supabase-client.js?v=202610131449"></script>
-<script src="assets/member-menu.js?v=202610131449"></script>
+<script src="assets/supabase-config.js?v=1791912870"></script>
+<script src="assets/supabase-client.js?v=1791912870"></script>
+<script src="assets/member-menu.js?v=1791912870"></script>
 <script>
   document.getElementById('logout-link').addEventListener('click', (e) => { e.preventDefault(); signOut(); });
   wireDirectoryConsent(document.getElementById('show_in_directory'));
