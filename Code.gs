@@ -222,7 +222,7 @@ function sendWelcomeEmail(name, email, opts) {
     var SITE = "https://ailearningcirclevp.github.io/";
     var WA_NUMBER = "+91 95664 30848";
     var WA_JOIN = "https://wa.me/919566430848?text=" + encodeURIComponent("Hi! I am interested in the community and would like to join the sessions. Could you share me details of it.");
-    var WA_MEMBER = "https://wa.me/919566430848?text=" + encodeURIComponent("I would like to subscribe for the membership for 3 months or 6 months. Kindly share me payment details");
+    var WA_MEMBER = "https://wa.me/919566430848?text=" + encodeURIComponent("I would like to subscribe for the 6 months membership. Kindly share me payment details");
     var CONTACT_EMAIL = "ailearningcirclevp@gmail.com";
     var first = String(name || "").split(" ")[0] || "there";
     var link = function (href, label) {
@@ -249,7 +249,7 @@ function sendWelcomeEmail(name, email, opts) {
       '<p style="margin:0;">' + link(SITE + '#calendar', 'View the session calendar') + ' and add any session to your calendar. Sessions are free to attend.</p>' +
       h('Membership') +
       '<p style="margin:0 0 6px;">Members get the Knowledge Library. For every session it includes the use case practice materials, a How-To &amp; Prompt Guide (steps, prompts and Copilot instructions) and the Session Recording. Pay once for the whole period; there are no monthly charges.</p>' +
-      '<ul style="margin:0;padding-left:20px;"><li>3 months: &#8377;2,100 (regular &#8377;2,500)</li><li>6 months: &#8377;2,600 (regular &#8377;3,600)</li></ul>' +
+      '<p style="margin:0 0 6px;"><b>&#8377;2,600 for 6 months</b>, one-time payment.</p>' +
       '<p style="margin:8px 0 0;">' + link(WA_MEMBER, 'Subscribe on WhatsApp') + ' or ' + link(SITE + '#membership', 'see membership details') + '.</p>' +
       h('Questions') +
       '<p style="margin:0;">WhatsApp ' + WA_NUMBER + ' or email ' + link('mailto:' + CONTACT_EMAIL, CONTACT_EMAIL) + '. You can also just reply to this email.</p>' +
@@ -270,7 +270,7 @@ function sendWelcomeEmail(name, email, opts) {
       "UPCOMING SESSIONS\nSession calendar: " + SITE + "#calendar (sessions are free to attend)\n\n" +
       "MEMBERSHIP\n" +
       "Members get the Knowledge Library. For every session: use case practice materials, a How-To & Prompt Guide (steps, prompts and Copilot instructions) and the Session Recording. Pay once for the whole period; no monthly charges.\n" +
-      "- 3 months: Rs 2,100 (regular Rs 2,500)\n- 6 months: Rs 2,600 (regular Rs 3,600)\n" +
+      "Rs 2,600 for 6 months, one-time payment.\n" +
       "Subscribe on WhatsApp: " + WA_MEMBER + "\nDetails: " + SITE + "#membership\n\n" +
       "QUESTIONS\nWhatsApp " + WA_NUMBER + " or email " + CONTACT_EMAIL + ". You can also reply to this email.\n\n" +
       "Regards,\nAI Learning Circle";
