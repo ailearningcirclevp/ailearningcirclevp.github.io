@@ -24,7 +24,7 @@ const sessions = [
     duration: "4:30 – 5:15 PM · Germany time",
     times: "Germany 4:30 PM · California 7:30 AM · Toronto 10:30 AM · UAE 6:30 PM · India 8:00 PM",
     description: "Compare the AI presentation tools and learn to connect them in one workflow, working on your deck like a shared PPT with an AI analyst.",
-    status: "open"
+    status: "completed"
   },
   {
     id: "financial-modelling-01",
