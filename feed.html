@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/shared.css?v=1791979043">
+<link rel="stylesheet" href="assets/shared.css?v=1791979175">
 <style>
   .paper{max-width:980px;margin:18px auto 30px;background:#fffdf7;border:1px solid var(--line);border-radius:6px;padding:26px 30px 34px;box-shadow:0 12px 30px -22px rgba(11,23,48,.35);}
   .mast{text-align:center;border-bottom:3px double #1d3a8a;padding-bottom:12px;margin-bottom:6px;}
@@ -78,20 +78,20 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=1791979043"></script>
-<script src="assets/supabase-client.js?v=1791979043"></script>
-<script src="assets/member-menu.js?v=1791979043"></script>
+<script src="assets/supabase-config.js?v=1791979175"></script>
+<script src="assets/supabase-client.js?v=1791979175"></script>
+<script src="assets/member-menu.js?v=1791979175"></script>
 <script>
   const esc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const safeUrl = (u) => /^https?:\/\//i.test(u || '') ? esc(u) : '';
   let posts = [];
     const listEl = document.getElementById('feed-list');
-  const TOPICS = [["free-vs-paid-myth", "Free isn't \"basic\". Here's what paying actually changes.", "Many people assume skills, file creation and connectors are paid-only. Often they aren't. Swipe to see what free can do and what paying really buys.", 6], ["best-features-by-tool", "What is each AI tool best at? Use all. Pick what to ask.", "ChatGPT for voice, work mode and connectors. Gemini for quick slides, Gmail and executive-style answers. Claude for complex analysis, automation, dashboards and presentations. Copilot for your Microsoft world.", 8], ["copilot-best-features", "Is Copilot enough? Look at the paid one.", "Paid Copilot adds apps, agents (Researcher, Analyst, Facilitator), Copilot Cowork, Copilot Studio and Power BI help. Some of it is early access. Learn Claude Cowork and Copilot Cowork will feel familiar.", 9], ["connectors-explained", "AI connectors in 4 steps (same in any tool)", "A connector is a secure link between an AI tool and your own apps. Open Settings, pick the app, sign in as yourself, allow only what's needed, then ask.", 6], ["prompt-guidance", "Don't memorise prompts. Learn to give one.", "Goal, context, task, format. The smarter the model, the less structure you need. More context, less guesswork.", 6], ["copilot-prompt-basics", "6 Copilot prompts to start with", "Summarise, draft, rewrite, explain, compare, plan. Examples for Outlook, Word, Excel and Teams. The full list is in the Knowledge Library.", 5], ["ten-ai-tools", "10 AI tools worth knowing, by purpose", "Think and write, research and learn, create, capture and automate. Ten is a start. The exhaustive list is in the Knowledge Library.", 6]];
+  const TOPICS = [["free-vs-paid-myth", "You don’t need to pay to start", "The belief that the clever AI features are locked behind a paid plan keeps many people from ever trying. Often it isn’t true. Some free plans already include skills, file creation and connectors, and free chat handles drafting, analysis and summaries well. Paying mostly buys more usage and top models. Try one real task on a free plan today, and pay only when free stops being enough.", 6], ["best-features-by-tool", "You don’t have to pick the “right” AI tool", "Choosing between ChatGPT, Gemini, Claude and Copilot feels like a high-stakes decision, but it isn’t one. Each has an edge: ChatGPT for voice and work mode, Gemini for quick slides and Gmail, Claude for analysis, skills and automation, and Copilot for your Microsoft world. Use them all, send each job to the one that fits, and switch when free credits run out. The tools change, but your skill stays.", 8], ["copilot-best-features", "You may already own more AI than you think", "If your company only gave you Copilot, it’s easy to feel you’re missing out. The paid version holds hidden features that most people never open: Scheduled Prompts, the Analyst Agent, Notebooks, Excel Agent Mode and custom agents. You may not have all of them yet, since rollout and admin settings decide what you see, so ask your IT team. Learn the idea on any tool, and it will carry over.", 9], ["connectors-explained", "You don’t have to copy-paste everything anymore", "Moving content between your apps and AI by hand is tiring, and a connector removes that step. It gives an AI tool secure access to one app, and you stay in control. Connect one low-risk app, such as your calendar, and ask a real question. Sign in as yourself, give the least access that works, and disconnect any time from Settings.", 6], ["prompt-guidance", "You don’t need the perfect prompt", "Many people stay away because they think they must memorise special prompts, but you don’t. Explain your situation the way you would brief a smart colleague: the goal, the context, the task and the format you want. The smarter the model, the less structure it needs. What matters more is context, so give more and leave less to guesswork.", 6], ["copilot-prompt-basics", "Start with six simple words in Copilot", "A hundred prompts is a daunting place to begin, so don’t start there. Six verbs cover most of an office day: summarise, draft, rewrite, explain, compare and plan. Try one in Outlook, Word, Excel or Teams, add your own details, and review before you send. The full list is in the Knowledge Library when you’re ready for more.", 5], ["ten-ai-tools", "You don’t need to know hundreds of tools. Ten will do.", "The sheer number of AI tools can make anyone feel behind. Ten cover most needs: ChatGPT, Claude, Gemini and Copilot to think and write, Perplexity and NotebookLM to research, Gamma and Canva to create, and Otter.ai and Zapier to capture and automate. Try one new tool a week, and don’t worry about the rest. The exhaustive list is in the Knowledge Library whenever you want it.", 6]];
   (function(){
     const box = document.getElementById('topics-list');
     box.innerHTML = TOPICS.map((t, i) => {
       let imgs = ''; for (let k = 1; k <= t[3]; k++) imgs += `<img ${k > 1 ? 'loading="lazy" ' : ''}alt="${esc(t[1])} card ${k} of ${t[3]}" src="feed/${t[0]}/card-${k}.webp">`;
-      return `<section class="tp"><div class="tn">TOPIC ${i + 1}</div><h3>${esc(t[1])}</h3><p>${esc(t[2])}</p>
+      return `<section class="tp"><div class="tn">TOPIC ${i + 1}</div><h3>${esc(t[1])}</h3><div class="by">By Vishnupriya</div><p>${esc(t[2])}</p>
         <div class="tcar"><div class="ttrack">${imgs}</div><button class="tb pv" aria-label="Previous card">&#8249;</button><button class="tb nx" aria-label="Next card">&#8250;</button></div>
         <div class="tdots">${'<i></i>'.repeat(t[3])}</div><a class="tl" href="feed/${t[0]}/">Open this topic on its own page &rsaquo;</a></section>`;
     }).join('');
@@ -182,6 +182,6 @@
     render();
   })();
 </script>
-<script src="assets/site-footer.js?v=1791979043"></script>
+<script src="assets/site-footer.js?v=1791979175"></script>
 </body>
 </html>
