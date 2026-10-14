@@ -634,6 +634,29 @@
   .feed-hl .fh-thumbs img{aspect-ratio:16/10 !important;}
   .hero{padding-bottom:22px;}
   .start-label{margin-top:4px;}
+  /* ---- home v2 ---- */
+  .h-wa{display:flex;align-items:center;gap:12px;text-decoration:none;background:#0b6b3a;color:#fff;border:1px solid #064d29;border-radius:14px;padding:12px 14px;margin:12px 0 0;}
+  .h-wa svg{width:22px;height:22px;flex:none;}
+  .h-wa span{flex:1;display:flex;flex-direction:column;}
+  .h-wa strong{font-size:15px;} .h-wa small{font-size:12.5px;opacity:.9;} .h-wa b{font-size:22px;}
+  .h-wa:hover{background:#085c31;}
+  .h-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 0;}
+  .h-tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;min-height:92px;padding:26px 6px 12px;background:#fff;border:1px solid #e3dcc6;border-radius:14px;color:#0f1e3d;text-decoration:none;font:inherit;cursor:pointer;box-shadow:0 6px 16px -12px rgba(15,30,61,.45);}
+  .h-tile i{font-style:normal;font-size:24px;line-height:1;}
+  .h-tile span{font-weight:700;font-size:13px;text-align:center;}
+  .h-new{position:absolute;top:7px;right:7px;font-style:normal;font-size:9px;font-weight:800;letter-spacing:.1em;color:#fff;padding:3px 7px;border-radius:99px;background:linear-gradient(110deg,#0b1736 0%,#2c4a94 30%,#12285c 55%,#3d5cae 80%,#081230 100%);background-size:250% 100%;animation:glit 2.4s linear infinite;box-shadow:0 0 7px rgba(11,23,54,.7);}
+  .h-next{display:block;text-decoration:none;color:#0f1e3d;background:#fff;border:1px solid #e3dcc6;border-left:4px solid #f2c94c;border-radius:12px;padding:10px 14px;margin:12px 0 0;}
+  .h-next small{display:block;font-size:10px;font-weight:800;letter-spacing:.12em;color:#7a6a2b;}
+  .h-next strong{display:block;font-family:'Fraunces',Georgia,serif;font-size:16px;line-height:1.25;margin:3px 0;}
+  .h-next span{font-size:12.5px;color:#4a5573;}
+  .h-member{display:flex;justify-content:space-between;align-items:center;width:100%;margin:12px 0 0;padding:13px 14px;background:#eee8d8;color:#0f1e3d;border:1px solid #d9d2bd;border-radius:12px;font-weight:700;font-size:15px;font-family:inherit;cursor:pointer;}
+  .h-member b{font-size:20px;}
+  @media (prefers-color-scheme: dark){
+    .h-tile,.h-next{background:#14264f;border-color:#2c4a94;color:#fff;}
+    .h-next small{color:#f2c94c;} .h-next span{color:#cfe0ff;}
+    .h-member{background:#1b2f5e;color:#fff;border-color:#2c4a94;}
+  }
+  @media (min-width:860px){.h-tile{min-height:110px}}
   @keyframes glit{0%{background-position:0% 0}100%{background-position:250% 0}}
   @keyframes twk{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.2)}}
   @media (prefers-reduced-motion:reduce){.feed-hl .fh-new,.feed-hl .fh-new::before,.feed-hl .fh-new::after{animation:none}}
@@ -750,33 +773,27 @@
           <div class="eyebrow">AI Learning Circle · Practical AI for work</div>
           <h1>Real finance work.<br><em>Real use cases.</em><br>Built with AI.</h1>
           <p>Learn AI by solving the problems you actually face: reporting, forecasting, presentations and analysis.</p>
-
         </div>
 
-        <a class="feed-hl" href="feed.html">
-          <div class="fh-top"><strong>AI Nuggets</strong><span class="fh-new">NEW</span><span class="fh-go">Read &rsaquo;</span></div>
-          <div class="fh-sub">Quick swipe-through cards on using AI at work.</div>
-          <div class="fh-thumbs"><img src="feed/free-vs-paid-myth/card-1.webp" alt=""><img src="feed/connectors-explained/card-1.webp" alt=""><img src="feed/prompt-guidance/card-1.webp" alt=""></div>
+        <a class="h-wa" href="https://wa.me/919566430848?text=Hi!%20I%20would%20like%20to%20join%20the%20AI%20Learning%20Circle%20WhatsApp%20group.%20Please%20add%20me." target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.5 8.5 0 1 1 21 11.5z"/></svg>
+          <span><strong>Join the WhatsApp group</strong><small>Session reminders and new use cases</small></span>
+          <b>&rsaquo;</b>
         </a>
 
-        <div class="start">
-          <div class="start-label">Where would you like to start?</div>
-          <a class="start-card wa-card" href="https://wa.me/919566430848?text=Hi!%20I%20would%20like%20to%20join%20the%20AI%20Learning%20Circle%20WhatsApp%20group.%20Please%20add%20me." target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.7-5.4A8.5 8.5 0 1 1 21 11.5z"/></svg>
-            <span class="sc-text"><strong>Join the WhatsApp group</strong><small>Session reminders and new use cases</small></span>
-            <span class="sc-go">›</span>
-          </a>
-          <a class="start-card" href="#calendar" onclick="showView('calendar')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-            <span class="sc-text"><strong>Join a free live session</strong><small>See a real use case in action</small></span>
-            <span class="sc-go">›</span>
-          </a>
-          <button class="start-card" onclick="goToSlide(1)">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
-            <span class="sc-text"><strong>Explore membership</strong><small>Practice materials, guides and recordings</small></span>
-            <span class="sc-go">›</span>
-          </button>
+        <div class="h-tiles">
+          <a class="h-tile" href="#calendar" onclick="showView('calendar')"><i>📅</i><span>Sessions</span></a>
+          <a class="h-tile" href="feed.html"><em class="h-new">NEW</em><i>💡</i><span>AI Nuggets</span></a>
+          <button class="h-tile" onclick="openLibrary();"><i>📚</i><span>Library</span></button>
         </div>
+
+        <a class="h-next" id="h-next" href="#calendar" onclick="showView('calendar')" hidden>
+          <small>NEXT FREE SESSION</small>
+          <strong id="h-next-title"></strong>
+          <span id="h-next-when"></span>
+        </a>
+
+        <button class="h-member" onclick="goToSlide(1)">Explore membership <b>&rsaquo;</b></button>
       </div>
     </div>
 
@@ -903,9 +920,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=1791981533"></script>
-<script src="assets/supabase-client.js?v=1791981533"></script>
-<script src="assets/sessions.js?v=1791981533"></script>
+<script src="assets/supabase-config.js?v=1791981886"></script>
+<script src="assets/supabase-client.js?v=1791981886"></script>
+<script src="assets/sessions.js?v=1791981886"></script>
 <script>
 function copyEmail(btn){
   var text = "ailearningcirclevp@gmail.com";
@@ -938,6 +955,16 @@ const REGISTRATION_ENDPOINT = "https://script.google.com/macros/s/AKfycbxRuI7tR6
    directly). Change both sides together if you ever rotate it. */
 const REGISTRATION_KEY = "m70wf5pfK60pOce1S_JKpgze";
 
+
+(function(){
+  try{
+    var n=(typeof sessions!=='undefined'?sessions:[]).filter(function(x){return x.status==='open'})[0];
+    if(!n) return;
+    document.getElementById('h-next-title').textContent=n.title;
+    document.getElementById('h-next-when').textContent=n.date+(n.duration?' · '+n.duration:'');
+    document.getElementById('h-next').hidden=false;
+  }catch(e){}
+})();
 function showView(name){
   document.getElementById('view-home').classList.toggle('active', name === 'home');
   document.getElementById('view-calendar').classList.toggle('active', name === 'calendar');
