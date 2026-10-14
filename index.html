@@ -610,6 +610,15 @@
   }
   .start-card:hover{box-shadow:0 8px 20px -12px rgba(11,23,48,.4);}
   .start .start-card{background:#eee8d8 !important;}
+  .feed-hl{display:block;text-decoration:none;color:#fff;background:linear-gradient(135deg,#1d3a8a,#1d4ed8);border-radius:16px;padding:14px 16px 14px;margin:0 0 14px;box-shadow:0 12px 26px -14px rgba(29,78,216,.8);}
+  .feed-hl .fh-top{display:flex;align-items:center;gap:10px;}
+  .feed-hl strong{font-family:'Fraunces',Georgia,serif;font-size:19px;flex:1;}
+  .feed-hl .fh-new{background:#f2c94c;color:#0f1e3d;font-size:10.5px;font-weight:800;letter-spacing:.12em;padding:3px 8px;border-radius:99px;}
+  .feed-hl .fh-go{font-weight:700;font-size:14px;}
+  .feed-hl .fh-sub{font-size:13.5px;opacity:.92;margin:4px 0 10px;}
+  .feed-hl .fh-thumbs{display:flex;gap:8px;}
+  .feed-hl .fh-thumbs img{flex:1;min-width:0;aspect-ratio:4/3;object-fit:cover;object-position:top;border-radius:8px;border:1px solid rgba(255,255,255,.35);}
+
   .start .start-card.wa-card{background:#25D366 !important;color:#fff !important;border-color:#1da851 !important;}
   .start .start-card.wa-card strong,.start .start-card.wa-card small,.start .start-card.wa-card .sc-go,.start .start-card.wa-card svg{color:#fff !important;stroke:#fff;}
   .start .start-card.wa-card small{opacity:.92;}
@@ -692,6 +701,7 @@
   <button class="drawer-link" onclick="showView('home'); goToSlide(2); closeDrawer();">Stay Updated</button>
   <button class="drawer-link nav-calendar-link" onclick="showView('calendar'); closeDrawer();">Session Calendar</button>
   <button class="drawer-link" onclick="closeDrawer(); openLibrary();">🔒 Knowledge Library</button>
+  <a class="drawer-link" href="feed.html">AI Feed</a>
   <div class="drawer-section-label">Account</div>
   <a class="drawer-link" href="login.html">Login for free</a>
 </div>
@@ -703,6 +713,7 @@
     <button class="tab-btn nav-home-link active" onclick="showView('home'); goToSlide(0);">Home</button>
     <button class="tab-btn nav-calendar-link" onclick="showView('calendar');">Session Calendar</button>
     <button class="tab-btn" onclick="openLibrary();">🔒 Knowledge Library</button>
+    <a class="tab-btn" href="feed.html">AI Feed</a>
     <a class="tab-btn" href="login.html">Login for free</a>
   </div>
   <a class="nav-login" href="login.html">Login for free</a>
@@ -723,6 +734,12 @@
           <div class="hero-diff">Real problem → Build the workflow → Try it → Improve it together<br>Not a tools course. A use-case approach, close to how you actually work.</div>
 
         </div>
+
+        <a class="feed-hl" href="feed.html">
+          <div class="fh-top"><span class="fh-new">NEW</span><strong>AI Feed</strong><span class="fh-go">Read &rsaquo;</span></div>
+          <div class="fh-sub">Quick swipe-through cue cards on using AI at work. Free to open.</div>
+          <div class="fh-thumbs"><img src="feed/free-vs-paid-myth/card-1.webp" alt=""><img src="feed/connectors-explained/card-1.webp" alt=""><img src="feed/prompt-guidance/card-1.webp" alt=""><img src="feed/ten-ai-tools/card-1.webp" alt=""></div>
+        </a>
 
         <div class="start">
           <div class="start-label">Where would you like to start?</div>
@@ -868,9 +885,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=1791974800"></script>
-<script src="assets/supabase-client.js?v=1791974800"></script>
-<script src="assets/sessions.js?v=1791974800"></script>
+<script src="assets/supabase-config.js?v=1791978435"></script>
+<script src="assets/supabase-client.js?v=1791978435"></script>
+<script src="assets/sessions.js?v=1791978435"></script>
 <script>
 function copyEmail(btn){
   var text = "ailearningcirclevp@gmail.com";
