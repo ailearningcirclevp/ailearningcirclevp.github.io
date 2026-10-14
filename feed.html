@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AI Feed — AI Learning Circle</title>
+<title>AI Nuggets — AI Learning Circle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/shared.css?v=1791979546">
+<link rel="stylesheet" href="assets/shared.css?v=1791979585">
 <style>
   .paper{max-width:980px;margin:18px auto 30px;background:#fffdf7;border:1px solid var(--line);border-radius:6px;padding:26px 30px 34px;box-shadow:0 12px 30px -22px rgba(11,23,48,.35);}
   .mast{text-align:center;border-bottom:3px double #1d3a8a;padding-bottom:12px;margin-bottom:6px;}
@@ -74,7 +74,7 @@
   <div class="paper">
     <div class="mast">
       <div class="kicker">Knowledge Library</div>
-      <h1>The AI Feed</h1>
+      <h1>AI Nuggets</h1>
       <div class="tag">Short reads on using AI at work, from the AI Learning Circle</div>
     </div>
     <div class="topics">
@@ -88,9 +88,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=1791979546"></script>
-<script src="assets/supabase-client.js?v=1791979546"></script>
-<script src="assets/member-menu.js?v=1791979546"></script>
+<script src="assets/supabase-config.js?v=1791979585"></script>
+<script src="assets/supabase-client.js?v=1791979585"></script>
+<script src="assets/member-menu.js?v=1791979585"></script>
 <script>
   const esc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const safeUrl = (u) => /^https?:\/\//i.test(u || '') ? esc(u) : '';
@@ -159,7 +159,7 @@
   }
 
   function showLocked(loggedIn) {
-    listEl.innerHTML = `<div class="card"><h3>🔒 The AI Feed is for members</h3>
+    listEl.innerHTML = `<div class="card"><h3>🔒 AI Nuggets is for members</h3>
       <p>Paid members get short reads, pictures and PDFs on using AI at work, along with the rest of the Knowledge Library.</p>
       <div class="cta-row" style="margin-top:12px;">
         <a class="btn btn-primary" href="${MEMBERSHIP_WHATSAPP_URL}" target="_blank" rel="noopener">Subscribe on WhatsApp</a>
@@ -172,7 +172,7 @@
     if (supabaseNotConfigured()) { listEl.innerHTML = '<div class="empty-state">Not connected yet.</div>'; return; }
     const { data: { session } } = await supabaseClient.auth.getSession();
     if (!session) {
-      document.getElementById('nav-tabs').innerHTML = '<a class="tab-btn" href="index.html">Home</a><a class="tab-btn active" href="feed.html">AI Feed</a><a class="tab-btn" href="login.html">Member Login</a>';
+      document.getElementById('nav-tabs').innerHTML = '<a class="tab-btn" href="index.html">Home</a><a class="tab-btn active" href="feed.html">AI Nuggets</a><a class="tab-btn" href="login.html">Member Login</a>';
       showLocked(false);
       return;
     }
@@ -180,7 +180,7 @@
     document.getElementById('nav-tabs').innerHTML = `
       <a class="tab-btn" href="dashboard.html">Home</a>
       <a class="tab-btn" href="library.html">Library</a>
-      <a class="tab-btn active" href="feed.html">AI Feed</a>
+      <a class="tab-btn active" href="feed.html">AI Nuggets</a>
       <a class="tab-btn" href="sessions.html">Sessions</a>
       <a class="tab-btn" href="profile.html">Profile</a>`;
     injectAdminTab(member);
@@ -192,6 +192,6 @@
     render();
   })();
 </script>
-<script src="assets/site-footer.js?v=1791979546"></script>
+<script src="assets/site-footer.js?v=1791979585"></script>
 </body>
 </html>
