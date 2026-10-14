@@ -7,20 +7,32 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/shared.css?v=1791963798">
+<link rel="stylesheet" href="assets/shared.css?v=1791966611">
 <style>
-  .feed-header{margin:20px 0 4px;}
-  .feed-header h1{font-size:24px;margin:4px 0 6px;}
-  .feed-header p{font-size:14.5px;color:var(--slate-500);margin:0;}
-  .post{margin:14px 0;}
-  .post .when{font-size:12px;color:var(--slate-500);font-weight:600;}
-  .post h3{margin:4px 0 8px;font-size:18px;}
-  .post .text{font-size:14.5px;line-height:1.65;white-space:pre-wrap;}
-  .post img.pic{display:block;width:100%;max-height:520px;object-fit:contain;background:var(--cream-200);border-radius:12px;margin:10px 0;}
-  .post .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
-  .text.clamp{max-height:9.5em;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent);}
-  .more{background:none;border:0;padding:6px 0 0;color:var(--navy-700);font-weight:700;font-family:inherit;font-size:13.5px;cursor:pointer;}
-  .pin{font-size:11px;font-weight:800;color:var(--gold-600);letter-spacing:.06em;text-transform:uppercase;}
+  .paper{max-width:980px;margin:18px auto 30px;background:#fffdf7;border:1px solid var(--line);border-radius:6px;padding:26px 30px 34px;box-shadow:0 12px 30px -22px rgba(11,23,48,.35);}
+  .mast{text-align:center;border-bottom:3px double #1a1a1a;padding-bottom:12px;margin-bottom:6px;}
+  .mast .kicker{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--slate-500);font-weight:700;}
+  .mast h1{font-family:'Fraunces',Georgia,serif;font-size:clamp(38px,8vw,64px);line-height:1;margin:8px 0 6px;letter-spacing:-.02em;color:#111;}
+  .mast .tag{font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:15px;color:#444;}
+  .dateline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;color:#333;border-bottom:1px solid #1a1a1a;padding:7px 2px;margin-bottom:22px;}
+  .story{padding:0 0 24px;margin:0 0 24px;border-bottom:1px solid #cfc8b4;}
+  .story:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0;}
+  .story .when{font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--gold-600,#b45309);}
+  .story h2{font-family:'Fraunces',Georgia,serif;font-size:clamp(22px,4vw,30px);line-height:1.18;margin:6px 0 12px;color:#111;}
+  .story.lead h2{font-size:clamp(28px,6vw,44px);line-height:1.08;}
+  .story .text{font-family:'Fraunces',Georgia,serif;font-size:16.5px;line-height:1.72;color:#222;white-space:pre-wrap;}
+  @media (min-width:760px){
+    .story.lead .text,.story .text.long{column-count:2;column-gap:36px;column-rule:1px solid #d9d2bd;}
+    .story .text.long{column-count:2;}
+  }
+  .story .text::first-letter{}
+  .story.lead .text::first-letter{font-size:3.2em;float:left;line-height:.85;padding:6px 8px 0 0;font-weight:700;}
+  .story img.pic{display:block;width:100%;max-height:560px;object-fit:cover;border-radius:2px;margin:6px 0 14px;filter:grayscale(.05);}
+  .story .figcap{font-size:12px;color:#666;font-style:italic;margin:-8px 0 14px;}
+  .story .refs{margin-top:12px;font-size:14px;font-family:Inter,sans-serif;}
+  .story .refs a,.story .refs span.ref{color:var(--navy-700,#1e3a8a);text-decoration:underline;text-underline-offset:3px;font-weight:600;cursor:pointer;margin-right:16px;display:inline-block;margin-top:4px;}
+  .pin{font-size:11px;font-weight:800;color:#b91c1c;letter-spacing:.14em;text-transform:uppercase;}
+  @media (max-width:600px){.paper{padding:18px 16px 26px;border-radius:0;border-left:0;border-right:0;}}
 </style>
 </head>
 <body>
@@ -30,37 +42,29 @@
   <div class="tabs" id="nav-tabs"></div>
 </nav>
 
-<div class="wrap">
-  <div class="feed-header">
-    <div class="eyebrow">Knowledge Library</div>
-    <h1>AI Feed</h1>
-    <p>Short reads, pictures, PDFs and links on using AI at work. Newest first.</p>
+<div class="wrap" style="max-width:1040px;">
+  <div class="paper">
+    <div class="mast">
+      <div class="kicker">Knowledge Library &middot; Members Edition</div>
+      <h1>The AI Feed</h1>
+      <div class="tag">Short reads on using AI at work, from the AI Learning Circle</div>
+    </div>
+    <div class="dateline"><span id="today"></span><span>Newest first</span></div>
+    <div id="feed-list"><div class="empty-state">Loading…</div></div>
   </div>
-
-  <div class="tab-chips" id="feed-tabs"></div>
-  <div id="feed-list"><div class="empty-state">Loading…</div></div>
-  <div class="cta-row" style="margin-top:18px;"><a class="btn btn-secondary" href="library.html">← Back to the Knowledge Library</a></div>
+  <div class="cta-row" style="margin:0 0 18px;text-align:center;"><a href="library.html" style="font-size:14px;">← Back to the Knowledge Library</a></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=1791963798"></script>
-<script src="assets/supabase-client.js?v=1791963798"></script>
-<script src="assets/member-menu.js?v=1791963798"></script>
+<script src="assets/supabase-config.js?v=1791966611"></script>
+<script src="assets/supabase-client.js?v=1791966611"></script>
+<script src="assets/member-menu.js?v=1791966611"></script>
 <script>
   const esc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const safeUrl = (u) => /^https?:\/\//i.test(u || '') ? esc(u) : '';
-  const FILTERS = [['all', 'All'], ['article', 'Articles'], ['image', 'Pictures'], ['pdf', 'PDFs'], ['link', 'Links']];
   let posts = [];
-  let currentFilter = 'all';
-  const listEl = document.getElementById('feed-list');
-
-  function renderTabs() {
-    document.getElementById('feed-tabs').innerHTML = FILTERS.map(([k, label]) =>
-      `<button class="tab-chip ${k === currentFilter ? 'active' : ''}" data-f="${k}">${label}</button>`).join('');
-    document.querySelectorAll('#feed-tabs .tab-chip').forEach(b => b.addEventListener('click', () => {
-      currentFilter = b.dataset.f; renderTabs(); render();
-    }));
-  }
+    const listEl = document.getElementById('feed-list');
+  document.getElementById('today').textContent = new Date().toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
   async function signed(path, download) {
     const { data, error } = await supabaseClient.storage.from('library-files').createSignedUrl(path, 3600, download ? { download } : undefined);
@@ -74,29 +78,24 @@
   }
 
   function render() {
-    const shown = posts.filter(p => currentFilter === 'all' || p.kind === currentFilter || (currentFilter === 'pdf' && p.kind === 'file'));
-    if (!shown.length) { listEl.innerHTML = '<div class="empty-state">Nothing here yet. New posts appear here as they are shared.</div>'; return; }
-    listEl.innerHTML = shown.map(p => {
-      const when = new Date(p.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+    if (!posts.length) { listEl.innerHTML = '<div class="empty-state">Nothing here yet. New stories appear here as they are shared.</div>'; return; }
+    listEl.innerHTML = posts.map((p, i) => {
+      const when = new Date(p.created_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' });
       const link = safeUrl(p.link_url);
-      let actions = '';
-      if (link) actions += `<a class="btn btn-dark" href="${link}" target="_blank" rel="noopener">Open link</a>`;
+      let refs = '';
+      if (link) refs += `<a href="${link}" target="_blank" rel="noopener">Read the full source &rarr;</a>`;
       if (p.file_path && p.kind !== 'image') {
-        actions += `<button class="btn btn-dark" data-open="${esc(p.id)}">${p.kind === 'pdf' ? 'Open PDF' : 'Download'}${p.file_name ? ' · ' + esc(p.file_name) : ''}</button>`;
+        refs += `<span class="ref" data-open="${esc(p.id)}">${p.kind === 'pdf' ? 'Read the attached PDF' : 'Download the attachment'}${p.file_name ? ' (' + esc(p.file_name) + ')' : ''} &rarr;</span>`;
       }
-      return `<div class="card post" id="post-${esc(p.id)}">
-        <div class="when">${p.pinned ? '<span class="pin">Pinned</span> · ' : ''}${when}</div>
-        <h3>${esc(p.title)}</h3>
+      const long = p.body && p.body.length > 900;
+      return `<article class="story${i === 0 ? ' lead' : ''}" id="post-${esc(p.id)}">
+        <div class="when">${p.pinned ? '<span class="pin">Top story</span> &middot; ' : ''}${when}</div>
+        <h2>${esc(p.title)}</h2>
         ${p.kind === 'image' && p.file_path ? `<img class="pic" data-img="${esc(p.id)}" alt="${esc(p.title)}">` : ''}
-        ${p.body ? `<div class="text${p.body.length > 500 ? ' clamp' : ''}">${esc(p.body)}</div>${p.body.length > 500 ? '<button class="more">Read more</button>' : ''}` : ''}
-        ${actions ? `<div class="actions">${actions}</div>` : ''}
-      </div>`;
+        ${p.body ? `<div class="text${long ? ' long' : ''}">${esc(p.body)}</div>` : ''}
+        ${refs ? `<div class="refs">${refs}</div>` : ''}
+      </article>`;
     }).join('');
-    listEl.querySelectorAll('.more').forEach(b => b.addEventListener('click', () => {
-      const t = b.previousElementSibling;
-      const open = t.classList.toggle('clamp');
-      b.textContent = open ? 'Read more' : 'Show less';
-    }));
     listEl.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => {
       const p = posts.find(x => x.id === b.dataset.open);
       if (p) openFile(p.file_path, p.file_name, p.kind === 'pdf');
@@ -109,7 +108,6 @@
   }
 
   function showLocked(loggedIn) {
-    document.getElementById('feed-tabs').innerHTML = '';
     listEl.innerHTML = `<div class="card"><h3>🔒 The AI Feed is for members</h3>
       <p>Paid members get short reads, pictures and PDFs on using AI at work, along with the rest of the Knowledge Library.</p>
       <div class="cta-row" style="margin-top:12px;">
@@ -139,10 +137,9 @@
       .order('pinned', { ascending: false }).order('created_at', { ascending: false });
     if (error) { listEl.innerHTML = '<div class="empty-state">The feed is not set up yet. Please check back soon.</div>'; return; }
     posts = data || [];
-    renderTabs();
     render();
   })();
 </script>
-<script src="assets/site-footer.js?v=1791963798"></script>
+<script src="assets/site-footer.js?v=1791966611"></script>
 </body>
 </html>
