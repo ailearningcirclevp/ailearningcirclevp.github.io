@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/shared.css?v=1791979413">
+<link rel="stylesheet" href="assets/shared.css?v=1791979546">
 <style>
   .paper{max-width:980px;margin:18px auto 30px;background:#fffdf7;border:1px solid var(--line);border-radius:6px;padding:26px 30px 34px;box-shadow:0 12px 30px -22px rgba(11,23,48,.35);}
   .mast{text-align:center;border-bottom:3px double #1d3a8a;padding-bottom:12px;margin-bottom:6px;}
@@ -51,6 +51,16 @@
   .tp .tl{display:block;text-align:center;font-size:13px;margin-top:8px;color:#1d4ed8;}
   .pin{font-size:11px;font-weight:800;color:#b91c1c;letter-spacing:.14em;text-transform:uppercase;}
   @media (max-width:600px){.paper{padding:18px 16px 26px;border-radius:0;border-left:0;border-right:0;}}
+  @media (prefers-color-scheme: dark){
+    .paper{background:#0f1e3d;border-color:#2c4a94;}
+    .mast h1,.story h2,.tp h3,.topics-h,.mast .kicker{color:#fff !important;}
+    .mast .tag,.topics-sub,.by,.tp .tn,.story .refs a,.story .refs span.ref,.tp .tl{color:#9cc4ff !important;}
+    .story .text,.tp p{color:#eef2ff !important;}
+    .mast{border-bottom-color:#9cc4ff;}.topics{border-bottom-color:#2c4a94;}
+    .story{border-bottom-color:#2c4a94;}
+    .tp{background:#14264f;border-color:#2c4a94;}
+    .tdots i{background:#3a4c7d}.tdots i.on{background:#fff}
+  }
 </style>
 </head>
 <body>
@@ -78,9 +88,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=1791979413"></script>
-<script src="assets/supabase-client.js?v=1791979413"></script>
-<script src="assets/member-menu.js?v=1791979413"></script>
+<script src="assets/supabase-config.js?v=1791979546"></script>
+<script src="assets/supabase-client.js?v=1791979546"></script>
+<script src="assets/member-menu.js?v=1791979546"></script>
 <script>
   const esc = (t) => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const safeUrl = (u) => /^https?:\/\//i.test(u || '') ? esc(u) : '';
@@ -182,6 +192,6 @@
     render();
   })();
 </script>
-<script src="assets/site-footer.js?v=1791979413"></script>
+<script src="assets/site-footer.js?v=1791979546"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../assets/shared.css?v=1791979175">
+<link rel="stylesheet" href="../../assets/shared.css?v=1791979546">
 <style>
 :root{--navy900:#0f1e3d;--navy700:#1d3a6e;--gold:#f2c94c;--cream:#f7f4ec;--cream2:#ece6d6}
 .fx{max-width:1040px;margin:0 auto;padding:8px 16px 40px;}
@@ -43,6 +43,16 @@
 .tile b{font-family:Fraunces,Georgia,serif;font-size:17px;line-height:1.25;display:block;color:var(--navy900)}
 .tile span{display:block;font-size:13.5px;line-height:1.5;color:#4a5573;margin-top:6px}
 .tile em{display:inline-block;font-style:normal;font-size:11px;font-weight:800;letter-spacing:.14em;color:var(--navy700);margin-bottom:6px}
+@media (prefers-color-scheme: dark){
+.fx h1,.fx .lead,.tile b{color:#fff !important}
+.fx .lead{color:#e6ecff !important}
+.fx .by,.fx .eyebrow{color:#9cc4ff !important}
+.tile{background:#14264f;border-color:#2c4a94}
+.tile span{color:#d5def5}.tile em{color:#9cc4ff}
+.more a.nl,.fx a:not(.btn):not(.tile){color:#9cc4ff}
+.dots i{background:#3a4c7d}.dots i.on{background:#fff}
+.swipe{color:#c5d0ee}
+}
 </style>
 </head>
 <body>
@@ -76,6 +86,6 @@
  upd();
 })();
 </script>
-<script src="../../assets/site-footer.js?v=1791979175"></script>
+<script src="../../assets/site-footer.js?v=1791979546"></script>
 </body>
 </html>
