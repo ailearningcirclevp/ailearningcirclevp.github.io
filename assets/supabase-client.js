@@ -140,3 +140,7 @@ function injectAdminTab(member) {
     }
   });
 }
+
+// Knowledge Library: unlock enquiry. Opens the host's WhatsApp with a ready message.
+const LIBRARY_WHATSAPP_URL = "https://wa.me/919566430848?text=" +
+  encodeURIComponent("Hi Vishnu, I would like to know more about AI Learning Circle membership and get access to the Knowledge Library.");

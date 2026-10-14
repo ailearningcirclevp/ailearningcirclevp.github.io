@@ -7,15 +7,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/shared.css?v=1791982187">
+<link rel="stylesheet" href="assets/shared.css?v=1791983400">
 <style>
   .lib-header{margin:20px 0;}
   .lib-header h1{font-size:24px;margin:4px 0 6px;}
   .lib-header p{font-size:14.5px;color:var(--slate-500);margin:0;}
   .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;}
   .filter-row select{padding:8px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface-1);font-family:inherit;font-size:13px;}
-  a.locked-card{display:block;text-decoration:none;color:inherit;opacity:.92;}
+  
   .cat-num{font-size:12px;color:var(--slate-500);font-weight:700;}
+  .locked-card{cursor:pointer;}
+  .locked-card p{font-size:14.5px;line-height:1.6;margin:8px 0 0;}
+  .meta-line{font-size:12.5px !important;color:var(--slate-500);text-transform:capitalize;}
+  .incl-label{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--slate-500);margin:12px 0 6px;}
+  .chip.locked{cursor:pointer;border:1px solid #e3dcc6;background:#f7f1de;color:#0f1e3d;padding:7px 12px;border-radius:999px;font-family:inherit;font-weight:600;font-size:13px;margin:0 6px 6px 0;}
+  .chip.locked:hover{background:#f2c94c;}
+  .chip.soon{display:inline-block;padding:7px 12px;border-radius:999px;font-size:13px;background:#eee8d8;margin:0 6px 6px 0;}
+  .chip.soon{opacity:.6;}
   .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
 </style>
 </head>
@@ -55,9 +63,10 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=1791982187"></script>
-<script src="assets/supabase-client.js?v=1791982187"></script>
-<script src="assets/member-menu.js?v=1791982187"></script>
+<script src="assets/supabase-config.js?v=1791983400"></script>
+<script src="assets/supabase-client.js?v=1791983400"></script>
+<script src="assets/unlock-modal.js?v=1791983400"></script>
+<script src="assets/member-menu.js?v=1791983400"></script>
 <script>
   let isMember = false;
   let userId = null;
@@ -66,20 +75,28 @@
   let currentType = 'use_case';
 
   function lockedCard(r, i) {
-    const parts = [];
+    const items = [];
     if (r.type === 'use_case') {
-      if (r.has_recording) parts.push('Session recording');
-      if (r.has_file) parts.push('Use case practice materials');
-      if (r.has_starter_kit) parts.push('How-To & Prompt Guide');
+      items.push(['Use Case Practice Materials', r.has_file]);
+      items.push(['How-To & Prompt Guide', r.has_starter_kit]);
+      items.push(['Session Recording', r.has_recording]);
     } else {
-      if (r.has_file) parts.push('Download');
-      if (r.has_recording) parts.push('Recording');
+      if (r.has_file) items.push(['Download', true]);
+      if (r.has_recording) items.push(['Recording', true]);
     }
-    return `<a class="card locked-card" href="index.html#membership" title="Members only — tap to see membership">
-      <div class="cat-num">🔒 ${String(i + 1).padStart(3, '0')} · ${r.category}</div>
+    const desc = r.description || r.business_problem || '';
+    const meta = [r.level, r.tool_used ? 'Tool: ' + r.tool_used : ''].filter(Boolean).join(' · ');
+    return `<div class="card locked-card" data-unlock-card>
+      <div class="cat-num">${String(i + 1).padStart(3, '0')} · ${r.category}</div>
       <h3>${r.title}</h3>
-      <div class="chip-row">${parts.map(p => `<span class="chip locked">${p} 🔒</span>`).join('')}</div>
-    </a>`;
+      ${desc ? `<p>${desc}</p>` : ''}
+      ${r.what_you_learn ? `<p style="margin-top:8px;"><strong>What you'll learn:</strong> ${r.what_you_learn}</p>` : ''}
+      ${meta ? `<p class="meta-line">${meta}</p>` : ''}
+      <div class="incl-label">What's included</div>
+      <div class="chip-row">${items.map(([p, ok]) => ok
+        ? `<button type="button" class="chip locked" data-unlock>🔒 ${p}</button>`
+        : `<span class="chip soon">${p} · coming soon</span>`).join('')}</div>
+    </div>`;
   }
 
   function memberCard(r, i) {
@@ -100,7 +117,7 @@
 
   function renderTabs() {
     document.getElementById('type-tabs').innerHTML = TYPE_ORDER.map(t =>
-      `<button class="tab-chip ${t === currentType ? 'active' : ''}" data-type="${t}">${isMember ? '' : '🔒 '}${RESOURCE_TYPE_LABELS[t]}</button>`).join('');
+      `<button class="tab-chip ${t === currentType ? 'active' : ''}" data-type="${t}">${RESOURCE_TYPE_LABELS[t]}</button>`).join('');
     document.querySelectorAll('#type-tabs .tab-chip').forEach(btn => {
       btn.addEventListener('click', () => { currentType = btn.dataset.type; renderTabs(); render(); });
     });
@@ -123,6 +140,9 @@
 
     if (isMember) {
       wireDownloadButtons(container);
+    } else {
+      container.querySelectorAll('[data-unlock]').forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); openUnlockModal(); }));
+      container.querySelectorAll('[data-unlock-card]').forEach(c => c.addEventListener('click', openUnlockModal));
     }
   }
 
@@ -162,7 +182,7 @@
         <a class="tab-btn" href="profile.html">Profile</a>`;
       injectAdminTab(member);
     } else {
-      document.getElementById('nav-tabs').innerHTML = `<a class="tab-btn" href="index.html">Home</a><a class="tab-btn" href="feed.html">AI Nuggets</a><a class="tab-btn" href="login.html">Member Login</a>`;
+      document.getElementById('nav-tabs').innerHTML = `<a class="tab-btn" href="index.html">Home</a><a class="tab-btn" href="feed.html">AI Nuggets</a><a class="tab-btn" href="login.html">Member login</a>`;
     }
 
     if (isMember) {
@@ -171,8 +191,8 @@
       const { data: resources } = await supabaseClient.from('resources').select('*').order('created_at', { ascending: true });
       allResources = resources || [];
     } else {
-      document.getElementById('lib-title').textContent = 'See what\'s inside';
-      document.getElementById('lib-sub').textContent = 'Use Cases, Try This Week and the Prompt Library are for paid members. Tap any item to see membership.';
+      document.getElementById('lib-title').textContent = 'Explore the Knowledge Library';
+      document.getElementById('lib-sub').innerHTML = 'Browse all session resources below. Downloads, recordings and practice materials are available to members. ' + (userId ? '' : '<a href="login.html" style="white-space:nowrap;">Already a member? Log in</a>');
       const { data: catalogue } = await supabaseClient.from('resource_catalogue').select('*').order('category', { ascending: true });
       allResources = catalogue || [];
     }
@@ -182,11 +202,12 @@
 
     if (!isMember) {
       document.getElementById('resource-sections').insertAdjacentHTML('beforeend',
-        `<div class="cta-row"><a class="btn btn-primary" href="${MEMBERSHIP_WHATSAPP_URL}" target="_blank" rel="noopener">Subscribe on WhatsApp</a><a class="btn btn-secondary" href="index.html#membership">See membership</a></div>`);
+        `<div class="cta-row"><button type="button" class="btn btn-primary" id="unlock-cta">Unlock with membership</button></div>`);
+      document.getElementById('unlock-cta').addEventListener('click', openUnlockModal);
     }
   })();
 </script>
 
-<script src="assets/site-footer.js?v=1791982187"></script>
+<script src="assets/site-footer.js?v=1791983400"></script>
 </body>
 </html>
