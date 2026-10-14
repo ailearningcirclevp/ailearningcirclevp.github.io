@@ -660,6 +660,13 @@
     .h-member{background:#1b2f5e;color:#fff;border-color:#2c4a94;}
   }
   @media (min-width:860px){.h-tile{min-height:110px}}
+  .h-next{position:relative;overflow:hidden;background:#fff !important;border:1px solid #e8d9a0 !important;border-left:4px solid #f2c94c !important;color:#0f1e3d !important;box-shadow:0 0 0 1px rgba(242,201,76,.35),0 8px 22px -12px rgba(212,160,23,.7);}
+  .h-next strong{color:#0f1e3d !important;} .h-next span{color:#4a5573 !important;}
+  .h-next small{color:#8a6d00 !important;}
+  .h-next::before{content:"";position:absolute;top:0;bottom:0;left:-60%;width:45%;background:linear-gradient(100deg,transparent,rgba(255,214,90,.55),rgba(255,255,255,.9),rgba(255,214,90,.55),transparent);transform:skewX(-18deg);animation:sweep 3.2s ease-in-out infinite;pointer-events:none;}
+  .h-next::after{content:"\2726  \2727  \2726";position:absolute;top:6px;right:12px;font-size:11px;letter-spacing:6px;color:#e0a800;text-shadow:0 0 6px rgba(255,214,90,.95);animation:twk 1.6s ease-in-out infinite;pointer-events:none;}
+  @keyframes sweep{0%{left:-60%}60%,100%{left:130%}}
+  @media (prefers-reduced-motion:reduce){.h-next::before,.h-next::after{animation:none}.h-next::before{display:none}}
   @keyframes glit{0%{background-position:0% 0}100%{background-position:250% 0}}
   @keyframes twk{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.2)}}
   @media (prefers-reduced-motion:reduce){.feed-hl .fh-new,.feed-hl .fh-new::before,.feed-hl .fh-new::after{animation:none}}
@@ -923,9 +930,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=1791982057"></script>
-<script src="assets/supabase-client.js?v=1791982057"></script>
-<script src="assets/sessions.js?v=1791982057"></script>
+<script src="assets/supabase-config.js?v=1791982187"></script>
+<script src="assets/supabase-client.js?v=1791982187"></script>
+<script src="assets/sessions.js?v=1791982187"></script>
 <script>
 function copyEmail(btn){
   var text = "ailearningcirclevp@gmail.com";
