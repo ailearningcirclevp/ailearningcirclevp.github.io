@@ -645,6 +645,9 @@
   .h-tile i{font-style:normal;font-size:24px;line-height:1;}
   .h-tile span{font-weight:700;font-size:13px;text-align:center;}
   .h-new{position:absolute;top:7px;right:7px;font-style:normal;font-size:9px;font-weight:800;letter-spacing:.1em;color:#fff;padding:3px 7px;border-radius:99px;background:linear-gradient(110deg,#0b1736 0%,#2c4a94 30%,#12285c 55%,#3d5cae 80%,#081230 100%);background-size:250% 100%;animation:glit 2.4s linear infinite;box-shadow:0 0 7px rgba(11,23,54,.7);}
+  .h-tag{position:absolute;top:7px;right:7px;font-style:normal;font-size:9px;font-weight:800;letter-spacing:.1em;padding:3px 7px;border-radius:99px;}
+  .h-free{background:#0b6b3a;color:#fff;}
+  .h-paid{background:#f2c94c;color:#0f1e3d;}
   .h-next{display:block;text-decoration:none;color:#0f1e3d;background:#fff;border:1px solid #e3dcc6;border-left:4px solid #f2c94c;border-radius:12px;padding:10px 14px;margin:12px 0 0;}
   .h-next small{display:block;font-size:10px;font-weight:800;letter-spacing:.12em;color:#7a6a2b;}
   .h-next strong{display:block;font-family:'Fraunces',Georgia,serif;font-size:16px;line-height:1.25;margin:3px 0;}
@@ -782,9 +785,9 @@
         </a>
 
         <div class="h-tiles">
-          <a class="h-tile" href="#calendar" onclick="showView('calendar')"><i>📅</i><span>Sessions</span></a>
+          <a class="h-tile" href="#calendar" onclick="showView('calendar')"><em class="h-tag h-free">FREE</em><i>📅</i><span>Sessions</span></a>
           <a class="h-tile" href="feed.html"><em class="h-new">NEW</em><i>💡</i><span>AI Nuggets</span></a>
-          <button class="h-tile" onclick="openLibrary();"><i>📚</i><span>Library</span></button>
+          <button class="h-tile" onclick="openLibrary();"><em class="h-tag h-paid">PAID</em><i>📚</i><span>Library</span></button>
         </div>
 
         <a class="h-next" id="h-next" href="#calendar" onclick="showView('calendar')" hidden>
@@ -920,9 +923,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=1791981886"></script>
-<script src="assets/supabase-client.js?v=1791981886"></script>
-<script src="assets/sessions.js?v=1791981886"></script>
+<script src="assets/supabase-config.js?v=1791982057"></script>
+<script src="assets/supabase-client.js?v=1791982057"></script>
+<script src="assets/sessions.js?v=1791982057"></script>
 <script>
 function copyEmail(btn){
   var text = "ailearningcirclevp@gmail.com";
