@@ -610,14 +610,21 @@
   }
   .start-card:hover{box-shadow:0 8px 20px -12px rgba(11,23,48,.4);}
   .start .start-card{background:#eee8d8 !important;}
-  .feed-hl{display:block;text-decoration:none;color:#fff;background:linear-gradient(135deg,#1d3a8a,#1d4ed8);border-radius:16px;padding:14px 16px 14px;margin:0 0 14px;box-shadow:0 12px 26px -14px rgba(29,78,216,.8);}
-  .feed-hl .fh-top{display:flex;align-items:center;gap:10px;}
-  .feed-hl strong{font-family:'Fraunces',Georgia,serif;font-size:19px;flex:1;}
-  .feed-hl .fh-new{background:#f2c94c;color:#0f1e3d;font-size:10.5px;font-weight:800;letter-spacing:.12em;padding:3px 8px;border-radius:99px;}
-  .feed-hl .fh-go{font-weight:700;font-size:14px;}
-  .feed-hl .fh-sub{font-size:13.5px;opacity:.92;margin:4px 0 10px;}
+  .feed-hl{display:block;text-decoration:none;color:#14307a;background:#fffdf7;border:1px solid #cfd8f0;border-top:3px double #1d3a8a;border-radius:6px;padding:12px 16px 14px;margin:0 0 14px;box-shadow:0 12px 26px -18px rgba(20,48,122,.6);}
+  .feed-hl .fh-top{display:flex;align-items:center;gap:10px;border-bottom:1px solid #1d3a8a;padding-bottom:8px;}
+  .feed-hl strong{font-family:'Fraunces',Georgia,serif;font-size:24px;letter-spacing:-.01em;flex:1;color:#14307a;}
+  .feed-hl .fh-go{font-weight:700;font-size:13px;color:#1d4ed8;letter-spacing:.06em;text-transform:uppercase;}
+  .feed-hl .fh-sub{font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:14px;color:#1d4ed8;margin:8px 0 10px;}
   .feed-hl .fh-thumbs{display:flex;gap:8px;}
-  .feed-hl .fh-thumbs img{flex:1;min-width:0;aspect-ratio:4/3;object-fit:cover;object-position:top;border-radius:8px;border:1px solid rgba(255,255,255,.35);}
+  .feed-hl .fh-thumbs img{flex:1;min-width:0;aspect-ratio:4/3;object-fit:cover;object-position:top;border-radius:3px;border:1px solid #cfd8f0;}
+  .feed-hl .fh-new{position:relative;overflow:hidden;color:#3b2a00;font-size:10.5px;font-weight:800;letter-spacing:.14em;padding:4px 10px;border-radius:99px;background:linear-gradient(110deg,#f7d56b 0%,#fff6c4 25%,#f2c94c 40%,#ffe98a 60%,#e8b923 100%);background-size:250% 100%;animation:glit 2.4s linear infinite;box-shadow:0 0 8px rgba(242,201,76,.9),0 0 2px #fff inset;}
+  .feed-hl .fh-new::before,.feed-hl .fh-new::after{content:"\2726";position:absolute;font-size:8px;color:#fff;text-shadow:0 0 4px #fff;animation:twk 1.4s ease-in-out infinite;}
+  .feed-hl .fh-new::before{top:0;left:6px;}
+  .feed-hl .fh-new::after{bottom:0;right:7px;animation-delay:.7s;}
+  @keyframes glit{0%{background-position:0% 0}100%{background-position:250% 0}}
+  @keyframes twk{0%,100%{opacity:0;transform:scale(.4)}50%{opacity:1;transform:scale(1.2)}}
+  @media (prefers-reduced-motion:reduce){.feed-hl .fh-new,.feed-hl .fh-new::before,.feed-hl .fh-new::after{animation:none}}
+
 
   .start .start-card.wa-card{background:#25D366 !important;color:#fff !important;border-color:#1da851 !important;}
   .start .start-card.wa-card strong,.start .start-card.wa-card small,.start .start-card.wa-card .sc-go,.start .start-card.wa-card svg{color:#fff !important;stroke:#fff;}
@@ -736,8 +743,8 @@
         </div>
 
         <a class="feed-hl" href="feed.html">
-          <div class="fh-top"><span class="fh-new">NEW</span><strong>AI Feed</strong><span class="fh-go">Read &rsaquo;</span></div>
-          <div class="fh-sub">AI Nuggets: quick swipe-through cards on using AI at work. Free to open.</div>
+          <div class="fh-top"><strong>AI Nuggets</strong><span class="fh-new">NEW</span><span class="fh-go">Read &rsaquo;</span></div>
+          <div class="fh-sub">Quick swipe-through cards on using AI at work. Free to open.</div>
           <div class="fh-thumbs"><img src="feed/free-vs-paid-myth/card-1.webp" alt=""><img src="feed/connectors-explained/card-1.webp" alt=""><img src="feed/prompt-guidance/card-1.webp" alt=""><img src="feed/ten-ai-tools/card-1.webp" alt=""></div>
         </a>
 
@@ -885,9 +892,9 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/supabase-config.js?v=1791978963"></script>
-<script src="assets/supabase-client.js?v=1791978963"></script>
-<script src="assets/sessions.js?v=1791978963"></script>
+<script src="assets/supabase-config.js?v=1791979043"></script>
+<script src="assets/supabase-client.js?v=1791979043"></script>
+<script src="assets/sessions.js?v=1791979043"></script>
 <script>
 function copyEmail(btn){
   var text = "ailearningcirclevp@gmail.com";
