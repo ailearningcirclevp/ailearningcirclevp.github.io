@@ -1354,6 +1354,14 @@ renderSessions();
 loadFeedback();
 if(location.hash === '#calendar'){ showView('calendar'); }
 if(location.hash === '#membership'){ goToMembership(); }
+/* Shareable registration link: #register (next open session) or #register-<session-id> */
+(function(){
+  var m = /^#register(?:-(.+))?$/.exec(location.hash);
+  if(!m) return;
+  var s = m[1] ? sessions.find(function(x){ return x.id === m[1]; }) : null;
+  if(!s) s = sessions.find(function(x){ return x.status === 'open'; });
+  if(s) setTimeout(function(){ openModal(s.id); document.getElementById('modal-veil').classList.add('open'); }, 300);
+})();
 initSwipeDots();
 
 var drawerSearch = document.getElementById('drawer-search');
