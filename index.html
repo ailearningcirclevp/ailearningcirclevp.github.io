@@ -1175,7 +1175,8 @@ function openModal(sessionId){
       '<button class="btn-cancel" onclick="closeModal()">Cancel</button>' +
       '<button class="btn-confirm" id="f-confirm" onclick="submitRegistration(\'' + sessionId + '\')">Add me to the calendar</button>' +
     '</div>' +
-    '<div class="sess-note" style="margin-top:12px;">Your calendar invitation is sent to this email. Already a member? <a href="login.html">Log in</a> or just use the same email here.</div>';
+    '<div class="sess-note" style="margin-top:12px;line-height:1.55;"><b>Please note</b><br>&bull; A Google Calendar invitation will be sent to your email. <b>Accept the invite</b> to enrol the session in your calendar.<br>&bull; If you do not see it, check your <b>spam or junk</b> folder.<br>&bull; Know someone who would find this useful? Forward the invite to them.</div>' +
+    '<div class="sess-note" style="margin-top:8px;font-size:12px;">P.S. For session reminders and updates, <a href="https://chat.whatsapp.com/KzLDXT0O7pFIRG4R2Un3hL?s=cl&p=a&iam=2" target="_blank" rel="noopener">join our WhatsApp group</a>.</div>';
 
   document.getElementById('modal-veil').classList.add('open');
   var showEl = document.getElementById('f-show');
@@ -1280,7 +1281,7 @@ function submitRegistration(sessionId){
       renderResultModal({
         icon: '🎉',
         title: 'You’re in!',
-        message: 'A Google Calendar invitation has been sent to ' + email + '. Please <b>accept the invite</b> to add the session to your calendar, and check your spam folder if you do not see it.',
+        message: 'A Google Calendar invitation has been sent to ' + email + '. Please <b>accept the invite</b> to enrol the session in your calendar, and check your spam folder if you do not see it. Know someone who would find it useful? Forward the invite to them.<br><br><span style="font-size:13px;">P.S. For session reminders and updates, <a href="https://chat.whatsapp.com/KzLDXT0O7pFIRG4R2Un3hL?s=cl&p=a&iam=2" target="_blank" rel="noopener" style="color:inherit;font-weight:700;">join our WhatsApp group</a>.</span>',
         showAddAnother: true
       });
     } else {
