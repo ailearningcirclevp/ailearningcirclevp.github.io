@@ -31,8 +31,8 @@ const sessions = [
     title: "Structuring Chaos: AI-Built Financial Models & Dashboards",
     tag: "Finance",
     date: "Sat, 14 Nov 2026",
-    duration: "3:00 – 3:45 PM · Germany time",
-    times: "Germany 3:00 PM · California 6:00 AM · Toronto 9:00 AM · UAE 6:00 PM · India 7:30 PM",
+    duration: "4:00 – 4:45 PM · Germany time",
+    times: "Germany 4:00 PM · California 7:00 AM · Toronto 10:00 AM · UAE 7:00 PM · India 8:30 PM",
     description: "Turn scattered, messy finance inputs into a structured financial model using AI, then extend it into an interactive dashboard. See how it connects to Power BI via Microsoft Copilot where organisational access allows, and what to delegate to AI and what should stay with you.",
     status: "open"
   },
